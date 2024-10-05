@@ -43,7 +43,7 @@ const LogIn = () => {
       if (response.ok) {
         console.log("Signup successful:", result);
         alert("SignUp successful");
-        router.push("/login");
+        setAction("")
       } else {
         console.error("Signup error:", result.message);
       }
