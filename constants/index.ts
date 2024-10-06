@@ -2,9 +2,10 @@
 // NAVIGATION
 export const NAV_LINKS = [
   { href: '/', key: 'home', label: 'Home' },
-  { href: '/resources', key: 'resources', label: 'Resources' },
   { href: '/schedules', key: 'schedules', label: 'Schedules' },
-  { href: '/tracker', key: 'tracker', label: 'Tracker' }
+  { href: '/resources', key: 'resources', label: 'Resources' },
+  { href: '/tracker', key: 'tracker', label: 'Tracker' },
+  { href: '/login', key: 'login', label: 'Log-In' }
 ];
 
 
@@ -70,8 +71,10 @@ export const FOOTER_LINKS = [
 export const FOOTER_CONTACT_INFO = {
   title: 'Contact Us',
   links: [
-    { label: 'Admin Officer', value: '123-456-7890' },
-    { label: 'Email Officer', value: 'hilink@akinthil.com' },
+    { label: 'Name', value: 'B M Yashwanth' },
+    { label: 'Email', value: 'bmyash1234@gmail.com' },
+    { label: 'Name', value: 'Bangeera Paveen Sudhakar' },
+    { label: 'Email', value: 'pavin@gmail.com' },
   ],
 };
 

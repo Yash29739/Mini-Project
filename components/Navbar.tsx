@@ -10,6 +10,8 @@ const Navbar = () => {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+    if(isMenuOpen){
+    }
   };
 
   return (
@@ -18,7 +20,7 @@ const Navbar = () => {
         <Image src="/logo.png" alt="logo" width={194} height={59} />
       </Link>
 
-      <ul className={`lg:flex h-full gap-12 ${isMenuOpen ? "flex" : "hidden"} lg:items-center`}>
+      <ul className={`lg:flex h-full hidden gap-12 ${isMenuOpen ? "flex" : "hidden"} lg:items-center`}>
         {NAV_LINKS.map((link) => (
           <li key={link.key}>
             <Link href={link.href} className="regular-16 text-gray-50 flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold" aria-label={link.label}>
@@ -51,11 +53,11 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="absolute top-14 right-0 bg-gray-800 shadow-lg rounded-lg z-50">
-          <ul className="flex flex-col p-4">
+          <div className="absolute top-14 text-white right-0 bg-gray-800 mt-[30px] shadow-lg rounded-lg z-50">
+          <ul className="flex flex-col p-4 ">
             {NAV_LINKS.map((link) => (
               <li key={link.key}>
-                <Link href={link.href} className="text-gray-50 py-2 block hover:bg-gray-700 transition-all" onClick={toggleMenu}>
+                <Link href={link.href} className="text-white py-2 block hover:bg-gray-700 hover:rounded-lg p-[20px]  transition-all" onClick={toggleMenu}>
                   {link.label}
                 </Link>
               </li>

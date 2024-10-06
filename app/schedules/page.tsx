@@ -1,8 +1,11 @@
+import Query from '@/components/Query'
 import React from 'react'
 
 const Schedules = () => {
   return (
-    <div>Schedules</div>
+    <div>
+      <Query/>
+    </div>
   )
 }
 

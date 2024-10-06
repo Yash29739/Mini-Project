@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react";
-import { FaUser,FaLock} from "react-icons/fa";
+import { FaUser } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { useRouter } from "next/navigation";
 
@@ -50,8 +50,7 @@ const ForgotPassword = () => {
               required
               className="w-full h-full bg-transparent outline-none border border-[3px] border-[#2c2c2c1a] rounded-full text-[20px] p-5 pl-5"
             />
-            <FaLock className="absolute right-5 top-1/2 transform -translate-y-1/2 text-[25px]" />
-          </div>
+            </div>
           <button
             type="submit"
             className="w-full h-[65px]  text-white bg-black border-2 border-gray-400 shadow-md cursor-pointer font-bold rounded-full text-[25px] hover:scale-105 transition-transform duration-300"

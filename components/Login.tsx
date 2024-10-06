@@ -129,7 +129,6 @@ const LogIn = () => {
               required
               className="w-full h-full bg-transparent outline-none border border-[3px] border-[#2c2c2c1a] rounded-full text-[20px] p-5 pl-5"
             />
-            <FaLock className="absolute right-5 top-1/2 transform -translate-y-1/2 text-[25px]" />
           </div>
           <div className="flex justify-between text-[20px] mb-6">
             <label>
@@ -204,8 +203,7 @@ const LogIn = () => {
               required
               className="w-full h-full bg-transparent outline-none border border-[3px] border-[#2c2c2c1a] rounded-full text-[20px] p-5 pl-5"
             />
-            <FaLock className="absolute right-5 top-1/2 transform -translate-y-1/2 text-[25px]" />
-          </div>
+            </div>
           <div className="flex justify-between text-[20px] mb-6">
             <label>
               <input type="checkbox" className="accent-white mr-2" /> I agree to
