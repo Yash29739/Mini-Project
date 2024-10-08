@@ -19,41 +19,41 @@ const ForgotPassword = () => {
     <div className="flex justify-center items-center m-[200px]">
       <div className="w-[450px]">
         <form >
-          <h1 className="text-[56px] text-center text-black-500 font-bold font-serif">
+          <h1 className="text-[45px] text-center text-black-500 font-bold font-serif">
             Forgot Password!!
           </h1>
-          <div className="relative w-full h-[70px] my-12">
+          <div className="relative w-full h-[70px] my-2">
             <input
               type="text"
               name="username"
               placeholder="Username"
               required
-              className="w-full h-full bg-transparent outline-none border border-[3px] border-[#2c2c2c1a] rounded-full text-[20px] p-5 pl-5"
+              className="w-full h-[50px] bg-transparent outline-none border border-[3px] border-[#2c2c2c1a] rounded-full text-[20px] p-5 pl-5"
             />
-            <FaUser className="absolute right-5 top-1/2 transform -translate-y-1/2 text-[25px]" />
+            <FaUser className="absolute right-4 top-6 transform -translate-y-1/2 text-[18px]" />
           </div>
-          <div className="relative w-full h-[70px] my-12">
+          <div className="relative w-full h-[70px] my-2">
             <input
               type="email"
               name="email"
               placeholder="Email"
               required
-              className="w-full h-full bg-transparent outline-none border border-[3px] border-[#2c2c2c1a] rounded-full text-[20px] p-5 pl-5"
+              className="w-full h-[50px] bg-transparent outline-none border border-[3px] border-[#2c2c2c1a] rounded-full text-[18px] p-5 pl-5"
             />
-            <MdEmail className="absolute right-5 top-1/2 transform -translate-y-1/2 text-[25px]" />
+            <MdEmail className="absolute right-4 top-6 transform -translate-y-1/2 text-[18px]" />
           </div>
-          <div className="relative w-full h-[70px] my-12">
+          <div className="relative w-full h-[70px] my-2">
           <input
               type="password"
               name="password"
               placeholder="Password"
               required
-              className="w-full h-full bg-transparent outline-none border border-[3px] border-[#2c2c2c1a] rounded-full text-[20px] p-5 pl-5"
+              className="w-full h-[50px] bg-transparent outline-none border border-[3px] border-[#2c2c2c1a] rounded-full text-[18px] p-5 pl-5"
             />
             </div>
           <button
             type="submit"
-            className="w-full h-[65px]  text-white bg-black border-2 border-gray-400 shadow-md cursor-pointer font-bold rounded-full text-[25px] hover:scale-105 transition-transform duration-300"
+            className="w-full h-[45px]  text-white bg-black border-2 border-gray-400 shadow-md cursor-pointer font-bold rounded-full text-[15px] hover:scale-105 transition-transform duration-300"
             onClick={handleReset}
           >
             Reset Password

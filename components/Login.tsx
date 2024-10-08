@@ -95,8 +95,8 @@ const LogIn = () => {
 
   return (
     <div
-      className={`relative w-[600px] ${
-        action === "active" ? "h-[750px]" : "h-[600px]"
+      className={`relative w-[500px] ${
+        action === "active" ? "h-[750px]" : "h-[700px]"
       } bg-transparent backdrop-blur-lg rounded-[10px] flex items-center transition-all ease-in-out duration-[1500ms] overflow-hidden text-black`}
     >
       {/* Login Form */}
@@ -106,8 +106,8 @@ const LogIn = () => {
         } transition-transform duration-[1500ms] ease-in-out`}
       >
         <form onSubmit={handleLogIn}>
-          <h1 className="text-[56px] text-center font-semibold font-serif">Log-In</h1>
-          <div className="relative w-full h-[70px] my-12">
+          <h6 className=" text-[35px] text-center font-semibold underline font-serif">Log-In</h6>
+          <div className="relative w-full h-[40px] my-10">
             <input
               type="text"
               name="username"
@@ -115,11 +115,11 @@ const LogIn = () => {
               value={loginData.username}
               onChange={handleLoginChange}
               required
-              className="w-full h-full bg-transparent outline-none border border-[3px] border-[#2c2c2c1a] rounded-full text-[20px] p-5 pl-5"
+              className="w-full h-[50px] bg-transparent outline-none border border-[3px] border-[#2c2c2c1a] rounded-full text-[15px] p-1 pl-5"
             />
-            <FaUser className="absolute right-5 top-1/2 transform -translate-y-1/2 text-[25px]" />
+            <FaUser className="absolute right-4 top-6 transform -translate-y-1/2 text-[18px]" />
           </div>
-          <div className="relative w-full h-[70px] my-12">
+          <div className="relative w-full h-[70px] ">
             <input
               type="password"
               name="password"
@@ -127,10 +127,10 @@ const LogIn = () => {
               value={loginData.password}
               onChange={handleLoginChange}
               required
-              className="w-full h-full bg-transparent outline-none border border-[3px] border-[#2c2c2c1a] rounded-full text-[20px] p-5 pl-5"
+              className="w-full h-[50px] bg-transparent outline-none border border-[3px] border-[#2c2c2c1a] rounded-full text-[15px] p-5 pl-5"
             />
           </div>
-          <div className="flex justify-between text-[20px] mb-6">
+          <div className="flex justify-between text-[12px] mb-6">
             <label>
               <input type="checkbox" className="accent-white mr-2" /> Remember
               Me
@@ -142,11 +142,11 @@ const LogIn = () => {
           </div>
           <button
             type="submit"
-            className="w-full h-[65px]  text-white bg-black border-2 border-gray-400 shadow-md cursor-pointer font-bold rounded-full text-[25px] hover:scale-105 transition-transform duration-300"
+            className="w-full h-[45px]  text-white bg-black border-2 border-gray-400 shadow-md cursor-pointer font-bold rounded-full text-[15px] hover:scale-105 transition-transform duration-300"
           >
             LogIn
           </button>
-          <div className="text-[20px] text-center my-7">
+          <div className="text-[13px] text-center my-7">
             <p>
               Don't have an Account?{" "}
               <a
@@ -168,8 +168,8 @@ const LogIn = () => {
         } transition-transform duration-[1500ms] ease-in-out`}
       >
         <form onSubmit={handleSignUp}>
-          <h1 className="text-[56px] text-center font-bold font-serif">Sign-Up</h1>
-          <div className="relative w-full h-[70px] my-12">
+          <h1 className="text-[35px] text-center font-bold underline font-serif">Sign-Up</h1>
+          <div className="relative w-full h-[40px] my-10">
             <input
               type="text"
               name="username"
@@ -177,11 +177,11 @@ const LogIn = () => {
               value={signupData.username}
               onChange={handleSignupChange}
               required
-              className="w-full h-full bg-transparent outline-none border border-[3px] border-[#2c2c2c1a] rounded-full text-[20px] p-5 pl-5"
+              className="w-full h-[50px] bg-transparent outline-none border border-[3px] border-[#2c2c2c1a] rounded-full text-[15px] p-5 pl-5"
             />
-            <FaUser className="absolute right-5 top-1/2 transform -translate-y-1/2 text-[25px]" />
+            <FaUser className="absolute right-4 top-6 transform -translate-y-1/2 text-[18px]" />
           </div>
-          <div className="relative w-full h-[70px] my-12">
+          <div className="relative w-full h-[50px] my-8">
             <input
               type="email"
               name="email"
@@ -189,11 +189,11 @@ const LogIn = () => {
               value={signupData.email}
               onChange={handleSignupChange}
               required
-              className="w-full h-full bg-transparent outline-none border border-[3px] border-[#2c2c2c1a] rounded-full text-[20px] p-5 pl-5"
+              className="w-full h-full bg-transparent outline-none border border-[3px] border-[#2c2c2c1a] rounded-full text-[15px] p-5 pl-5"
             />
-            <MdEmail className="absolute right-5 top-1/2 transform -translate-y-1/2 text-[25px]" />
+            <MdEmail className="absolute right-4 top-6 transform -translate-y-1/2 text-[18px]" />
           </div>
-          <div className="relative w-full h-[70px] my-12">
+          <div className="relative w-full h-[70px] ">
             <input
               type="password"
               name="password"
@@ -201,22 +201,22 @@ const LogIn = () => {
               value={signupData.password}
               onChange={handleSignupChange}
               required
-              className="w-full h-full bg-transparent outline-none border border-[3px] border-[#2c2c2c1a] rounded-full text-[20px] p-5 pl-5"
+              className="w-full h-[50px] bg-transparent outline-none border border-[3px] border-[#2c2c2c1a] rounded-full text-[15px] p-5 pl-5"
             />
             </div>
-          <div className="flex justify-between text-[20px] mb-6">
+          <div className="flex justify-between text-[12px] mb-5">
             <label>
-              <input type="checkbox" className="accent-white mr-2" /> I agree to
+              <input type="checkbox" className="accent-white mr-1" /> I agree to
               the terms & conditions
             </label>
           </div>
           <button
             type="submit"
-            className="w-full h-[65px] bg-black border-2 border-gray-400 shadow-md cursor-pointer text-white font-bold rounded-full text-[25px] hover:scale-105 transition-transform duration-300"
+            className="w-full h-[45px] bg-black border-2 border-gray-400 shadow-md cursor-pointer text-white font-bold rounded-full text-[15px] hover:scale-105 transition-transform duration-300"
           >
             SignUp
           </button>
-          <div className="text-[20px] text-center my-7">
+          <div className="text-[13px] text-center my-5">
             <p>
               Have an Account Already?{" "}
               <a

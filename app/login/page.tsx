@@ -1,13 +1,12 @@
-// app/login/page.tsx
+import LogIn from '@/components/Login'
+import React from 'react'
 
-import LogIn from '../../components/Login';
-
-const LoginPage = () => {
+const page = () => {
   return (
     <div className="flex justify-center items-center min-h-screen">
-      <LogIn />
+        <LogIn/>
     </div>
-  );
-};
+  )
+}
 
-export default LoginPage;
+export default page
