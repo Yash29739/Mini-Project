@@ -11,14 +11,62 @@ const Query = () => {
     workScreenTime:"",
     workTimeBreaks:"",
     primaryGoal:"",
-    activityPriority:"",
+    activityPriority1:"",
+    activityPriority2:"",
+    activityPriority3:"",
+    activityPriority4:"",
+    activityPriority5:"",
     challengingTask:"",
     whatHelp:""
   });
 
   // Handle form submission
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    // Sending survey to backend to store
+    try {
+      const responsedata = {responses}
+      const response = await fetch(
+        "https://digital-detox-y73b.onrender.com/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(responsedata),
+        }
+      );
+
+      const result = await response.json();
+
+      if (response.ok) {
+        console.log("Signup successful:", result);
+        alert("SignUp successful");
+        setResponses({
+          screenTime: "",
+          screenActivity: "",
+          socialMediaTime: "",
+          socialMediaStrategy: "",
+          workScreenTime: "",
+          workTimeBreaks: "",
+          primaryGoal: "",
+          activityPriority1:"",
+          activityPriority2:"",
+          activityPriority3:"",
+          activityPriority4:"",
+          activityPriority5:"",
+          challengingTask: "",
+          whatHelp: ""
+        });
+      } else {
+        console.error("Signup error:", result.message);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+
     alert("Successfully submitted the survey");
     console.log("User Responses:", responses);
   };
@@ -231,7 +279,7 @@ const Query = () => {
                 </h2>
                 <div className="mb-4">
                   <label className="block text-gray-700 mb-2">
-                    How much of your screen time is work-related?
+                  What is your primary goal for a digital detox?
                   </label>
                   <div className="space-y-2">
                     {[
@@ -255,7 +303,7 @@ const Query = () => {
                 </div>
 
                 <div>
-                  <label className="block text-gray-700 mb-2">v</label>
+                  <label className="block text-gray-700 mb-2">Which activities do you want to prioritize 1st during your detox?</label>
                   <div className="space-y-2">
                     {[
                       "Physical exercise",
@@ -267,7 +315,99 @@ const Query = () => {
                       <label key={option} className="flex items-center">
                         <input
                           type="radio"
-                          name="activityPriority"
+                          name="activityPriority1"
+                          value={option}
+                          onChange={handleChange}
+                          className="mr-2"
+                        />
+                        {option}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-gray-700 mb-2">Which activities do you want to prioritize 2nd during your detox?</label>
+                  <div className="space-y-2">
+                    {[
+                      "Physical exercise",
+                      "Spending time with family/friends",
+                      "Reading",
+                      "Meditation/mindfulness",
+                      "Outdoor activities",
+                    ].map((option) => (
+                      <label key={option} className="flex items-center">
+                        <input
+                          type="radio"
+                          name="activityPriority2"
+                          value={option}
+                          onChange={handleChange}
+                          className="mr-2"
+                        />
+                        {option}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-gray-700 mb-2">Which activities do you want to prioritize 3rd during your detox?</label>
+                  <div className="space-y-2">
+                    {[
+                      "Physical exercise",
+                      "Spending time with family/friends",
+                      "Reading",
+                      "Meditation/mindfulness",
+                      "Outdoor activities",
+                    ].map((option) => (
+                      <label key={option} className="flex items-center">
+                        <input
+                          type="radio"
+                          name="activityPriority3"
+                          value={option}
+                          onChange={handleChange}
+                          className="mr-2"
+                        />
+                        {option}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-gray-700 mb-2">Which activities do you want to prioritize 4th during your detox?</label>
+                  <div className="space-y-2">
+                    {[
+                      "Physical exercise",
+                      "Spending time with family/friends",
+                      "Reading",
+                      "Meditation/mindfulness",
+                      "Outdoor activities",
+                    ].map((option) => (
+                      <label key={option} className="flex items-center">
+                        <input
+                          type="radio"
+                          name="activityPriority4"
+                          value={option}
+                          onChange={handleChange}
+                          className="mr-2"
+                        />
+                        {option}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-gray-700 mb-2">Which activities do you want to prioritize 5th during your detox?</label>
+                  <div className="space-y-2">
+                    {[
+                      "Physical exercise",
+                      "Spending time with family/friends",
+                      "Reading",
+                      "Meditation/mindfulness",
+                      "Outdoor activities",
+                    ].map((option) => (
+                      <label key={option} className="flex items-center">
+                        <input
+                          type="radio"
+                          name="activityPriority5"
                           value={option}
                           onChange={handleChange}
                           className="mr-2"

@@ -59,7 +59,8 @@ const LogIn = () => {
 
     try {
       const response = await fetch(
-        "https://digital-detox-y73b.onrender.com/auth",
+        // "https://digital-detox-y73b.onrender.com/auth",
+        "http://localhost:3000/auth",
         {
           method: "POST",
           headers: {
