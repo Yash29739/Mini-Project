@@ -3,6 +3,7 @@ import Features from "@/components/Features";
 import GetApp from "@/components/GetApp";
 import Guide from "@/components/Guide";
 import Hero from "@/components/Hero";
+import Navbar from "@/components/Navbar";
 
 export default function Home() {
   return (
@@ -14,5 +15,5 @@ export default function Home() {
       <GetApp />
       <h1>Home Page</h1>
     </>
-  )
+  );
 }

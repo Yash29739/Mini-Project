@@ -1,5 +1,5 @@
 "use client";
-
+import { useLogin } from "@/context/LoginContext";
 import React, { useState } from "react";
 import { FaUser, FaLock } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
@@ -14,6 +14,8 @@ const LogIn = () => {
     email: "",
     password: "",
   });
+
+  const { setIsLoggedIn } = useLogin(); // Use the context to set login state
   const router = useRouter();
 
   // Toggle between login and signup form
@@ -43,7 +45,7 @@ const LogIn = () => {
       if (response.ok) {
         console.log("Signup successful:", result);
         alert("SignUp successful");
-        setAction("")
+        setAction("");
       } else {
         console.error("Signup error:", result.message);
       }
@@ -75,6 +77,8 @@ const LogIn = () => {
       if (response.ok) {
         console.log("Login successful:", result);
         alert("Login successful");
+
+        setIsLoggedIn(true); // Set the user as logged in
         router.push("/");
       } else {
         console.error("Login error:", result.message);
@@ -106,7 +110,9 @@ const LogIn = () => {
         } transition-transform duration-[1500ms] ease-in-out`}
       >
         <form onSubmit={handleLogIn}>
-          <h6 className=" text-[35px] text-center font-semibold underline font-serif">Log-In</h6>
+          <h6 className=" text-[35px] text-center font-semibold underline font-serif">
+            Log-In
+          </h6>
           <div className="relative w-full h-[40px] my-10">
             <input
               type="text"
@@ -135,10 +141,12 @@ const LogIn = () => {
               <input type="checkbox" className="accent-white mr-2" /> Remember
               Me
             </label>
-            <Link href="/ForgotPassword" className="text-black hover:underline cursor-pointer">
-               Forgot password?
+            <Link
+              href="/ForgotPassword"
+              className="text-black hover:underline cursor-pointer"
+            >
+              Forgot password?
             </Link>
-
           </div>
           <button
             type="submit"
@@ -168,7 +176,9 @@ const LogIn = () => {
         } transition-transform duration-[1500ms] ease-in-out`}
       >
         <form onSubmit={handleSignUp}>
-          <h1 className="text-[35px] text-center font-bold underline font-serif">Sign-Up</h1>
+          <h1 className="text-[35px] text-center font-bold underline font-serif">
+            Sign-Up
+          </h1>
           <div className="relative w-full h-[40px] my-10">
             <input
               type="text"
@@ -203,7 +213,7 @@ const LogIn = () => {
               required
               className="w-full h-[50px] bg-transparent outline-none border border-[3px] border-[#2c2c2c1a] rounded-full text-[15px] p-5 pl-5"
             />
-            </div>
+          </div>
           <div className="flex justify-between text-[12px] mb-5">
             <label>
               <input type="checkbox" className="accent-white mr-1" /> I agree to
@@ -224,7 +234,7 @@ const LogIn = () => {
                 onClick={logInLink}
                 className="text-black font-semibold hover:underline"
               >
-                Log-In
+                LogIn
               </a>
             </p>
           </div>

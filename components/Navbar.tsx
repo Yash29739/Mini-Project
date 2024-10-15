@@ -1,44 +1,14 @@
 "use client";
 import { NAV_LINKS } from "@/constants";
 import Image from "next/image";
+import { useLogin } from "@/context/LoginContext";
 import Link from "next/link";
 import { useState } from "react";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false); // State to manage mobile menu
-  const [loggedIn, setloggedIn] = useState(false);
 
-  // Handle login functionality
-  const handleLogIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Entered the Log-In function");
-
-    try {
-      const response = await fetch(
-        "https://digital-detox-y73b.onrender.com/refresh",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-
-      const result = await response.json();
-
-      if (response.ok) {
-        console.log("Profile exists");
-        setloggedIn(result.loggedIn); // Set login state to true
-      } else {
-        console.error("Login error:", result.message);
-      }
-    } catch (error) {
-      console.error("An error occurred:", error);
-    }
-  };
-
-  // Handle menu toggle for mobile view
+  const { isLoggedIn,logout } = useLogin();
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -46,7 +16,7 @@ const Navbar = () => {
   return (
     <nav className="flexBetween max-container padding-container relative z-30 py-5">
       <Link href="/" aria-label="Home">
-        <Image src="/logo.png" alt="logo" width={194} height={59} />
+        <Image src="/logo.png" alt="logo" width={154} height={59} />
       </Link>
 
       <ul
@@ -86,36 +56,48 @@ const Navbar = () => {
             Tracker
           </Link>
         </li>
-      </ul>
 
-      {/* Render Login/Profile Button */}
-      <div className="md:flex hidden md:items-center">
-        {!loggedIn ? (
-          // Render login button when not logged in
-          <button
-            className="flexCenter gap-2 px-3 py-2 border-yellow-400 hover:border-red-50 hover:bg-slate-900 bg-slate-950 text-white rounded-2xl border btn"
-            onClick={handleLogIn} // Trigger login logic
-          >
-            <Image src="/user.svg" alt="Login" width={20} height={14} />
-            <label className="bold-10 whitespace-nowrap cursor-pointer">
-              LogIn
-            </label>
-          </button>
-        ) : (
-          // Render profile icon when logged in
-          <Link href="/profile">
-            <button
-              className="flexCenter gap-2 px-3 py-2 border-yellow-400 hover:border-red-50 hover:bg-slate-900 bg-slate-950 text-white rounded-2xl border btn"
-              type="button"
-            >
-              <Image src="/user.svg" alt="Profile" width={20} height={20} />
-              <label className="bold-10 whitespace-nowrap cursor-pointer">
-                Profile
-              </label>
-            </button>
-          </Link>
-        )}
-      </div>
+        <li>
+          {isLoggedIn ?  (
+            // Render profile icon and logout when logged in
+            <div className="flex items-center">
+              <Link href="/profile">
+                <button
+                  className="flexCenter gap-2 px-5 py-2 border-yellow-400 hover:border-red-50 hover:bg-slate-900 bg-slate-950 text-white rounded-2xl border btn"
+                  type="button"
+                >
+                  <Image src="/user.svg" alt="Profile" width={20} height={20} />
+                  <label className="bold-10 whitespace-nowrap cursor-pointer">
+                    Profile
+                  </label>
+                </button>
+              </Link>
+              <button
+                onClick={logout} // Call logout function on click
+                className="ml-4 flexCenter gap-2 px-5 py-2 border-red-600 hover:border-red-50 hover:bg-red-600 bg-red-700 text-white rounded-2xl border btn"
+              >
+                <Image src="logout.svg" alt="Logout" width={20} height={20} />
+                <label className="bold-10 whitespace-nowrap cursor-pointer">
+                  Logout
+                </label>
+              </button>
+            </div>
+          ): (
+            // Render login button when not logged in
+            <Link href="/login">
+              <button
+                className="flexCenter gap-2 px-3 py-2 border-yellow-400 hover:border-red-50 hover:bg-slate-900 bg-slate-950 text-white rounded-2xl border btn"
+                type="button"
+              >
+                <Image src="/user.svg" alt="Login" width={20} height={14} />
+                <label className="bold-10 whitespace-nowrap cursor-pointer">
+                  LogIn
+                </label>
+              </button>
+            </Link>
+          )}
+        </li>
+      </ul>
 
       {/* Mobile Menu Button */}
       <button
@@ -135,18 +117,76 @@ const Navbar = () => {
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="absolute top-14 text-white right-0 bg-gray-800 mt-[30px] shadow-lg rounded-lg z-50">
-          <ul className="flex flex-col p-4">
-            {NAV_LINKS.map((link) => (
-              <li key={link.key}>
-                <Link
-                  href={link.href}
-                  className="text-white py-2 block hover:bg-gray-700 hover:rounded-lg p-[20px]  transition-all"
-                  onClick={toggleMenu}
-                >
-                  {link.label}
+          <ul className="flex flex-col p-4 ">
+            <li>
+              <Link
+                href="/"
+                className="text-white py-2 block hover:bg-gray-700 hover:rounded-lg p-[20px] transition-all"
+                onClick={toggleMenu}
+              >
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/schedules"
+                className="text-white py-2 block hover:bg-gray-700 hover:rounded-lg p-[20px] transition-all"
+                onClick={toggleMenu}
+              >
+                Schedules
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/resources"
+                className="text-white py-2 block hover:bg-gray-700 hover:rounded-lg p-[20px] transition-all"
+                onClick={toggleMenu}
+              >
+                Resources
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/tracker"
+                className="text-white py-2 block hover:bg-gray-700 hover:rounded-lg p-[20px] transition-all"
+                onClick={toggleMenu}
+              >
+                Tracker
+              </Link>
+            </li>
+            <li className="flex flex-col justify-center">
+              {isLoggedIn ?  (
+                // Render profile icon and logout button when logged in
+                <div className="flex flex-col">
+                  <Link href="/profile" className="text-white py-2 block hover:bg-gray-700 hover:rounded-lg p-[20px] transition-all">
+                  <div className="flex gap-2">
+                      <Image src="/user.svg" alt="Logout" width={20} height={20} />
+                      <label className="bold-10 whitespace-nowrap cursor-pointer">
+                        Profile
+                      </label>
+                    </div>
+                  </Link>
+                  <button
+                    onClick={logout} // Call logout function on click
+                    className="text-white py-2 block hover:bg-red-600 hover:rounded-lg p-[20px] transition-all"
+                  >
+                    <div className="flex gap-2">
+                      <Image src="/logout.svg" alt="Logout" width={20} height={20} />
+                      <label className="bold-10 whitespace-nowrap cursor-pointer">
+                        Logout
+                      </label>
+                    </div>
+                  </button>
+                </div>
+              ) : (
+                // Render login button when not logged in
+                <Link href="/login" className="text-white py-2 block hover:bg-gray-700 hover:rounded-lg p-[20px] transition-all">
+                    <label className="bold-10 whitespace-nowrap cursor-pointer">
+                      LogIn
+                    </label>
                 </Link>
-              </li>
-            ))}
+              )}
+            </li>
           </ul>
         </div>
       )}
