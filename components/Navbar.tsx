@@ -180,10 +180,13 @@ const Navbar = () => {
                 </div>
               ) : (
                 // Render login button when not logged in
-                <Link href="/login" className="text-white py-2 block hover:bg-gray-700 hover:rounded-lg p-[20px] transition-all">
-                    <label className="bold-10 whitespace-nowrap cursor-pointer">
-                      LogIn
-                    </label>
+                <Link href="/login" className=" hover:bg-green-600 text-white py-2 block hover:rounded-lg p-[20px] transition-all">
+                    <div className="flex gap-2">
+                      <Image src="/user.svg" alt="Logout" width={20} height={20} />
+                      <label className="bold-10 whitespace-nowrap cursor-pointer">
+                        Login
+                      </label>
+                    </div>
                 </Link>
               )}
             </li>

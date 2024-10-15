@@ -25,7 +25,23 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
   const login = () => setIsLoggedIn(true);
   
   // Define the logout function
-  const logout = () => setIsLoggedIn(false);
+  const logout = async() =>{
+    try {
+      const response = await fetch(
+        "https://digital-detox-y73b.onrender.com/logout",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include"
+        }
+      );
+      setIsLoggedIn(false)
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  } 
 
   return (
     <LoginContext.Provider value={{ isLoggedIn, setIsLoggedIn, login, logout }}>
