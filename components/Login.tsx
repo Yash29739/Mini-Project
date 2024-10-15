@@ -1,3 +1,5 @@
+// LogIn.jsx
+
 "use client";
 import { useLogin } from "@/context/LoginContext";
 import React, { useState } from "react";
@@ -5,6 +7,7 @@ import { FaUser, FaLock } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import LoadingSpinner from "@/components/LoadingSpinner"; // Import the loading spinner component
 
 const LogIn = () => {
   const [action, setAction] = useState("");
@@ -14,8 +17,9 @@ const LogIn = () => {
     email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false); // Loading state
 
-  const { setIsLoggedIn } = useLogin(); // Use the context to set login state
+  const { setIsLoggedIn } = useLogin();
   const router = useRouter();
 
   // Toggle between login and signup form
@@ -25,7 +29,7 @@ const LogIn = () => {
   // Handle signup form submission
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Entered the Sign-Up function");
+    setLoading(true); // Set loading state to true when signup starts
 
     try {
       const response = await fetch(
@@ -41,9 +45,7 @@ const LogIn = () => {
       );
 
       const result = await response.json();
-
       if (response.ok) {
-        console.log("Signup successful:", result);
         alert("SignUp successful");
         setAction("");
       } else {
@@ -51,13 +53,15 @@ const LogIn = () => {
       }
     } catch (error) {
       console.error("An error occurred:", error);
+    } finally {
+      setLoading(false); // Set loading state to false when signup is done
     }
   };
 
   // Handle login form submission
   const handleLogIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Entered the Log-In function");
+    setLoading(true); // Set loading state to true when login starts
 
     try {
       const response = await fetch(
@@ -73,18 +77,17 @@ const LogIn = () => {
       );
 
       const result = await response.json();
-
       if (response.ok) {
-        console.log("Login successful:", result);
         alert("Login successful");
-
-        setIsLoggedIn(true); // Set the user as logged in
+        setIsLoggedIn(true);
         router.push("/");
       } else {
         console.error("Login error:", result.message);
       }
     } catch (error) {
       console.error("An error occurred:", error);
+    } finally {
+      setLoading(false); // Set loading state to false when login is done
     }
   };
 
@@ -110,7 +113,7 @@ const LogIn = () => {
         } transition-transform duration-[1500ms] ease-in-out`}
       >
         <form onSubmit={handleLogIn}>
-          <h6 className=" text-[35px] text-center font-semibold underline font-serif">
+          <h6 className="text-[35px] text-center font-semibold underline font-serif">
             Log-In
           </h6>
           <div className="relative w-full h-[40px] my-10">
@@ -150,9 +153,9 @@ const LogIn = () => {
           </div>
           <button
             type="submit"
-            className="w-full h-[45px]  text-white bg-black border-2 border-gray-400 shadow-md cursor-pointer font-bold rounded-full text-[15px] hover:scale-105 transition-transform duration-300"
+            className="w-full h-[45px] text-white bg-black border-2 border-gray-400 shadow-md cursor-pointer font-bold rounded-full text-[15px] hover:scale-105 transition-transform duration-300"
           >
-            LogIn
+            {loading ? <LoadingSpinner /> : "Log In"}
           </button>
           <div className="text-[13px] text-center my-7">
             <p>
@@ -222,19 +225,19 @@ const LogIn = () => {
           </div>
           <button
             type="submit"
-            className="w-full h-[45px] bg-black border-2 border-gray-400 shadow-md cursor-pointer text-white font-bold rounded-full text-[15px] hover:scale-105 transition-transform duration-300"
+            className="w-full h-[45px] text-white bg-black border-2 border-gray-400 shadow-md cursor-pointer font-bold rounded-full text-[15px] hover:scale-105 transition-transform duration-300"
           >
-            SignUp
+            {loading ? <LoadingSpinner /> : "Sign Up"}
           </button>
-          <div className="text-[13px] text-center my-5">
+          <div className="text-[13px] text-center my-7">
             <p>
-              Have an Account Already?{" "}
+              Already have an Account?{" "}
               <a
                 href="#"
                 onClick={logInLink}
                 className="text-black font-semibold hover:underline"
               >
-                LogIn
+                Log In
               </a>
             </p>
           </div>
