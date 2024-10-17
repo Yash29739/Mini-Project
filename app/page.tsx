@@ -1,19 +1,9 @@
-import Camp from "@/components/Camp";
-import Features from "@/components/Features";
-import GetApp from "@/components/GetApp";
-import Guide from "@/components/Guide";
-import Hero from "@/components/Hero";
-import Navbar from "@/components/Navbar";
+import Homy from "@/components/Home";
 
-export default function Home() {
+export default function home() {
   return (
     <>
-      <Hero />
-      <Camp />
-      <Guide />
-      <Features />
-      <GetApp />
-      <h1>Home Page</h1>
+    <Homy/>
     </>
   );
 }
