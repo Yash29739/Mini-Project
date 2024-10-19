@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IoIosCloseCircle } from "react-icons/io";
 
 const Query = () => {
@@ -20,6 +20,46 @@ const Query = () => {
     whatHelp:""
   });
 
+   // Fetch existing survey responses on component mount
+   useEffect(() => {
+    const fetchSurveyResponses = async () => {
+      try {
+        const response = await fetch(
+          "https://digital-detox-y73b.onrender.com/survey", // Replace with actual API endpoint
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
+
+        // Check if response is OK
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+
+        const result = await response.json();
+
+        // Log the entire response for debugging
+        console.log("Fetched survey data:", result);
+
+        // Ensure result contains the correct data structure
+        if (result && result.foundSurvey.responses) {
+          setResponses(result.foundSurvey.responses);
+        } else {
+          console.warn("No responses found in the fetched data");
+        }
+      } catch (error) {
+        console.error("Error fetching survey responses:", error);
+      }
+    };
+
+    fetchSurveyResponses();
+  }, []); // Empty dependency array means this effect runs once on component mount
+
+
   // Handle form submission
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -28,7 +68,7 @@ const Query = () => {
     try {
       const responsedata = {responses}
       const response = await fetch(
-        "https://digital-detox-y73b.onrender.com/register",
+        "https://digital-detox-y73b.onrender.com/survey",
         {
           method: "POST",
           headers: {
