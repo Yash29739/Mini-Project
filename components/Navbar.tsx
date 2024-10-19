@@ -1,5 +1,4 @@
 "use client";
-import { NAV_LINKS } from "@/constants";
 import Image from "next/image";
 import { useLogin } from "@/context/LoginContext";
 import Link from "next/link";
@@ -14,7 +13,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="flexBetween max-container padding-container relative z-30 bg-black">
+    <nav className="flexBetween max-container w-full padding-container relative z-30 bg-black">
       <Link href="/" aria-label="Home">
         <Image src="/logo.png" alt="logo" width={154} height={59} />
       </Link>
@@ -27,7 +26,7 @@ const Navbar = () => {
         <li>
           <Link
             href="/"
-            className="regular-16 text-gray-50 flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold"
+            className="regular-16 text-white flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold"
           >
             Home
           </Link>
@@ -35,7 +34,7 @@ const Navbar = () => {
         <li>
           <Link
             href="/schedules"
-            className="regular-16 text-gray-50 flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold"
+            className="regular-16 text-white flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold"
           >
             Schedules
           </Link>
@@ -43,7 +42,7 @@ const Navbar = () => {
         <li>
           <Link
             href="/resources"
-            className="regular-16 text-gray-50 flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold"
+            className="regular-16 text-white flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold"
           >
             Resources
           </Link>
@@ -51,7 +50,7 @@ const Navbar = () => {
         <li>
           <Link
             href="/tracker"
-            className="regular-16 text-gray-50 flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold"
+            className="regular-16 text-white flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold"
           >
             Tracker
           </Link>
@@ -63,7 +62,7 @@ const Navbar = () => {
             <div className="flex items-center">
               <Link href="/profile">
                 <button
-                  className="flexCenter gap-2 px-5 py-2 border-yellow-400 hover:border-red-50 hover:bg-slate-900 bg-slate-950 text-white rounded-2xl border btn"
+                  className="flexCenter gap-2 px-5 py-2 hover:border-white border-none  bg-green-700 text-white rounded-2xl border "
                   type="button"
                 >
                   <Image src="/user.svg" alt="Profile" width={20} height={20} />
@@ -74,7 +73,7 @@ const Navbar = () => {
               </Link>
               <button
                 onClick={logout} // Call logout function on click
-                className="ml-4 flexCenter gap-2 px-5 py-2 border-red-600 hover:border-red-50 hover:bg-red-600 bg-red-700 text-white rounded-2xl border btn"
+                className="ml-4 flexCenter gap-2 px-5 py-2 border-red-600 hover:border-white hover:bg-red-600 bg-red-700 text-white rounded-2xl border btn"
               >
                 <Image src="logout.svg" alt="Logout" width={20} height={20} />
                 <label className="bold-10 whitespace-nowrap cursor-pointer">
@@ -86,7 +85,7 @@ const Navbar = () => {
             // Render login button when not logged in
             <Link href="/login">
               <button
-                className="flexCenter gap-2 px-3 py-2 border-yellow-400 hover:border-red-50 hover:bg-slate-900 bg-slate-950 text-white rounded-2xl border btn"
+                className="flexCenter gap-2 px-3 py-2  hover:border-red-50  bg-green-700 text-white rounded-2xl border btn"
                 type="button"
               >
                 <Image src="/user.svg" alt="Login" width={20} height={14} />
