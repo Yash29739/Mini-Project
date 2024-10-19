@@ -13,9 +13,6 @@ const Query = () => {
     primaryGoal:"",
     activityPriority1:"",
     activityPriority2:"",
-    activityPriority3:"",
-    activityPriority4:"",
-    activityPriority5:"",
     challengingTask:"",
     whatHelp:""
   });
@@ -54,9 +51,6 @@ const Query = () => {
           primaryGoal: "",
           activityPriority1:"",
           activityPriority2:"",
-          activityPriority3:"",
-          activityPriority4:"",
-          activityPriority5:"",
           challengingTask: "",
           whatHelp: ""
         });
@@ -339,75 +333,6 @@ const Query = () => {
                         <input
                           type="radio"
                           name="activityPriority2"
-                          value={option}
-                          onChange={handleChange}
-                          className="mr-2"
-                        />
-                        {option}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-gray-700 mb-2">Which activities do you want to prioritize 3rd during your detox?</label>
-                  <div className="space-y-2">
-                    {[
-                      "Physical exercise",
-                      "Spending time with family/friends",
-                      "Reading",
-                      "Meditation/mindfulness",
-                      "Outdoor activities",
-                    ].map((option) => (
-                      <label key={option} className="flex items-center">
-                        <input
-                          type="radio"
-                          name="activityPriority3"
-                          value={option}
-                          onChange={handleChange}
-                          className="mr-2"
-                        />
-                        {option}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-gray-700 mb-2">Which activities do you want to prioritize 4th during your detox?</label>
-                  <div className="space-y-2">
-                    {[
-                      "Physical exercise",
-                      "Spending time with family/friends",
-                      "Reading",
-                      "Meditation/mindfulness",
-                      "Outdoor activities",
-                    ].map((option) => (
-                      <label key={option} className="flex items-center">
-                        <input
-                          type="radio"
-                          name="activityPriority4"
-                          value={option}
-                          onChange={handleChange}
-                          className="mr-2"
-                        />
-                        {option}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-gray-700 mb-2">Which activities do you want to prioritize 5th during your detox?</label>
-                  <div className="space-y-2">
-                    {[
-                      "Physical exercise",
-                      "Spending time with family/friends",
-                      "Reading",
-                      "Meditation/mindfulness",
-                      "Outdoor activities",
-                    ].map((option) => (
-                      <label key={option} className="flex items-center">
-                        <input
-                          type="radio"
-                          name="activityPriority5"
                           value={option}
                           onChange={handleChange}
                           className="mr-2"
