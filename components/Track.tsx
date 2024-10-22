@@ -1,24 +1,25 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
+import AreaChart from '@/components/AreaChartComponent';
 
 const Track = () => {
-  const [appName, setAppName] = useState("");
-  const [screenTime, setScreenTime] = useState("");
-  const [date, setDate] = useState("");
+  const [appName, setAppName] = useState('');
+  const [screenTime, setScreenTime] = useState('');
+  const [date, setDate] = useState('');
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
     try {
       const response = await fetch(
-        "https://digital-detox-y73b.onrender.com/tracker",
+        'https://digital-detox-y73b.onrender.com/tracker',
         {
-          method: "POST",
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
-          credentials: "include",
+          credentials: 'include',
           body: JSON.stringify({
             trackingInfo: {
               weeklyusage: {
@@ -31,15 +32,15 @@ const Track = () => {
       );
 
       if (response.ok) {
-        alert("Screen time data saved!");
+        alert('Screen time data saved!');
       } else {
         const errorData = await response.json();
-        console.error("Error:", errorData);
-        alert("Error saving data inn err");
+        console.error('Error:', errorData);
+        alert('Error saving data');
       }
     } catch (error) {
-      console.error("Error:", error);
-      alert("Error saving data");
+      console.error('Error:', error);
+      alert('Error saving data');
     }
   };
 
@@ -49,14 +50,10 @@ const Track = () => {
         onSubmit={handleSubmit}
         className="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg"
       >
-        <h2 className="text-2xl font-semibold mb-4 text-center">
-          Track Screen Time
-        </h2>
+        <h2 className="text-2xl font-semibold mb-4 text-center">Track Screen Time</h2>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            App Name
-          </label>
+          <label className="block text-sm font-medium text-gray-700">App Name</label>
           <input
             type="text"
             value={appName}
@@ -67,9 +64,7 @@ const Track = () => {
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Screen Time (hrs)
-          </label>
+          <label className="block text-sm font-medium text-gray-700">Screen Time (hrs)</label>
           <input
             type="number"
             value={screenTime}
@@ -80,9 +75,7 @@ const Track = () => {
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Date
-          </label>
+          <label className="block text-sm font-medium text-gray-700">Date</label>
           <input
             type="date"
             value={date}
@@ -99,9 +92,16 @@ const Track = () => {
           Submit
         </button>
       </form>
-      <div className="grid">
-        
-      </div>
+
+      {/* Chart Section */}
+      <main className="flex min-h-screen flex-col items-center justify-center px-4 md:px-8 xl:px-10 py-44">
+        <div className="grid xl:grid-cols-3 lg:grid-cols-2 w-full gap-10 max-w-[1400px]">
+          <div className="col-span-1">
+            {/* Chart Rendering */}
+            <AreaChart />
+          </div>
+        </div>
+      </main>
     </div>
   );
 };
