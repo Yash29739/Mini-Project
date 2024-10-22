@@ -1,10 +1,10 @@
-import Navbar from '@/components/Navbar'
+import Track from '@/components/Track'
 import React from 'react'
 
 const Tracker = () => {
   return (
     <div>
-      Tracker
+      <Track/>
     </div>
   )
 }
