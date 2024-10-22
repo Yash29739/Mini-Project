@@ -1,91 +1,33 @@
-'use client'; // This ensures it's only rendered on the client
-
+// components/ScreenTimeGraph.tsx
 import React from 'react';
-import {
-  AreaChart,
-  Area,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-} from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-// Example data for the chart
-const productSales = [
-  { name: 'Jan', product1: 4000, product2: 2400 },
-  { name: 'Feb', product1: 3000, product2: 2210 },
-  { name: 'Mar', product1: 2000, product2: 2290 },
-  { name: 'Apr', product1: 2780, product2: 2000 },
-  { name: 'May', product1: 1890, product2: 2181 },
-  { name: 'Jun', product1: 2390, product2: 2500 },
+// Example data for screen time
+const data = [
+  { day: 'Monday', screenTime: 2 },
+  { day: 'Tuesday', screenTime: 3.5 },
+  { day: 'Wednesday', screenTime: 4 },
+  { day: 'Thursday', screenTime: 2.8 },
+  { day: 'Friday', screenTime: 5 },
+  { day: 'Saturday', screenTime: 1.5 },
+  { day: 'Sunday', screenTime: 3 },
 ];
 
-// Define custom tooltip props with TypeScript
-interface CustomTooltipProps {
-  active?: boolean;
-  payload?: Array<{ value: number }>;
-  label?: string;
-}
-
-// CustomTooltip component
-const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label }) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="p-4 bg-slate-900 flex flex-col gap-4 rounded-md">
-        <p className="text-medium text-lg">{label}</p>
-        <p className="text-sm text-blue-400">
-          Product 1:
-          <span className="ml-2">${payload[0].value}</span>
-        </p>
-        <p className="text-sm text-indigo-400">
-          Product 2:
-          <span className="ml-2">${payload[1].value}</span>
-        </p>
-      </div>
-    );
-  }
-
-  return null; // Ensure that the tooltip returns null if not active
-};
-
-// Main AreaChartComponent
-const AreaChartComponent: React.FC = () => {
+const ScreenTimeGraph: React.FC = () => {
   return (
-    <ResponsiveContainer width="100%" height="100%">
-      <AreaChart
-        width={500}
-        height={400}
-        data={productSales}
-        margin={{ right: 30 }}
-      >
-        <YAxis />
-        <XAxis dataKey="name" />
-        <CartesianGrid strokeDasharray="5 5" />
-        <Tooltip content={<CustomTooltip />} />
-        <Legend />
-
-        {/* Product 1 Area */}
-        <Area
-          type="monotone"
-          dataKey="product1"
-          stroke="#2563eb"
-          fill="#3b82f6"
-          stackId="1"
-        />
-
-        {/* Product 2 Area */}
-        <Area
-          type="monotone"
-          dataKey="product2"
-          stroke="#7c3aed"
-          fill="#8b5cf6"
-          stackId="1"
-        />
-      </AreaChart>
-    </ResponsiveContainer>
+    <div className="w-full h-80">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="day" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Line type="monotone" dataKey="screenTime" stroke="#8884d8" activeDot={{ r: 8 }} />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   );
 };
 
-export default AreaChartComponent;
+export default ScreenTimeGraph;

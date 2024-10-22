@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import AreaChart from '@/components/AreaChartComponent';
+import ScreenTimeGraph from '@/components/AreaChartComponent';
 
 const Track = () => {
-  const [appName, setAppName] = useState('');
   const [screenTime, setScreenTime] = useState('');
   const [date, setDate] = useState('');
 
@@ -51,17 +51,6 @@ const Track = () => {
         <h2 className="text-2xl font-semibold mb-4 text-center">Track Screen Time</h2>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">App Name</label>
-          <input
-            type="text"
-            value={appName}
-            onChange={(e) => setAppName(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">Screen Time (hrs)</label>
           <input
             type="number"
@@ -92,14 +81,9 @@ const Track = () => {
       </form>
 
       {/* Chart Section */}
-      <main className="flex min-h-screen flex-col items-center justify-center px-4 md:px-8 xl:px-10 py-44">
-        <div className="grid xl:grid-cols-3 lg:grid-cols-2 w-full gap-10 max-w-[1400px]">
-          <div className="col-span-1">
-            {/* Chart Rendering */}
-            <AreaChart />
-          </div>
-        </div>
-      </main>
+      <div className="d">
+        <ScreenTimeGraph/>
+      </div>
     </div>
   );
 };
