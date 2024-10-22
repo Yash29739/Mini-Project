@@ -24,20 +24,8 @@ const Track = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-<<<<<<< HEAD
           credentials: 'include',
-          body: JSON.stringify({
-            trackingInfo: {
-              weeklyusage: {
-                usage: Number(screenTime),
-                date: new Date(date).toISOString(),
-              },
-            },
-          }),
-=======
-          credentials: "include",
           body: JSON.stringify({ weeklyUsage }),
->>>>>>> 8bf6ccd6de2e31b5214ce5e448f6d87bd37b8537
         }
       );
 
