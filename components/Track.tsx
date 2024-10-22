@@ -11,6 +11,11 @@ const Track = () => {
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
+    const weeklyUsage = {
+        usage: screenTime,
+        date: new Date(date).toISOString()
+    }
+
     try {
       const response = await fetch(
         'https://digital-detox-y73b.onrender.com/tracker',
@@ -19,6 +24,7 @@ const Track = () => {
           headers: {
             'Content-Type': 'application/json',
           },
+<<<<<<< HEAD
           credentials: 'include',
           body: JSON.stringify({
             trackingInfo: {
@@ -28,6 +34,10 @@ const Track = () => {
               },
             },
           }),
+=======
+          credentials: "include",
+          body: JSON.stringify({ weeklyUsage }),
+>>>>>>> 8bf6ccd6de2e31b5214ce5e448f6d87bd37b8537
         }
       );
 
