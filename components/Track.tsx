@@ -81,7 +81,8 @@ const Track = () => {
       </form>
 
       {/* Chart Section */}
-      <div className="d">
+      <div className=" my-10 max-w-[1000px] h-auto md:mx-auto mx-auto text-center">
+        <p className='text-[30px] my-5'>Screen Time Usage</p>
         <ScreenTimeGraph/>
       </div>
     </div>
