@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   LineChart,
   Line,
@@ -9,6 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import LoadingSpinner from "./LoadingSpinner";
 
 // Helper function to format the date into MM/DD format
 const formatDate = (dateString: string) => {
@@ -44,56 +45,65 @@ const groupByDate = (data: { date: string; usage: number }[]) => {
 
 const ScreenTimeGraph: React.FC = () => {
   const [data, setData] = useState<{ date: string; screenTime: number }[]>([]);
+  const [loading, setLoading] = useState(true); // Add a loading state
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(
-          'https://digital-detox-y73b.onrender.com/tracker',
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-          }
-        );
-        const result = await response.json();
+  // Memoized fetch function to get the screen time data
+  const fetchData = useCallback(async () => {
+    try {
+      const response = await fetch(
+        'https://digital-detox-y73b.onrender.com/tracker',
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        }
+      );
+      const result = await response.json();
 
-        // Sort the weeklyUsage data based on the date
-        const sortedData = result.existingTracker.weeklyUsage.sort(
-          (a: { date: string }, b: { date: string }) => new Date(a.date).getTime() - new Date(b.date).getTime()
-        );
+      // Sort the weeklyUsage data based on the date
+      const sortedData = result.existingTracker.weeklyUsage.sort(
+        (a: { date: string }, b: { date: string }) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      );
 
-        // Group data by date and sum up the usage if the date repeats
-        const groupedData = groupByDate(sortedData);
+      // Group data by date and sum up the usage if the date repeats
+      const groupedData = groupByDate(sortedData);
 
-        setData(groupedData); // Update state with grouped and sorted data
-      } catch (error) {
-        console.log("Error in the fetch", error);
-      }
-    };
-
-    fetchData();
+      setData(groupedData); // Update state with grouped and sorted data
+    } catch (error) {
+      console.log("Error in the fetch", error);
+    } finally {
+      setLoading(false); // End loading state when fetch completes
+    }
   }, []);
+
+  // UseEffect hook to fetch data on mount
+  useEffect(() => {
+    fetchData(); // Only run the fetch when the component is mounted or when needed
+  }, [fetchData]);
 
   return (
     <div className="w-full h-80">
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" /> {/* Display dates (MM/DD) on X-axis */}
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Line
-            type="monotone"
-            dataKey="screenTime"
-            stroke="#8884d8"
-            activeDot={{ r: 8 }}
-          />
-        </LineChart>
-      </ResponsiveContainer>
+      {loading ? (
+        <LoadingSpinner/>// Display loading state
+      ) : (
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" /> {/* Display dates (MM/DD) on X-axis */}
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Line
+              type="monotone"
+              dataKey="screenTime"
+              stroke="#8884d8"
+              activeDot={{ r: 8 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      )}
     </div>
   );
 };
