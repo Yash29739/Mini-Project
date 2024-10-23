@@ -20,7 +20,7 @@ const formatDate = (dateString: string) => {
 };
 
 // Function to group usage by date and sum usage for duplicate dates
-const groupByDate = (data: { date: string; usage: number }[]) => {
+const groupByDate = (data: { date: string; usage: number }[], ) => {
   const groupedData: { [key: string]: number } = {};
 
   data.forEach((entry) => {
