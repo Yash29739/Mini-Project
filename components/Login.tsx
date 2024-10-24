@@ -3,7 +3,7 @@
 "use client";
 import { useLogin } from "@/context/LoginContext";
 import React, { useState } from "react";
-import { FaUser, FaLock } from "react-icons/fa";
+import { FaUser } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -17,8 +17,8 @@ const LogIn = () => {
     email: "",
     password: "",
   });
+  
   const [loading, setLoading] = useState(false); // Loading state
-
   const { setIsLoggedIn } = useLogin();
   const router = useRouter();
 

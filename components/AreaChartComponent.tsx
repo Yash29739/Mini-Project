@@ -20,7 +20,7 @@ const formatDate = (dateString: string) => {
 };
 
 // Function to group usage by date and sum usage for duplicate dates
-const groupByDate = (data: { date: string; usage: number }[], ) => {
+const groupByDate = (data: { date: string; usage: number }[]) => {
   const groupedData: { [key: string]: number } = {};
 
   data.forEach((entry) => {
@@ -43,7 +43,11 @@ const groupByDate = (data: { date: string; usage: number }[], ) => {
     .sort((a, b) => new Date(`2024/${a.date}`).getTime() - new Date(`2024/${b.date}`).getTime()); // Sort in increasing order
 };
 
-const ScreenTimeGraph: React.FC = () => {
+interface ScreenTimeGraphProps {
+  refreshGraph: boolean; // Accept refreshGraph prop
+}
+
+const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph }) => {
   const [data, setData] = useState<{ date: string; screenTime: number }[]>([]);
   const [loading, setLoading] = useState(true); // Add a loading state
 
@@ -78,15 +82,15 @@ const ScreenTimeGraph: React.FC = () => {
     }
   }, []);
 
-  // UseEffect hook to fetch data on mount
+  // UseEffect hook to fetch data when the component is mounted or when refreshGraph changes
   useEffect(() => {
-    fetchData(); // Only run the fetch when the component is mounted or when needed
-  }, [fetchData]);
+    fetchData(); // Run fetchData on mount and when refreshGraph changes
+  }, [fetchData, refreshGraph]);
 
   return (
     <div className="w-full h-80">
       {loading ? (
-        <LoadingSpinner/>// Display loading state
+        <LoadingSpinner /> // Display loading state
       ) : (
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data}>

@@ -1,29 +1,26 @@
 'use client';
 
 import { useState } from 'react';
-import ScreenTimeGraph from '@/components/AreaChartComponent'; // Only use one import for the graph component
-import { toast, ToastContainer } from 'react-toastify'; // For better notifications
+import ScreenTimeGraph from '@/components/AreaChartComponent'; // Graph component
+import { toast, ToastContainer } from 'react-toastify'; // Notification library
 import 'react-toastify/dist/ReactToastify.css';
 import LoadingSpinner from './LoadingSpinner';
 
 const Track = () => {
-  const [screenTime, setScreenTime] = useState(''); // This is a string initially
+  const [screenTime, setScreenTime] = useState('');
   const [date, setDate] = useState('');
-  const [loading, setLoading] = useState(false); // State for managing loading spinner
+  const [loading, setLoading] = useState(false);
+  const [refreshGraph, setRefreshGraph] = useState(false); // State to refresh the graph
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
-    // Convert screenTime to a number for validation
     const screenTimeNum = Number(screenTime);
-
-    // Input validation: Screen time should be a positive number between 1 and 24
     if (isNaN(screenTimeNum) || screenTimeNum <= 0 || screenTimeNum > 24) {
       toast.error('Please enter valid screen time between 1 and 24 hours.');
       return;
     }
 
-    // Input validation: Date should not be in the future
     const selectedDate = new Date(date);
     const today = new Date();
     if (selectedDate > today) {
@@ -32,11 +29,11 @@ const Track = () => {
     }
 
     const weeklyUsage = {
-      usage: screenTimeNum, // Now the correct number type
-      date: selectedDate.toISOString(), // ISO string format for the backend
+      usage: screenTimeNum,
+      date: selectedDate.toISOString(),
     };
 
-    setLoading(true); // Set loading state to true when starting the fetch
+    setLoading(true);
     try {
       const response = await fetch(
         'https://digital-detox-y73b.onrender.com/tracker',
@@ -52,9 +49,11 @@ const Track = () => {
 
       if (response.ok) {
         toast.success('Screen time data saved!');
-        // Reset the form after successful submission
         setScreenTime('');
         setDate('');
+
+        // Toggle the refreshGraph state to re-render the graph
+        setRefreshGraph((prev) => !prev);
       } else {
         const errorData = await response.json();
         console.error('Error:', errorData);
@@ -64,13 +63,9 @@ const Track = () => {
       console.error('Error:', error);
       toast.error('Error saving data');
     } finally {
-      setLoading(false); // End loading state
+      setLoading(false);
     }
   };
-
-
-                                                // Main Part
-
 
   return (
     <div>
@@ -109,24 +104,23 @@ const Track = () => {
           />
         </div>
 
-        {loading ? <LoadingSpinner/> : ''}
+        {loading ? <LoadingSpinner /> : ''}
         <button
           type="submit"
           className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          disabled={loading} // Disable button when loading
+          disabled={loading}
         >
-          
-          {loading ? "Submitting..." : 'Submit'} {/* Button text changes */}
+          {loading ? 'Submitting...' : 'Submit'}
         </button>
       </form>
 
       {/* Toast Notifications */}
       <div className="mt-10 mx-auto max-w-[1000px] ">
         <p className="text-center text-[30px] mb-8">Screen Time Usage</p>
-        <ScreenTimeGraph />
+        <ScreenTimeGraph refreshGraph={refreshGraph} /> {/* Pass refreshGraph */}
       </div>
 
-      <ToastContainer/>
+      <ToastContainer />
     </div>
   );
 };

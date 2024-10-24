@@ -14,8 +14,8 @@ const Navbar = () => {
 
   return (
     <nav className="flexBetween max-container w-full padding-container relative z-30 bg-black">
-      <Link href="/" aria-label="Home">
-        <Image src="/logo.png" alt="logo" width={154} height={59} />
+      <Link href="/" aria-label="Home" >
+        <Image src="/logo.png" alt="logo" className="rounded-3xl" width={14} height={59} />
       </Link>
 
       <ul
