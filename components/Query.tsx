@@ -1,9 +1,13 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { IoIosCloseCircle } from "react-icons/io";
+import { toast, ToastContainer } from "react-toastify";
 
 const Query = () => {
-  const [responses, setResponses] = useState({
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [responses, setResponses] = useState<Record<string, string>>({
     screenTime: "",
     screenActivity: "",
     socialMediaTime: "",
@@ -11,11 +15,59 @@ const Query = () => {
     workScreenTime: "",
     workTimeBreaks: "",
     primaryGoal: "",
-    activityPriority1: "",
-    activityPriority2: "",
+    activityPriority: "",
     challengingTask: "",
     whatHelp: "",
   });
+  const isMounted = useRef(true);
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsSaving(true);
+
+    // Sending survey to backend to store
+    try {
+      const responsedata = { responses };
+      const response = await fetch(
+        "https://digital-detox-y73b.onrender.com/survey",
+        {
+          method: isEditing ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(responsedata),
+        }
+      );
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setIsEditing(false);
+        setResponses({
+          screenTime: "",
+          screenActivity: "",
+          socialMediaTime: "",
+          socialMediaStrategy: "",
+          workScreenTime: "",
+          workTimeBreaks: "",
+          primaryGoal: "",
+          activityPriority: "",
+          challengingTask: "",
+          whatHelp: "",
+        });
+        toast.success("Submission successful");
+      } else {
+        console.error("Submission error:", result.message);
+        toast.error(result.message);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    } finally {
+      setIsSaving(false);
+      setSurveyVisible(false);
+    }
+    console.log("User Responses:", responses);
+  };
 
   // Fetch existing survey responses on component mount
   useEffect(() => {
@@ -50,71 +102,39 @@ const Query = () => {
         }
       } catch (error) {
         console.error("Error fetching survey responses:", error);
+      } finally {
+        setIsLoading(false);
+        setSurveyVisible(false);
       }
     };
 
     fetchSurveyResponses();
+    return () => {
+      isMounted.current = false;
+    };
   }, []); // Empty dependency array means this effect runs once on component mount
-
-  // Handle form submission
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    // Sending survey to backend to store
-    try {
-      const responsedata = { responses };
-      const response = await fetch(
-        "https://digital-detox-y73b.onrender.com/survey",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify(responsedata),
-        }
-      );
-
-      const result = await response.json();
-
-      if (response.ok) {
-        console.log("Signup successful:", result);
-        alert("SignUp successful");
-        setResponses({
-          screenTime: "",
-          screenActivity: "",
-          socialMediaTime: "",
-          socialMediaStrategy: "",
-          workScreenTime: "",
-          workTimeBreaks: "",
-          primaryGoal: "",
-          activityPriority1: "",
-          activityPriority2: "",
-          challengingTask: "",
-          whatHelp: "",
-        });
-      } else {
-        console.error("Signup error:", result.message);
-      }
-    } catch (error) {
-      console.error("An error occurred:", error);
-    }
-
-    alert("Successfully submitted the survey");
-    console.log("User Responses:", responses);
-  };
 
   // Handle form input changes
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setResponses({
-      ...responses,
-      [event.target.name]: event.target.value,
-    });
+    const { name, value } = event.target;
+
+    setResponses((prevResponses) => ({
+      ...prevResponses,
+      [name]: value, // No type assertion needed here
+    }));
   };
 
   // Toggle for showing/hiding the survey
   const [isSurveyVisible, setSurveyVisible] = useState(false);
   const toggleSurvey = () => setSurveyVisible(!isSurveyVisible);
+
+  const handleEdit = () => {
+    setIsEditing(true);
+    setSurveyVisible(true);
+  };
+  const handleSave = async () => {
+    setIsEditing(false);
+  };
 
   return (
     <div>
@@ -352,33 +372,7 @@ const Query = () => {
                         <label key={option} className="flex items-center">
                           <input
                             type="radio"
-                            name="activityPriority1"
-                            value={option}
-                            onChange={handleChange}
-                            className="mr-2"
-                          />
-                          {option}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-gray-700 mb-2">
-                      Which activities do you want to prioritize 2nd during your
-                      detox?
-                    </label>
-                    <div className="space-y-2">
-                      {[
-                        "Physical exercise",
-                        "Spending time with family/friends",
-                        "Reading",
-                        "Meditation/mindfulness",
-                        "Outdoor activities",
-                      ].map((option) => (
-                        <label key={option} className="flex items-center">
-                          <input
-                            type="radio"
-                            name="activityPriority2"
+                            name="activityPriority"
                             value={option}
                             onChange={handleChange}
                             className="mr-2"
@@ -451,8 +445,9 @@ const Query = () => {
                   <button
                     type="submit"
                     className="bg-black text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-70 transition duration-300"
+                    disabled={isSaving}
                   >
-                    Submit
+                    {isSaving ? "Saving..." : "Submit"}
                   </button>
                 </div>
               </form>
@@ -460,84 +455,103 @@ const Query = () => {
           )}
         </div>
       </div>
-      <div className="text-center my-8">
-        <h1 className="text-2xl font-bold mb-6">Survey Responses</h1>
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
-            <thead>
-              <tr className="bg-gray-100 border-b">
-                <th className="py-3 px-6  text-center text-gray-700 font-semibold uppercase tracking-wider border border-gray-300">
-                  Question
-                </th>
-                <th className="py-3 px-6 text-center text-gray-700 font-semibold uppercase tracking-wider border border-gray-300">
-                  Response
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                {
-                  question: "How many hours per day do you spend on screens?",
-                  responseKey: "screenTime",
-                },
-                {
-                  question: "What is your most frequent screen activity?",
-                  responseKey: "screenActivity",
-                },
-                {
-                  question:
-                    "How much time do you spend on social media each day?",
-                  responseKey: "socialMediaTime",
-                },
-                {
-                  question:
-                    "Which strategy would you consider to reduce social media usage?",
-                  responseKey: "socialMediaStrategy",
-                },
-                {
-                  question: "How much of your screen time is work-related?",
-                  responseKey: "workScreenTime",
-                },
-                {
-                  question:
-                    "Would you be open to scheduling tech-free work breaks throughout the day?",
-                  responseKey: "workTimeBreaks",
-                },
-                {
-                  question: "What is your primary goal for a digital detox?",
-                  responseKey: "primaryGoal",
-                },
-                {
-                  question:
-                    "Which activities do you want to prioritize 1st during your detox?",
-                  responseKey: "activityPriority1",
-                },
-                {
-                  question:
-                    "Which activities do you want to prioritize 2nd during your detox?",
-                  responseKey: "activityPriority2",
-                },
-                {
-                  question:
-                    "What do you find most challenging about reducing your screen time?",
-                  responseKey: "challengingTask",
-                },
-                {
-                  question: "What would help you stick to a detox plan?",
-                  responseKey: "whatHelp",
-                },
-              ].map((item, index) => (
-                <tr key={index} className="border-b">
-                  <td className="py-4 px-6 text-gray-600 border border-gray-300">
-                    {item.question}
-                  </td>
-                  <td className="py-4 px-6 text-gray-700 border border-gray-300"></td>
+
+      {!isLoading && (
+        <div className=" my-8">
+          <h1 className="text-2xl text-center font-bold mb-6">
+            Survey Responses
+          </h1>
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
+              <thead>
+                <tr className="bg-gray-100 border-b">
+                  <th className="py-3 px-6  text-center text-gray-700 font-semibold uppercase tracking-wider border border-gray-300">
+                    Question
+                  </th>
+                  <th className="py-3 px-6 text-center text-gray-700 font-semibold uppercase tracking-wider border border-gray-300">
+                    Response
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {[
+                  {
+                    question: "How many hours per day do you spend on screens?",
+                    responseKey: "screenTime",
+                  },
+                  {
+                    question: "What is your most frequent screen activity?",
+                    responseKey: "screenActivity",
+                  },
+                  {
+                    question:
+                      "How much time do you spend on social media each day?",
+                    responseKey: "socialMediaTime",
+                  },
+                  {
+                    question:
+                      "Which strategy would you consider to reduce social media usage?",
+                    responseKey: "socialMediaStrategy",
+                  },
+                  {
+                    question: "How much of your screen time is work-related?",
+                    responseKey: "workScreenTime",
+                  },
+                  {
+                    question:
+                      "Would you be open to scheduling tech-free work breaks throughout the day?",
+                    responseKey: "workTimeBreaks",
+                  },
+                  {
+                    question: "What is your primary goal for a digital detox?",
+                    responseKey: "primaryGoal",
+                  },
+                  {
+                    question:
+                      "Which activities do you want to prioritize 1st during your detox?",
+                    responseKey: "activityPriority",
+                  },
+                  {
+                    question:
+                      "What do you find most challenging about reducing your screen time?",
+                    responseKey: "challengingTask",
+                  },
+                  {
+                    question: "What would help you stick to a detox plan?",
+                    responseKey: "whatHelp",
+                  },
+                ].map((item, index) => (
+                  <tr key={index} className="border-b">
+                    <td className="py-4 px-6 text-gray-600 border border-gray-300">
+                      {item.question}
+                    </td>
+                    <td className="py-4 px-6 text-gray-700 border border-gray-300">
+                      {responses[item.responseKey] || "No response"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <ToastContainer />
+            {/* Edit and Save  */}
+
+            <div className="text-center my-5 space-x-5">
+              <button
+                className="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                onClick={handleEdit}
+              >
+                Edit
+              </button>
+              <button
+                className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                onClick={handleSave}
+              >
+                Save
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

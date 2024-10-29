@@ -9,7 +9,7 @@ const Navbar = () => {
   const { isLoggedIn, setIsLoggedIn, logout } = useLogin(); // Destructure context values
 
   useEffect(() => {
-    const checkLoginStatus = async () => {
+    const fetchLoginStatus = async () => {
       try {
         const response = await fetch(
           "https://digital-detox-y73b.onrender.com/refresh",
@@ -25,17 +25,19 @@ const Navbar = () => {
         const result = await response.json();
 
         if (response.ok) {
-          setIsLoggedIn(result.loggedIn); // Update login state based on response
+          setIsLoggedIn(result.isLoggedIn); // Update login state based on response
         } else {
           console.error("Login error:", result.message);
+          throw new Error('Unauthorized');
         }
-      } catch (error) {
-        console.error("An error occurred:", error);
+      }  catch (error) {
+        console.error('Failed to fetch login status:', error);
+        setIsLoggedIn(false);
       }
     };
 
-    checkLoginStatus(); // Call the function to check login status on component mount
-  }, [setIsLoggedIn]);
+    fetchLoginStatus(); // Call the function to check login status on component mount
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -65,7 +67,7 @@ const Navbar = () => {
           {isLoggedIn ? (
             // Render profile icon and logout when logged in
             <div className="flex items-center">
-              <Link href="/profile">
+              <Link href="/Profile">
                 <button className="flexCenter gap-2 px-5 py-2 hover:border-white border-none bg-green-700 text-white rounded-2xl border">
                   <Image src="/user.svg" alt="Profile" width={20} height={20} />
                   <label className="bold-10 whitespace-nowrap cursor-pointer">Profile</label>
@@ -124,7 +126,7 @@ const Navbar = () => {
               {isLoggedIn ? (
                 // Render profile icon and logout button when logged in
                 <div className="flex flex-col">
-                  <Link href="/profile" className="text-white py-2 block hover:bg-gray-700 hover:rounded-lg p-[20px] transition-all">
+                  <Link href="/Profile" className="text-white py-2 block hover:bg-gray-700 hover:rounded-lg p-[20px] transition-all">
                     <div className="flex gap-2">
                       <Image src="/user.svg" alt="Profile" width={20} height={20} />
                       <label className="bold-10 whitespace-nowrap cursor-pointer">Profile</label>
