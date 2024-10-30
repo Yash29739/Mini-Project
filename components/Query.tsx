@@ -42,19 +42,21 @@ const Query = () => {
       const result = await response.json();
 
       if (response.ok) {
+        if(!isEditing){
+          setResponses({
+            screenTime: "",
+            screenActivity: "",
+            socialMediaTime: "",
+            socialMediaStrategy: "",
+            workScreenTime: "",
+            workTimeBreaks: "",
+            primaryGoal: "",
+            activityPriority: "",
+            challengingTask: "",
+            whatHelp: "",
+          });
+        }
         setIsEditing(false);
-        setResponses({
-          screenTime: "",
-          screenActivity: "",
-          socialMediaTime: "",
-          socialMediaStrategy: "",
-          workScreenTime: "",
-          workTimeBreaks: "",
-          primaryGoal: "",
-          activityPriority: "",
-          challengingTask: "",
-          whatHelp: "",
-        });
         toast.success("Submission successful");
       } else {
         console.error("Submission error:", result.message);
