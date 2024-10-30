@@ -60,6 +60,9 @@ const Navbar = () => {
           <Link href="/resources" className="regular-16 text-white flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold">Resources</Link>
         </li>
         <li>
+          <Link href="/toDoList" className="regular-16 text-white flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold">ToDo-List</Link>
+        </li>
+        <li>
           <Link href="/tracker" className="regular-16 text-white flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold">Tracker</Link>
         </li>
 
