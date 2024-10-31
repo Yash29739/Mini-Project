@@ -121,6 +121,11 @@ const Navbar = () => {
               </Link>
             </li>
             <li>
+              <Link href="/toDoList" className="text-white py-2 block hover:bg-gray-700 hover:rounded-lg p-[20px] transition-all" onClick={toggleMenu}>
+                ToDo-List
+              </Link>
+            </li>
+            <li>
               <Link href="/tracker" className="text-white py-2 block hover:bg-gray-700 hover:rounded-lg p-[20px] transition-all" onClick={toggleMenu}>
                 Tracker
               </Link>

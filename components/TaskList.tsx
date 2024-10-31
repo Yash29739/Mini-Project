@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { MdDeleteSweep } from "react-icons/md";
 
 interface Todo {
   text: string;
@@ -27,19 +28,24 @@ const TodoList = () => {
     localStorage.setItem('todos', JSON.stringify(todos));
   }, [todos]);
 
+              // add the task 
+
   const addTodo = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedInput = inputValue.trim();
-    if (trimmedInput === '') return;
+    
+    if (trimmedInput === ''){
+      toast.info(<>Input is Blank!!! <br/> Please fill the Input</>);
+      return;
+    } 
 
-    // Check for duplicate task
     if (todos.some(todo => todo.text === trimmedInput)) {
-      toast.error("Task already exists!"); // Show toast notification
+      toast.error("Task already exists!"); 
       return;
     }
 
-    // Add the new task
     setTodos(prevTodos => [...prevTodos, { text: trimmedInput, completed: false, priority: 0 }]);
+    toast.success("Task added Successfully!!");
     setInputValue('');
   };
 
@@ -50,9 +56,8 @@ const TodoList = () => {
   };
 
   const deleteTodo = (text: string) => {
-    if (window.confirm("Are you sure you want to delete this task?")) {
       setTodos(prevTodos => prevTodos.filter(todo => todo.text !== text));
-    }
+      toast.success("Task Deleted Successfully.");
   };
 
   const updatePriority = (text: string) => {
@@ -62,15 +67,28 @@ const TodoList = () => {
   };
 
   const clearCompleted = () => {
+    if(todos.length==0){
+      toast.error("No Completed Tasks!!!");
+      return;
+    }
+
+    const hasCompletedTasks = todos.some(todo => todo.completed);
+    if(!hasCompletedTasks){
+      toast.info("No completed tasks to clear!");
+      return;
+    }
+
     setTodos(prevTodos => prevTodos.filter(todo => !todo.completed));
+    toast.success("Completed tasks cleared successfully!");
   };
 
-  // Sort todos based on priority (high priority first)
+                         // Sort todos
   const sortedTodos = [...todos].sort((a, b) => b.priority - a.priority);
 
+                         // Todo List UI
   return (
-    <div className="max-w-md mx-auto mt-10 p-5 border rounded-lg shadow-lg bg-white">
-      <h1 className="text-2xl font-bold text-center mb-5">Todo List</h1>
+    <div className="max-w-full mx-10 mt-10 p-10 border rounded-lg shadow-lg bg-white">
+      <h1 className="text-4xl font-bold text-center mb-5">Todo List</h1>
       <form onSubmit={addTodo} className="flex mb-5">
         <input
           type="text"
@@ -79,7 +97,7 @@ const TodoList = () => {
           className="flex-grow p-2 border rounded-l-lg"
           placeholder="Add a new task"
         />
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded-r-lg">
+        <button type="submit" className="bg-blue-500 focus:ring-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-blue-700 text-white p-2 rounded-r-lg">
           Add
         </button>
       </form>
@@ -97,7 +115,7 @@ const TodoList = () => {
             >
               {todo.text}
             </span>
-            <div className="flex items-center ml-2">
+            <div className="flex items-center ml-2 space-x-5">
               <svg
                 onClick={() => updatePriority(todo.text)}
                 className={`w-6 h-6 cursor-pointer ${todo.priority === 1 ? 'text-yellow-500' : 'text-gray-300'}`}
@@ -107,15 +125,15 @@ const TodoList = () => {
               >
                 <path d="M10 15.27L16.18 19l-1.64-7.03L20 8.24l-7.19-.61L10 1 7.19 7.63 0 8.24l5.46 3.73L3.82 19z" />
               </svg>
-            </div>
             <button onClick={() => deleteTodo(todo.text)} className="text-red-500">
-              Delete
+            <img src="/delete.svg" alt="df" className='w-[25px]' />
             </button>
+            </div>
           </li>
         ))}
       </ul>
-      <button onClick={clearCompleted} className="mt-5 bg-red-500 text-white p-2 rounded">
-        Clear Completed
+      <button onClick={clearCompleted} className="mt-5 bg-red-500 focus:ring-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-red-600 text-white p-2 rounded-[5px]">
+        Clear Completed Tasks
       </button>
       <ToastContainer />
     </div>
