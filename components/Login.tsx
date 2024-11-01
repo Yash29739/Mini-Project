@@ -90,7 +90,6 @@ const LogIn = () => {
     }
   };
 
-  // Handle Login Form Submission
   const handleLogIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -116,7 +115,13 @@ const LogIn = () => {
       if (response.ok) {
         toast.success("Login successful!");
         setIsLoggedIn(true);
-        router.push("/");
+
+        // Store login state in local storage with an expiry time
+        const expiryTime = Date.now() + 24 * 60 * 60 * 1000; // 1 day in milliseconds
+        localStorage.setItem('isLoggedIn', JSON.stringify(true));
+        localStorage.setItem('loginExpiry', JSON.stringify(expiryTime));
+
+        router.push("/"); // Redirect to home page
       } else {
         toast.error(result.message || "Login error");
       }
@@ -126,6 +131,7 @@ const LogIn = () => {
       setLoading(false);
     }
   };
+
 
   // Handle Input Changes
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -138,18 +144,16 @@ const LogIn = () => {
 
   return (
     <div
-      className={`relative w-[500px] ${
-        action === "active" ? "h-[750px]" : "h-[700px]"
-      } bg-transparent backdrop-blur-lg rounded-[10px] flex items-center transition-all ease-in-out duration-500 overflow-hidden text-black`}
+      className={`relative w-[500px] ${action === "active" ? "h-[750px]" : "h-[700px]"
+        } bg-transparent backdrop-blur-lg rounded-[10px] flex items-center transition-all ease-in-out duration-500 overflow-hidden text-black`}
     >
       {/* Toast Notification Container */}
       <ToastContainer />
 
       {/* Login Form */}
       <div
-        className={`w-full p-10 ${
-          action === "active" ? "translate-x-[-600px]" : "translate-x-0"
-        } transition-transform duration-500 ease-in-out`}
+        className={`w-full p-10 ${action === "active" ? "translate-x-[-600px]" : "translate-x-0"
+          } transition-transform duration-500 ease-in-out`}
       >
         <form onSubmit={handleLogIn}>
           <h6 className="text-[35px] text-center font-semibold underline font-serif">
@@ -205,9 +209,8 @@ const LogIn = () => {
 
       {/* Signup Form */}
       <div
-        className={`absolute w-full p-10 ${
-          action === "active" ? "translate-x-0" : "translate-x-[600px]"
-        } transition-transform duration-500 ease-in-out`}
+        className={`absolute w-full p-10 ${action === "active" ? "translate-x-0" : "translate-x-[600px]"
+          } transition-transform duration-500 ease-in-out`}
       >
         <form onSubmit={handleSignUp}>
           <h1 className="text-[35px] text-center font-bold underline font-serif">
