@@ -8,36 +8,19 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false); // State to manage mobile menu
   const { isLoggedIn, setIsLoggedIn, logout } = useLogin(); // Destructure context values
 
-  // useEffect(() => {
-  //   const fetchLoginStatus = async () => {
-  //     try {
-  //       const response = await fetch(
-  //         "https://digital-detox-y73b.onrender.com/refresh",
-  //         {
-  //           method: "GET",
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //           },
-  //           credentials: "include",
-  //         }
-  //       );
+  useEffect(() => {
+    const isLoggedIn = JSON.parse(localStorage.getItem('isLoggedIn') || 'false');
+    const expiry = JSON.parse(localStorage.getItem('loginExpiry') || '0');
+    const currentTime = Date.now();
 
-  //       const result = await response.json();
+    if (isLoggedIn && currentTime < expiry) {
+      setIsLoggedIn(true); // Set login state if still valid
+    } else {
+      localStorage.removeItem('isLoggedIn'); // Clear the login state if expired
+      localStorage.removeItem('loginExpiry'); // Clear the expiry time
+    }
+  }, []);
 
-  //       if (response.ok) {
-  //         setIsLoggedIn(result.isLoggedIn); // Update login state based on response
-  //       } else {
-  //         console.error("Login error:", result.message);
-  //         throw new Error('Unauthorized');
-  //       }
-  //     }  catch (error) {
-  //       console.error('Failed to fetch login status:', error);
-  //       setIsLoggedIn(false);
-  //     }
-  //   };
-
-  //   fetchLoginStatus(); // Call the function to check login status on component mount
-  // }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
