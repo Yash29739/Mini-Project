@@ -63,12 +63,7 @@ const TodoList = () => {
       const response = await fetch('https://digital-detox-y73b.onrender.com/toDoList', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          task_name: newTodo.task_name,
-          task_limit: newTodo.task_limit,
-          priority: newTodo.priority,
-          status:newTodo.status
-        }),
+        body: JSON.stringify(newTodo),
         credentials: "include",
       });
       
@@ -193,42 +188,56 @@ const TodoList = () => {
           className="p-2 border mb-4 w-full rounded-lg"
           placeholder="Time limit (minutes)"
         />
-        <button type="submit" className="bg-blue-500 w-full mb-4 focus:ring-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-blue-700 text-white p-2 rounded-md sm:rounded-md">
+        <button type="submit" className="bg-blue-500 w-full mb-4 text-white p-2 rounded-md">
           Add Task
         </button>
       </form>
-      <ul className="space-y-2">
-        {sortedTodos.map((todo) => (
-          <li
-            key={todo.task_name}
-            className={`flex justify-between items-center p-2 border rounded ${todo.status ? 'bg-green-100' : 'bg-gray-100'}`}
-          >
-            <span
-              onClick={() => toggleTodo(todo.task_name)}
-              className={`cursor-pointer ${todo.status ? 'line-through text-gray-500' : ''}`}
-              tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && toggleTodo(todo.task_name)}
-            >
-              {todo.task_name}
-            </span>
-            <div className="flex items-center ml-2 space-x-5">
-              <svg
-                onClick={() => updatePriority(todo.task_name)}
-                className={`w-6 h-6 cursor-pointer ${todo.priority === 1 ? 'text-yellow-500' : 'text-gray-300'}`}
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M10 15.27L16.18 19l-1.64-7.03L20 8.24l-7.19-.61L10 1 7.19 7.63 0 8.24l5.46 3.73L3.82 19z" />
-              </svg>
-              <button onClick={() => deleteTodo(todo.task_name)} className="text-red-500">
-                <img src="/delete.svg" alt="Delete" className="w-[25px]" />
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
-      <button onClick={clearCompleted} className="mt-5 bg-red-500 focus:ring-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-red-600 text-white p-2 rounded-[5px]">
+
+      <table className="w-full table-auto border-collapse border border-gray-300">
+        <thead>
+          <tr className="bg-gray-200">
+            <th className="border border-gray-300 p-2">Task Name</th>
+            <th className="border border-gray-300 p-2">Time Limit</th>
+            <th className="border border-gray-300 p-2">Status</th>
+            <th className="border border-gray-300 p-2">Priority</th>
+            <th className="border border-gray-300 p-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sortedTodos.map((todo) => (
+            <tr key={todo.task_name} className={todo.status ? 'bg-green-100' : '#fff'}>
+              <td className="border border-gray-300 p-2">{todo.task_name}</td>
+              <td className="border border-gray-300 p-2">{todo.task_limit} hr</td>
+              <td className="border border-gray-300 p-2">
+                <span
+                  onClick={() => toggleTodo(todo.task_name)}
+                  className={`cursor-pointer ${todo.status ? 'line-through text-gray-500' : ''}`}
+                >
+                  {todo.status ? 'Completed' : 'Pending'}
+                </span>
+              </td>
+              <td className="border border-gray-300 p-2">
+                <svg
+                  onClick={() => updatePriority(todo.task_name)}
+                  className={`w-6 h-6 cursor-pointer ${todo.priority === 1 ? 'text-yellow-500' : 'text-gray-300'}`}
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M10 15.27L16.18 19l-1.64-7.03L20 8.24l-7.19-.61L10 1 7.19 7.63 0 8.24l5.46 3.73L3.82 19z" />
+                </svg>
+              </td>
+              <td className="border border-gray-300 p-2 flex justify-center space-x-3">
+                <button onClick={() => deleteTodo(todo.task_name)} className="text-red-500">
+                  <img src="/delete.svg" alt="Delete" className="w-[20px]" />
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <button onClick={clearCompleted} className="mt-5 bg-red-500 text-white p-2 rounded-md">
         Clear Completed Tasks
       </button>
       <ToastContainer />

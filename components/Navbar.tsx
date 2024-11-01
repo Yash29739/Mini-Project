@@ -46,10 +46,10 @@ const Navbar = () => {
   return (
     <nav className="flexBetween max-container w-full padding-container relative z-30 bg-black">
       <Link href="/" aria-label="Home">
-        <Image src="/logo.png" alt="logo" className="rounded-3xl" width={154} height={59} />
+        <Image src="/logo.png" alt="logo" className="rounded-3xl min-w-[100px]" width={10} height={59} />
       </Link>
 
-      <ul className={`md:flex h-full hidden gap-8 ${isMenuOpen ? "flex" : "hidden"} md:items-center`}>
+      <ul className={`md:flex h-full ml-5 hidden gap-8 ${isMenuOpen ? "flex" : "hidden"} md:items-center`}>
         <li>
           <Link href="/" className="regular-16 text-white flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold">Home</Link>
         </li>

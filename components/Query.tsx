@@ -19,6 +19,40 @@ const Query = () => {
     challengingTask: "",
     whatHelp: "",
   });
+
+  const requestML = async () => {
+    console.log("Entered the ml");
+    
+    const data = {
+      screen_time: "More than 6 hours",
+      main_activity: "Gaming",
+      social_media_time: "Less than 1 hour",
+      screen_time_challenges: "Work requirements",
+      work_screen_time: "More than 4 hours",
+    };
+    try {
+      const response = await fetch(
+        "https://digital-detox-ml.onrender.com/predict",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
+      const res = await response.json();
+      if (response.ok) {
+        toast.success("Successfully communicated wiht the AI");
+        console.log("Log Response", res.message);
+      } else {
+        console.log("Log error", res.message);
+      }
+    } catch (error) {
+      toast.error("An error occurred: " + error);
+    }
+  };
+
   const isMounted = useRef(true);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -42,7 +76,7 @@ const Query = () => {
       const result = await response.json();
 
       if (response.ok) {
-        if(!isEditing){
+        if (!isEditing) {
           setResponses({
             screenTime: "",
             screenActivity: "",
@@ -534,7 +568,6 @@ const Query = () => {
                 ))}
               </tbody>
             </table>
-            <ToastContainer />
             {/* Edit and Save  */}
 
             <div className="text-center my-5 space-x-5">
@@ -554,6 +587,12 @@ const Query = () => {
           </div>
         </div>
       )}
+        <ToastContainer />
+      <div className="flex justify-center h-[50vh] mx-10 border flex-col items-center border-red-500">
+        <p className=" text-[30px] text-ellipsis font-serif text-center ">ML OutPut</p>
+        <button className="bg-green-600 text-white py-2 px-4 rounded-md w-[250px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+        onClick={requestML}>Chat with the AI</button>
+      </div>
     </div>
   );
 };
