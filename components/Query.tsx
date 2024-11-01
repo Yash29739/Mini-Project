@@ -44,7 +44,7 @@ const Query = () => {
       const res = await response.json();
       if (response.ok) {
         toast.success("Successfully communicated wiht the AI");
-        console.log("Log Response", res.message);
+        console.log("Log Response", res);
       } else {
         console.log("Log error", res.message);
       }
@@ -591,7 +591,7 @@ const Query = () => {
       <div className="flex justify-center h-[50vh] mx-10 border flex-col items-center border-red-500">
         <p className=" text-[30px] text-ellipsis font-serif text-center ">ML OutPut</p>
         <button className="bg-green-600 text-white py-2 px-4 rounded-md w-[250px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-        onClick={requestML}>Chat with the AI</button>
+        onClick={requestML}>Get Suggestions from AI !!</button>
       </div>
     </div>
   );
