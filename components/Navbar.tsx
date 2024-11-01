@@ -8,36 +8,36 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false); // State to manage mobile menu
   const { isLoggedIn, setIsLoggedIn, logout } = useLogin(); // Destructure context values
 
-  useEffect(() => {
-    const fetchLoginStatus = async () => {
-      try {
-        const response = await fetch(
-          "https://digital-detox-y73b.onrender.com/refresh",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          }
-        );
+  // useEffect(() => {
+  //   const fetchLoginStatus = async () => {
+  //     try {
+  //       const response = await fetch(
+  //         "https://digital-detox-y73b.onrender.com/refresh",
+  //         {
+  //           method: "GET",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //           credentials: "include",
+  //         }
+  //       );
 
-        const result = await response.json();
+  //       const result = await response.json();
 
-        if (response.ok) {
-          setIsLoggedIn(result.isLoggedIn); // Update login state based on response
-        } else {
-          console.error("Login error:", result.message);
-          throw new Error('Unauthorized');
-        }
-      }  catch (error) {
-        console.error('Failed to fetch login status:', error);
-        setIsLoggedIn(false);
-      }
-    };
+  //       if (response.ok) {
+  //         setIsLoggedIn(result.isLoggedIn); // Update login state based on response
+  //       } else {
+  //         console.error("Login error:", result.message);
+  //         throw new Error('Unauthorized');
+  //       }
+  //     }  catch (error) {
+  //       console.error('Failed to fetch login status:', error);
+  //       setIsLoggedIn(false);
+  //     }
+  //   };
 
-    fetchLoginStatus(); // Call the function to check login status on component mount
-  }, []);
+  //   fetchLoginStatus(); // Call the function to check login status on component mount
+  // }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
