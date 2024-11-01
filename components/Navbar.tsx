@@ -8,36 +8,36 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false); // State to manage mobile menu
   const { isLoggedIn, setIsLoggedIn, logout } = useLogin(); // Destructure context values
 
-  useEffect(() => {
-    const fetchLoginStatus = async () => {
-      try {
-        const response = await fetch(
-          "https://digital-detox-y73b.onrender.com/refresh",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          }
-        );
+  // useEffect(() => {
+  //   const fetchLoginStatus = async () => {
+  //     try {
+  //       const response = await fetch(
+  //         "https://digital-detox-y73b.onrender.com/refresh",
+  //         {
+  //           method: "GET",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //           credentials: "include",
+  //         }
+  //       );
 
-        const result = await response.json();
+  //       const result = await response.json();
 
-        if (response.ok) {
-          setIsLoggedIn(result.isLoggedIn); // Update login state based on response
-        } else {
-          console.error("Login error:", result.message);
-          throw new Error('Unauthorized');
-        }
-      }  catch (error) {
-        console.error('Failed to fetch login status:', error);
-        setIsLoggedIn(false);
-      }
-    };
+  //       if (response.ok) {
+  //         setIsLoggedIn(result.isLoggedIn); // Update login state based on response
+  //       } else {
+  //         console.error("Login error:", result.message);
+  //         throw new Error('Unauthorized');
+  //       }
+  //     }  catch (error) {
+  //       console.error('Failed to fetch login status:', error);
+  //       setIsLoggedIn(false);
+  //     }
+  //   };
 
-    fetchLoginStatus(); // Call the function to check login status on component mount
-  }, []);
+  //   fetchLoginStatus(); // Call the function to check login status on component mount
+  // }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -46,10 +46,10 @@ const Navbar = () => {
   return (
     <nav className="flexBetween max-container w-full padding-container relative z-30 bg-black">
       <Link href="/" aria-label="Home">
-        <Image src="/logo.png" alt="logo" className="rounded-3xl" width={154} height={59} />
+        <Image src="/logo.png" alt="logo" className="rounded-3xl min-w-[100px]" width={10} height={59} />
       </Link>
 
-      <ul className={`md:flex h-full hidden gap-8 ${isMenuOpen ? "flex" : "hidden"} md:items-center`}>
+      <ul className={`md:flex h-full ml-5 hidden gap-8 ${isMenuOpen ? "flex" : "hidden"} md:items-center`}>
         <li>
           <Link href="/" className="regular-16 text-white flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold">Home</Link>
         </li>

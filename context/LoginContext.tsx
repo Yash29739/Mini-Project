@@ -43,30 +43,30 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
     }
   } 
 
-  useEffect(() => {
-    const checkLoginStatus = async () => {
-      try {
-        const response = await fetch("https://digital-detox-y73b.onrender.com/refresh", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include"
-        });
+  // useEffect(() => {
+  //   const checkLoginStatus = async () => {
+  //     try {
+  //       const response = await fetch("https://digital-detox-y73b.onrender.com/refresh", {
+  //         method: "GET",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         credentials: "include"
+  //       });
         
-        // If the cookie exists and login is valid, set logged in to true
-        if (response.ok) {
-          setIsLoggedIn(true);
-        } else {
-          setIsLoggedIn(false);
-        }
-      } catch (error) {
-        console.error("An error occurred:", error);
-      }
-    };
+  //       // If the cookie exists and login is valid, set logged in to true
+  //       if (response.ok) {
+  //         setIsLoggedIn(true);
+  //       } else {
+  //         setIsLoggedIn(false);
+  //       }
+  //     } catch (error) {
+  //       console.error("An error occurred:", error);
+  //     }
+  //   };
 
-    checkLoginStatus();
-  }, []);
+  //   checkLoginStatus();
+  // }, []);
 
   return (
     <LoginContext.Provider value={{ isLoggedIn, setIsLoggedIn, login, logout }}>
