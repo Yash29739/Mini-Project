@@ -1,6 +1,6 @@
 "use client"
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState,useEffect, ReactNode } from 'react';
 
 interface LoginContextProps {
   isLoggedIn: boolean;
@@ -27,7 +27,7 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
   // Define the logout function
   const logout = async() =>{
     try {
-      const response = await fetch(
+      await fetch(
         "https://digital-detox-y73b.onrender.com/logout",
         {
           method: "GET",
@@ -42,6 +42,31 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
       console.error("An error occurred:", error);
     }
   } 
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const response = await fetch("https://digital-detox-y73b.onrender.com/refresh", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include"
+        });
+        
+        // If the cookie exists and login is valid, set logged in to true
+        if (response.ok) {
+          setIsLoggedIn(true);
+        } else {
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
 
   return (
     <LoginContext.Provider value={{ isLoggedIn, setIsLoggedIn, login, logout }}>
