@@ -117,7 +117,7 @@ const LogIn = () => {
         setIsLoggedIn(true);
 
         // Store login state in local storage with an expiry time
-        const expiryTime = Date.now() + 24 * 60 * 60 * 1000; // 1 day in milliseconds
+        const expiryTime = Date.now() + 23 * 60 * 60 * 1000; // 1 day in milliseconds
         localStorage.setItem('isLoggedIn', JSON.stringify(true));
         localStorage.setItem('loginExpiry', JSON.stringify(expiryTime));
 

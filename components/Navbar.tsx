@@ -13,7 +13,7 @@ const Navbar = () => {
     const expiry = JSON.parse(localStorage.getItem('loginExpiry') || '0');
     const currentTime = Date.now();
 
-    if (isLoggedIn && currentTime < expiry) {
+    if (isLoggedIn && (currentTime < expiry)) {
       setIsLoggedIn(true); // Set login state if still valid
     } else {
       localStorage.removeItem('isLoggedIn'); // Clear the login state if expired
