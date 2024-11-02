@@ -14,48 +14,53 @@ const Track = () => {
   const [refreshGraph, setRefreshGraph] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
-    useEffect(() => {
-      getLimit();
-    }, [ refreshGraph]);
-  
-    const updateLimit = async () => {
-      try {
-        setSaving(true);
-        const response = await fetch("https://digital-detox-y73b.onrender.com/tracker", {
+  useEffect(() => {
+    getLimit();
+  }, [refreshGraph]);
+
+  const updateLimit = async () => {
+    try {
+      setSaving(true);
+      const response = await fetch(
+        "https://digital-detox-y73b.onrender.com/tracker",
+        {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
           credentials: "include",
-          body: JSON.stringify({limitedUsage:limitUsage}) 
-        });
-    
-        if (response.ok) {
-          const result = await response.json();
-          console.log("Update successful:", result);
-          toast.success("Screen time limit updated!");
-        } else {
-          console.error("Failed to update limit:", response);
-          toast.error("Failed to update limit.");
+          body: JSON.stringify({ limitedUsage: limitUsage }),
         }
-      } catch (error) {
-        console.error("Error:", error);
-        toast.error("An error occurred while updating the limit.");
-      }finally{
-        setSaving(false);
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Update successful:", result);
+        toast.success("Screen time limit updated!");
+      } else {
+        console.error("Failed to update limit:", response);
+        toast.error("Failed to update limit.");
       }
-    };
-    
-  const getLimit=async()=>{
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("An error occurred while updating the limit.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const getLimit = async () => {
     try {
-      const response= await fetch("https://digital-detox-y73b.onrender.com/tracker",
-      {
-        method: "GET",
-        headers:{
-          "Content_Type":"application/json",
-        },
-        credentials: "include",
-      });
+      const response = await fetch(
+        "https://digital-detox-y73b.onrender.com/tracker",
+        {
+          method: "GET",
+          headers: {
+            Content_Type: "application/json",
+          },
+          credentials: "include",
+        }
+      );
       const result = await response.json();
       console.log(result);
 
@@ -63,7 +68,7 @@ const Track = () => {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
@@ -194,18 +199,22 @@ const Track = () => {
           min="1"
         />
       </div>
-        <div className="flex space-x-3 mb-5 justify-center flex-row mt-3">
-          <button className="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+      <div className="flex space-x-3 mb-5 justify-center flex-row mt-3">
+        <button
+          className="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
           onClick={handleEditClick}
-          disabled={isEditing}>
-            Edit
-          </button>
-          <button className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          disabled={isEditing}
+        >
+          Edit
+        </button>
+        <button
+          className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
           onClick={handleSaveClick}
-          disabled={!isEditing}>
-            {saving?"Saving":"Save"}
-          </button>
-        </div>
+          disabled={!isEditing}
+        >
+          {saving ? "Saving" : "Save"}
+        </button>
+      </div>
       <ToastContainer />
     </div>
   );
