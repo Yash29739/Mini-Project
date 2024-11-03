@@ -2,11 +2,22 @@
 import React, { useState, useEffect, useRef } from "react";
 import { IoIosCloseCircle } from "react-icons/io";
 import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { styled, Theme, useTheme } from "@mui/material/styles";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell, { tableCellClasses } from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 const Query = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [mlResponse, setMlResponse] = useState("");
   const [responses, setResponses] = useState<Record<string, string>>({
     screenTime: "",
     screenActivity: "",
@@ -22,13 +33,13 @@ const Query = () => {
 
   const requestML = async () => {
     console.log("Entered the ml");
-    
+
     const data = {
-      screen_time: "More than 6 hours",
-      main_activity: "Gaming",
-      social_media_time: "Less than 1 hour",
-      screen_time_challenges: "Work requirements",
-      work_screen_time: "More than 4 hours",
+      screen_time: responses.screenTime,
+      main_activity: responses.screenActivity,
+      social_media_time: responses.socialMediaTime,
+      screen_time_challenges: responses.challengingTask,
+      work_screen_time: responses.workScreenTime,
     };
     try {
       const response = await fetch(
@@ -43,10 +54,12 @@ const Query = () => {
       );
       const res = await response.json();
       if (response.ok) {
-        toast.success("Successfully communicated wiht the AI");
-        console.log("Log Response", res);
+        // toast.success("Successfully communicated wiht the AI");
+        console.log("Log Response", res.prediction);
+        setMlResponse(res.prediction);
       } else {
         console.log("Log error", res.message);
+        toast.success("Communiczation Unsuccessfull");
       }
     } catch (error) {
       toast.error("An error occurred: " + error);
@@ -171,6 +184,83 @@ const Query = () => {
   const handleSave = async () => {
     setIsEditing(false);
   };
+
+  const StyledTableCell = styled(TableCell)(({ theme }:{theme:Theme}) => ({
+    [`&.${tableCellClasses.head}`]: {
+      backgroundColor: theme.palette.grey[200],
+    color: theme.palette.text.primary,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    padding: theme.spacing(1),
+    },
+    [`&.${tableCellClasses.body}`]: {
+      fontSize: 14,
+      color: theme.palette.text.secondary,
+      borderColor: theme.palette.divider,
+      padding: theme.spacing(1),
+      wordBreak: "break-word",
+    },
+  }));
+
+  const StyledTableRow = styled(TableRow)(({ theme }) => ({
+    "&:nth-of-type(odd)": {
+      backgroundColor: theme.palette.action.hover,
+    },
+    // hide last border
+    "&:last-child td, &:last-child th": {
+      border: 0,
+    },
+  }));
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const questions = [
+    {
+      question: "How many hours per day do you spend on screens?",
+      responseKey: "screenTime",
+    },
+    {
+      question: "What is your most frequent screen activity?",
+      responseKey: "screenActivity",
+    },
+    {
+      question: "How much time do you spend on social media each day?",
+      responseKey: "socialMediaTime",
+    },
+    {
+      question:
+        "Which strategy would you consider to reduce social media usage?",
+      responseKey: "socialMediaStrategy",
+    },
+    {
+      question: "How much of your screen time is work-related?",
+      responseKey: "workScreenTime",
+    },
+    {
+      question:
+        "Would you be open to scheduling tech-free work breaks throughout the day?",
+      responseKey: "workTimeBreaks",
+    },
+    {
+      question: "What is your primary goal for a digital detox?",
+      responseKey: "primaryGoal",
+    },
+    {
+      question:
+        "Which activities do you want to prioritize 1st during your detox?",
+      responseKey: "activityPriority",
+    },
+    {
+      question:
+        "What do you find most challenging about reducing your screen time?",
+      responseKey: "challengingTask",
+    },
+    {
+      question: "What would help you stick to a detox plan?",
+      responseKey: "whatHelp",
+    },
+  ];
 
   return (
     <div>
@@ -493,81 +583,43 @@ const Query = () => {
       </div>
 
       {!isLoading && (
-        <div className=" my-8">
+        <div className=" my-8 mx-20">
           <h1 className="text-2xl text-center font-bold mb-6">
             Survey Responses
           </h1>
           <div className="overflow-x-auto">
-            <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
-              <thead>
-                <tr className="bg-gray-100 border-b">
-                  <th className="py-3 px-6  text-center text-gray-700 font-semibold uppercase tracking-wider border border-gray-300">
-                    Question
-                  </th>
-                  <th className="py-3 px-6 text-center text-gray-700 font-semibold uppercase tracking-wider border border-gray-300">
-                    Response
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  {
-                    question: "How many hours per day do you spend on screens?",
-                    responseKey: "screenTime",
-                  },
-                  {
-                    question: "What is your most frequent screen activity?",
-                    responseKey: "screenActivity",
-                  },
-                  {
-                    question:
-                      "How much time do you spend on social media each day?",
-                    responseKey: "socialMediaTime",
-                  },
-                  {
-                    question:
-                      "Which strategy would you consider to reduce social media usage?",
-                    responseKey: "socialMediaStrategy",
-                  },
-                  {
-                    question: "How much of your screen time is work-related?",
-                    responseKey: "workScreenTime",
-                  },
-                  {
-                    question:
-                      "Would you be open to scheduling tech-free work breaks throughout the day?",
-                    responseKey: "workTimeBreaks",
-                  },
-                  {
-                    question: "What is your primary goal for a digital detox?",
-                    responseKey: "primaryGoal",
-                  },
-                  {
-                    question:
-                      "Which activities do you want to prioritize 1st during your detox?",
-                    responseKey: "activityPriority",
-                  },
-                  {
-                    question:
-                      "What do you find most challenging about reducing your screen time?",
-                    responseKey: "challengingTask",
-                  },
-                  {
-                    question: "What would help you stick to a detox plan?",
-                    responseKey: "whatHelp",
-                  },
-                ].map((item, index) => (
-                  <tr key={index} className="border-b">
-                    <td className="py-4 px-6 text-gray-600 border border-gray-300">
-                      {item.question}
-                    </td>
-                    <td className="py-4 px-6 text-gray-700 border border-gray-300">
-                      {responses[item.responseKey] || "No response"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <TableContainer
+              component={Paper}
+              sx={{ borderRadius: "8px", boxShadow: 3, overflowX: "auto" }}
+            >
+              <Table
+                sx={{
+                  minWidth: isMobile ? 300 : 700,
+                  tableLayout: "fixed",
+                }}
+                aria-label="customized table"
+              >
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell>Question</StyledTableCell>
+                    <StyledTableCell sx={{ borderLeft: `2px solid ${theme.palette.divider}`}}>Response</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {questions.map((item, index) => (
+                    <StyledTableRow key={index}>
+                      <StyledTableCell component="th" scope="row">
+                        {item.question}
+                      </StyledTableCell>
+                      <StyledTableCell>
+                        {responses[item.responseKey] || "No response"}
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
             {/* Edit and Save  */}
 
             <div className="text-center my-5 space-x-5">
@@ -587,11 +639,20 @@ const Query = () => {
           </div>
         </div>
       )}
-        <ToastContainer />
-      <div className="flex justify-center h-[50vh] mx-10 border flex-col items-center border-red-500">
-        <p className=" text-[30px] text-ellipsis font-serif text-center ">ML OutPut</p>
-        <button className="bg-green-600 text-white py-2 px-4 rounded-md w-[250px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-        onClick={requestML}>Get Suggestions from AI !!</button>
+      <ToastContainer />
+      <div className="flex justify-center h-[30vh] mx-10 border flex-col items-center">
+        <p className=" text-[30px] text-ellipsis font-serif text-center ">
+          ML OutPut
+        </p>
+        <button
+          className="bg-green-600 text-white py-2 px-4 rounded-md w-[250px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          onClick={requestML}
+        >
+          Get Suggestions from AI
+        </button>
+        <span className="my-2 font-serif">
+          {mlResponse ? `" ${mlResponse} "` : "communicating with the AI......"}
+        </span>
       </div>
     </div>
   );

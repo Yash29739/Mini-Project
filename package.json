@@ -9,6 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@fontsource/roboto": "^5.1.0",
+    "@mui/icons-material": "^6.1.6",
+    "@mui/material": "^6.1.6",
+    "@mui/styled-engine-sc": "^6.1.6",
     "axios": "^1.7.7",
     "clsx": "^2.1.1",
     "framer-motion": "^11.11.9",
@@ -21,6 +27,7 @@
     "react-toastify": "^10.0.6",
     "recharts": "^2.13.0",
     "simplex-noise": "^4.0.3",
+    "styled-components": "^6.1.13",
     "tailwind-merge": "^2.5.4"
   },
   "devDependencies": {

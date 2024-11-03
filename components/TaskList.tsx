@@ -3,6 +3,18 @@
 import { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { styled } from '@mui/material/styles';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import Checkbox from '@mui/material/Checkbox';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import StarIcon from '@mui/icons-material/Star';
 
 interface Todo {
   task_name: string;
@@ -209,8 +221,27 @@ const TodoList = () => {
     (a, b) => (b.priority ? 1 : 0) - (a.priority ? 1 : 0)
   );
 
+  const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.head}`]: {
+      backgroundColor: theme.palette.grey[300],
+      color: theme.palette.common.black,
+      wordBreak: "break-word",
+    },
+    [`&.${tableCellClasses.body}`]: {
+      fontSize: 14,
+      wordBreak: "break-word",
+    },
+  }));
+
+  const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  '&:nth-of-type(odd)': {
+    backgroundColor: theme.palette.action.hover,
+  },
+}));
+
+
   return (
-    <div className="max-w-full mx-10 mt-10 p-10 border rounded-lg shadow-lg bg-white">
+    <div className="max-w-full min-h-[85vh] mx-10 mt-10 p-10 border rounded-lg shadow-lg bg-white">
       <h1 className="text-4xl font-bold text-center mb-10">Todo List</h1>
       <form
         onSubmit={addTodo}
@@ -238,7 +269,7 @@ const TodoList = () => {
         </button>
       </form>
 
-      <table className="w-full table-auto border-collapse border border-gray-300">
+      {/* <table className="w-full mt-10 table-auto border-collapse border border-gray-300">
         <thead>
           <tr className="bg-gray-200">
             <th className="border border-gray-300 p-2">Task Name</th>
@@ -290,7 +321,44 @@ const TodoList = () => {
             </tr>
           ))}
         </tbody>
-      </table>
+      </table> */}
+      <TableContainer component={Paper} className="mt-10">
+      <Table sx={{ minWidth: 700 }} aria-label="customized table">
+        <TableHead>
+          <TableRow>
+            <StyledTableCell>Task Name</StyledTableCell>
+            <StyledTableCell align="right">Time Limit</StyledTableCell>
+            <StyledTableCell align="right">Priority</StyledTableCell>
+            <StyledTableCell align="right">Actions</StyledTableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {sortedTodos.map((todo) => (
+            <StyledTableRow key={todo.task_name} style={{ backgroundColor: todo.status ? '#d1f7c4' : '#ffffff' }}>
+              <StyledTableCell component="th" scope="row">
+                <Checkbox
+                  checked={todo.status}
+                  onChange={() => toggleTodo(todo.task_name)}
+                  color="primary"
+                />
+                {todo.task_name}
+              </StyledTableCell>
+              <StyledTableCell align="right">{todo.task_limit} hr</StyledTableCell>
+              <StyledTableCell align="right">
+                <IconButton onClick={() => updatePriority(todo.task_name)}>
+                  <StarIcon style={{ color: todo.priority ? '#fbc02d' : '#e0e0e0' }} />
+                </IconButton>
+              </StyledTableCell>
+              <StyledTableCell align="center">
+                <IconButton onClick={() => deleteTodo(todo.task_name)} color="error">
+                  <DeleteIcon />
+                </IconButton>
+              </StyledTableCell>
+            </StyledTableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
 
       <button
         onClick={deleteCompleteTodos}
