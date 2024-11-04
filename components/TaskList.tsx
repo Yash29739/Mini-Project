@@ -30,8 +30,6 @@ const TodoList = () => {
 
   // Load todos from the backend on component mount
   const fetchTodos = async () => {
-    console.log("running fetch");
-
     try {
       const response = await fetch(
         "https://digital-detox-y73b.onrender.com/toDoList",
@@ -42,14 +40,15 @@ const TodoList = () => {
         }
       );
       const data = await response.json();
+
       if (response.ok) {
-        const todosWithPriority = Array.isArray(data.tasks) ? data.tasks : [];
-        setTodos(todosWithPriority);
-        console.log("Fetched todos with priority status:", todosWithPriority);
-        console.log("fetch ", todos);
+        const sortedTodos = (Array.isArray(data.tasks) ? data.tasks : []).sort((a: Todo, b: Todo) => {
+          if (a.status !== b.status) return a.status ? 1 : -1; // Move completed tasks to the end
+          return b.priority ? 1 : -1; // Among uncompleted tasks, prioritize those with priority
+        });
+        setTodos(sortedTodos);
       } else {
         toast.error("Failed to fetch tasks.");
-        console.log("error in fetch is ", data.message);
       }
     } catch (error) {
       toast.error("An error occurred while fetching tasks.");
@@ -79,6 +78,7 @@ const TodoList = () => {
       priority: false,
       task_limit: taskLimit,
     };
+
     try {
       const response = await fetch(
         "https://digital-detox-y73b.onrender.com/toDoList",
@@ -89,8 +89,6 @@ const TodoList = () => {
           credentials: "include",
         }
       );
-
-      const result = await response.json();
       if (response.ok) {
         setTodos((prevTodos) => [...prevTodos, newTodo]);
         toast.success("Task added successfully!");
@@ -98,8 +96,6 @@ const TodoList = () => {
         setTaskLimit(0);
       } else {
         toast.error("Failed to add task.");
-        console.log("POST Error", result.message);
-        console.log("POST Error", newTodo);
       }
     } catch (error) {
       toast.error("An error occurred while adding the task.");
@@ -111,13 +107,12 @@ const TodoList = () => {
       todo.task_name === taskName ? { ...todo, status: !todo.status } : todo
     );
     setTodos(updatedTodos);
-
     try {
       await fetch(`https://digital-detox-y73b.onrender.com/toDoList`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          task_name: taskName,
+          task_name:taskName,
           status: updatedTodos.find((todo) => todo.task_name === taskName)
             ?.status,
         }),
@@ -127,30 +122,33 @@ const TodoList = () => {
     } catch (error) {
       toast.error("An error occurred while toggling task status.");
     }
+
+    setTodos(updatedTodos.sort((a, b) => {
+      if (a.status !== b.status) return a.status ? 1 : -1;
+      return b.priority ? 1 : -1;
+    }));
   };
 
-  const deleteTodo = async (text: string) => {
+  const deleteTodo = async (taskName: string) => {
     try {
       const response = await fetch(
         `https://digital-detox-y73b.onrender.com/toDoList`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ task_name: text }),
+          body: JSON.stringify({ task_name: taskName  }),
           credentials: "include",
         }
       );
 
-      const res = await response.json();
-
       if (response.ok) {
         setTodos((prevTodos) =>
-          prevTodos.filter((todo) => todo.task_name !== text)
+          prevTodos.filter((todo) => todo.task_name !== taskName)
         );
         toast.success("Task deleted successfully.");
       } else {
         toast.error("Failed to delete task.");
-        console.log("delete ", res.message);
+        // console.log("delete ", res.message);
       }
     } catch (error) {
       toast.error("An error occurred while deleting the task.");
@@ -161,16 +159,22 @@ const TodoList = () => {
     const updatedTodos = todos.map((todo) =>
       todo.task_name === taskName ? { ...todo, priority: !todo.priority } : todo
     );
+
+    const currentTodo = todos.find((todo) => todo.task_name === taskName);
+    if (currentTodo && currentTodo.status) {
+      toast.info("Cannot update priority for completed tasks.");
+      return; // Exit the function if the task is completed
+    }
+
     setTodos(updatedTodos);
 
     try {
-      await fetch(`https://digital-detox-y73b.onrender.com/toDoList`, {
+      await fetch("https://digital-detox-y73b.onrender.com/toDoList", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          task_name: taskName,
-          priority: updatedTodos.find((todo) => todo.task_name === taskName)
-            ?.priority,
+          task_name:taskName,
+          priority: updatedTodos.find((todo) => todo.task_name === taskName)?.priority,
         }),
         credentials: "include",
       });
@@ -178,43 +182,12 @@ const TodoList = () => {
     } catch (error) {
       toast.error("An error occurred while updating priority.");
     }
-  };
 
-  const deleteCompleteTodos = async () => {
-    try {
-      const response = await fetch(
-        `https://digital-detox-y73b.onrender.com/toDoList`,
-        {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: true }), // Specify condition to delete incomplete tasks
-          credentials: "include",
-        }
-      );
-  
-      const res = await response.json();
-  
-      if (response.ok) {
-        // Filter out tasks with status as false and update the state
-        setTodos((prevTodos) => prevTodos.filter((todo) => !todo.status));
-        toast.success("completed tasks deleted successfully.");
-      } else {
-        toast.error("Failed to delete completed tasks.");
-        console.log("Delete completed Error:", res.message);
-      }
-    } catch (error) {
-      toast.error("An error occurred while deleting completed tasks.");
-    }
-  };
-
-  const clearCompleted = () => {
-    const completedTodos = todos.some((todo) => todo.status);
-    if (completedTodos) {
-      setTodos((prevTodos) => prevTodos.filter((todo) => !todo.status));
-      toast.success("Completed tasks cleared successfully!");
-    } else {
-      toast.info("No completed tasks to clear!");
-    }
+    // Sort todos after priority change
+    setTodos(updatedTodos.sort((a, b) => {
+      if (a.status !== b.status) return a.status ? 1 : -1;
+      return b.priority ? 1 : -1;
+    }));
   };
 
   const sortedTodos = [...todos].sort(
@@ -223,8 +196,8 @@ const TodoList = () => {
 
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
-      backgroundColor: theme.palette.grey[300],
-      color: theme.palette.common.black,
+      backgroundColor: theme.palette.common.black,
+      color: theme.palette.common.white,
       wordBreak: "break-word",
     },
     [`&.${tableCellClasses.body}`]: {
@@ -268,73 +241,20 @@ const TodoList = () => {
           Add Task
         </button>
       </form>
-
-      {/* <table className="w-full mt-10 table-auto border-collapse border border-gray-300">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="border border-gray-300 p-2">Task Name</th>
-            <th className="border border-gray-300 p-2">Time Limit</th>
-            <th className="border border-gray-300 p-2">Priority</th>
-            <th className="border border-gray-300 p-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedTodos.map((todo) => (
-            <tr
-              key={todo.task_name}
-              className={todo.status ? "bg-green-100" : "#fff"}
-            >
-              <td className="border flex  p-2">
-                <input
-                  type="checkbox"
-                  checked={todo.status}
-                  onChange={() => toggleTodo(todo.task_name)}
-                  className="form-checkbox mx-2"
-                />
-                {todo.task_name}
-              </td>
-              <td className="border p-2 ">
-                {todo.task_limit} hr
-              </td>
-              <td className="border p-2">
-                <svg
-                  onClick={() => updatePriority(todo.task_name)}
-                  className={`w-6 h-6 cursor-pointer ${
-                    todo.priority ? "text-yellow-500" : "text-gray-300"
-                  }`}
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M10 15.27L16.18 19l-1.64-7.03L20 8.24l-7.19-.61L10 1 7.19 7.63 0 8.24l5.46 3.73L3.82 19z" />
-                </svg>
-                {todo.priority}
-              </td>
-              <td className="p-2 text-center space-x-3">
-                <button
-                  onClick={() => deleteTodo(todo.task_name)}
-                  className="text-red-500"
-                >
-                  <img src="/delete.svg" alt="Delete" className="w-[20px]" />
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table> */}
-      <TableContainer component={Paper} className="mt-10">
+      <h2 className="text-2xl font-bold mb-4">Tasks In Progress</h2>
+    <TableContainer component={Paper} className="mt-5">
       <Table sx={{ minWidth: 700 }} aria-label="customized table">
         <TableHead>
           <TableRow>
             <StyledTableCell>Task Name</StyledTableCell>
-            <StyledTableCell align="right">Time Limit</StyledTableCell>
-            <StyledTableCell align="right">Priority</StyledTableCell>
-            <StyledTableCell align="right">Actions</StyledTableCell>
+            <StyledTableCell align="center">Time Limit</StyledTableCell>
+            <StyledTableCell align="center">Priority</StyledTableCell>
+            <StyledTableCell align="center">Actions</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {sortedTodos.map((todo) => (
-            <StyledTableRow key={todo.task_name} style={{ backgroundColor: todo.status ? '#d1f7c4' : '#ffffff' }}>
+          {sortedTodos.filter(todo => !todo.status).map((todo) => (
+            <StyledTableRow key={todo.task_name} style={{ backgroundColor: '#ffffff' }}>
               <StyledTableCell component="th" scope="row">
                 <Checkbox
                   checked={todo.status}
@@ -343,10 +263,10 @@ const TodoList = () => {
                 />
                 {todo.task_name}
               </StyledTableCell>
-              <StyledTableCell align="right">{todo.task_limit} hr</StyledTableCell>
-              <StyledTableCell align="right">
+              <StyledTableCell align="center">{todo.task_limit} hr</StyledTableCell>
+              <StyledTableCell align="center">
                 <IconButton onClick={() => updatePriority(todo.task_name)}>
-                  <StarIcon style={{ color: todo.priority ? '#fbc02d' : '#e0e0e0' }} />
+                  <StarIcon style={{ color: todo.priority ? '#fbc02d' : '#b3b3b3' }} />
                 </IconButton>
               </StyledTableCell>
               <StyledTableCell align="center">
@@ -360,12 +280,50 @@ const TodoList = () => {
       </Table>
     </TableContainer>
 
-      <button
+    <h2 className="text-2xl font-bold mb-4 mt-10">Completed Tasks</h2>
+    <TableContainer component={Paper} className="mt-5">
+      <Table sx={{ minWidth: 700 }} aria-label="customized table">
+        <TableHead>
+          <TableRow>
+            <StyledTableCell>Task Name</StyledTableCell>
+            <StyledTableCell align="center">Time Limit</StyledTableCell>
+            <StyledTableCell align="center">Priority</StyledTableCell>
+            <StyledTableCell align="center">Actions</StyledTableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {sortedTodos.filter(todo => todo.status).map((todo) => (
+            <StyledTableRow key={todo.task_name} style={{ backgroundColor: '#d1f7c4' }}>
+              <StyledTableCell component="th" scope="row">
+                <Checkbox
+                  checked={todo.status}
+                  onChange={() => toggleTodo(todo.task_name)}
+                  color="primary"
+                />
+                {todo.task_name}
+              </StyledTableCell>
+              <StyledTableCell align="center">{todo.task_limit} hr</StyledTableCell>
+              <StyledTableCell align="center">
+                <IconButton onClick={() => updatePriority(todo.task_name)}>
+                  <StarIcon style={{ color: todo.priority ? '#fbc02d' : '#b3b3b3' } } />
+                </IconButton>
+              </StyledTableCell>
+              <StyledTableCell align="center">
+                <IconButton onClick={() => deleteTodo(todo.task_name)} color="error">
+                  <DeleteIcon />
+                </IconButton>
+              </StyledTableCell>
+            </StyledTableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+      {/* <button
         onClick={deleteCompleteTodos}
         className="mt-5 bg-red-500 text-white p-2 rounded-md"
       >
         Clear Completed Tasks
-      </button>
+      </button> */}
       <ToastContainer />
     </div>
   );

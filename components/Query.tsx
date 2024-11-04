@@ -187,10 +187,10 @@ const Query = () => {
 
   const StyledTableCell = styled(TableCell)(({ theme }:{theme:Theme}) => ({
     [`&.${tableCellClasses.head}`]: {
-      backgroundColor: theme.palette.grey[200],
-    color: theme.palette.text.primary,
+      backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
     fontWeight: 'bold',
-    textAlign: 'center',
+    textAlign: 'left',
     padding: theme.spacing(1),
     },
     [`&.${tableCellClasses.body}`]: {
