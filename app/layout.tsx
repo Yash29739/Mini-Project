@@ -3,6 +3,9 @@ import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { LoginProvider } from '@/context/LoginContext'; // Import LoginProvider to manage global login state
+// import { Suspense } from 'react';
+// import Loading from './Loading';
+
 
 export const metadata: Metadata = {
   title: 'Digital-Detox',

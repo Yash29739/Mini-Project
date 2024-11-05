@@ -6,6 +6,7 @@ import { toast, ToastContainer } from "react-toastify"; // Notification library
 import "react-toastify/dist/ReactToastify.css";
 import LoadingSpinner from "./LoadingSpinner";
 
+
 const Track = () => {
   const [screenTime, setScreenTime] = useState("");
   const [date, setDate] = useState("");
