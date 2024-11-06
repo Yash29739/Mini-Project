@@ -9,7 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import LoadingSpinner from "./LoadingSpinner";
+import LoadingCursor from "@/app/loading";
 
 // Helper function to format the date into MM/DD format
 const formatDate = (dateString: string) => {
@@ -104,7 +104,9 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, dotThre
   return (
     <div className="w-full h-80">
       {loading ? (
-        <LoadingSpinner />
+        <div className="flex justify-center  items-center ">
+          <LoadingCursor w={300} h={300} />
+        </div>
       ) : (
         <ResponsiveContainer width="100%" height="100%">
           <LineChart

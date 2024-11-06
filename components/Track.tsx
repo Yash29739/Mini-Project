@@ -167,7 +167,7 @@ const Track = () => {
           />
         </div>
 
-        {loading ? <LoadingSpinner /> : ""}
+        {loading ? < LoadingSpinner/> : ""}
         <button
           type="submit"
           className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -178,7 +178,7 @@ const Track = () => {
       </form>
 
       <div className="mt-10 mx-auto max-w-[1000px] ">
-        <p className="text-center text-[30px] mb-8">Screen Time Usage</p>
+        <p className="text-center font-semibold text-[30px] mb-8">Screen Time Usage</p>
         <ScreenTimeGraph
           refreshGraph={refreshGraph}
           dotThreshold={limitUsage}

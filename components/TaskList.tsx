@@ -4,17 +4,22 @@ import { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { styled } from '@mui/material/styles';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
+// import Table from '@mui/material/Table';
+// import TableBody from '@mui/material/TableBody';
+// import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+// import TableContainer from '@mui/material/TableContainer';
+// import TableHead from '@mui/material/TableHead';
+// import TableRow from '@mui/material/TableRow';
+// import Paper from '@mui/material/Paper';2
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import StarIcon from '@mui/icons-material/Star';
+
+import { Table, Thead, Tbody, Tr, Th, Td } from 'react-super-responsive-table';
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+import LoadingSpinner from "./LoadingSpinner";
+import LoadingCursor from "@/app/loading";
 
 interface Todo {
   task_name: string;
@@ -27,9 +32,13 @@ const TodoList = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
   const [taskLimit, setTaskLimit] = useState<number>(0);
+  const [loading, setloading] = useState(false)
 
   // Load todos from the backend on component mount
   const fetchTodos = async () => {
+    console.log("started fetch of todolist");
+    setloading(true);
+    
     try {
       const response = await fetch(
         "https://digital-detox-y73b.onrender.com/toDoList",
@@ -52,6 +61,9 @@ const TodoList = () => {
       }
     } catch (error) {
       toast.error("An error occurred while fetching tasks.");
+    }finally{
+      setloading(false);
+      console.log("Ending fetch of todolist");
     }
   };
 
@@ -194,27 +206,27 @@ const TodoList = () => {
     (a, b) => (b.priority ? 1 : 0) - (a.priority ? 1 : 0)
   );
 
-  const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-      backgroundColor: theme.palette.common.black,
-      color: theme.palette.common.white,
-      wordBreak: "break-word",
-    },
-    [`&.${tableCellClasses.body}`]: {
-      fontSize: 14,
-      wordBreak: "break-word",
-    },
-  }));
+//   const StyledTableCell = styled(TableCell)(({ theme }) => ({
+//     [`&.${tableCellClasses.head}`]: {
+//       backgroundColor: theme.palette.common.black,
+//       color: theme.palette.common.white,
+//       wordBreak: "break-word",
+//     },
+//     [`&.${tableCellClasses.body}`]: {
+//       fontSize: 14,
+//       wordBreak: "break-word",
+//     },
+//   }));
 
-  const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover,
-  },
-}));
+//   const StyledTableRow = styled(TableRow)(({ theme }) => ({
+//   '&:nth-of-type(odd)': {
+//     backgroundColor: theme.palette.action.hover,
+//   },
+// }));
 
 
   return (
-    <div className="max-w-full min-h-[85vh] mx-10 mt-10 p-10 border rounded-lg shadow-lg bg-white">
+    <div className="max-w-full min-h-[85vh] mx-5 md:mx-10 mt-5 md:mt-10 p-10 border rounded-lg shadow-lg bg-white">
       <h1 className="text-4xl font-bold text-center mb-10">Todo List</h1>
       <form
         onSubmit={addTodo}
@@ -242,7 +254,96 @@ const TodoList = () => {
         </button>
       </form>
       <h2 className="text-2xl font-bold mb-4">Tasks In Progress</h2>
-    <TableContainer component={Paper} className="mt-5">
+      {loading? <div className="flex justify-center">
+            <LoadingCursor w={100} h={100}/>
+          </div>
+          :    
+          <Table className="mt-5">
+  <Thead>
+    <Tr>
+      <Th className="bg-black text-white border border-white px-4 py-2">Task Name</Th>
+      <Th align="center" className="bg-black text-white border border-white px-4 py-2">Time Limit</Th>
+      <Th align="center" className="bg-black text-white border border-white px-4 py-2">Priority</Th>
+      <Th align="center" className="bg-black text-white border border-white px-4 py-2">Actions</Th>
+    </Tr>
+  </Thead>
+  <Tbody>
+    {todos.filter(todo => !todo.status).map((todo) => (
+      <Tr key={todo.task_name} className="bg-white ">
+        <Td className="border border-slate-300 px-4 py-2 flex items-center">
+          <Checkbox
+            checked={todo.status}
+            onChange={() => toggleTodo(todo.task_name)}
+            color="primary"
+          />
+          <span className="ml-2">{todo.task_name}</span>
+        </Td>
+        <Td align="center" className="border border-slate-300 px-4 py-2">
+          {todo.task_limit}
+        </Td>
+        <Td align="center" className="border border-slate-300 px-4 py-2">
+          <IconButton onClick={() => updatePriority(todo.task_name)}>
+            <StarIcon style={{ color: todo.priority ? '#fbc02d' : '#b3b3b3' }} />
+          </IconButton>
+        </Td>
+        <Td align="center" className="border border-slate-300 px-4 py-2">
+          <IconButton onClick={() => deleteTodo(todo.task_name)} color="error">
+            <DeleteIcon />
+          </IconButton>
+        </Td>
+      </Tr>
+    ))}
+  </Tbody>
+</Table>
+
+        
+          }
+
+      <h2 className="text-2xl font-bold mb-4 mt-10">Completed Tasks</h2>
+      {loading?<div className="flex justify-center">
+            <LoadingCursor w={100} h={100}/>
+          </div>
+      :
+      <Table className="mt-5 border border-black">
+  <Thead>
+    <Tr>
+      <Th className="bg-black text-white border border-white">Task Name</Th>
+      <Th align="center" className="bg-black text-white border border-white">Time Limit</Th>
+      <Th align="center" className="bg-black text-white border border-white">Priority</Th>
+      <Th align="center" className="bg-black text-white border border-white">Actions</Th>
+    </Tr>
+  </Thead>
+  <Tbody>
+    {todos.filter(todo => todo.status).map((todo) => (
+      <Tr key={todo.task_name} className="bg-green-100 border border-slate-300">
+        <Td>
+          <Checkbox
+            checked={todo.status}
+            onChange={() => toggleTodo(todo.task_name)}
+            color="primary"
+          />
+          {todo.task_name}
+        </Td>
+        <Td className="border border-slate-300" align="center">
+          {todo.task_limit}
+        </Td>
+        <Td align="center">
+          <IconButton onClick={() => updatePriority(todo.task_name)}>
+            <StarIcon style={{ color: todo.priority ? '#fbc02d' : '#b3b3b3' }} />
+          </IconButton>
+        </Td>
+        <Td align="center" className="border border-slate-300">
+          <IconButton onClick={() => deleteTodo(todo.task_name)} color="error">
+            <DeleteIcon />
+          </IconButton>
+        </Td>
+      </Tr>
+    ))}
+  </Tbody>
+</Table>
+
+      }
+    {/* <TableContainer component={Paper} className="mt-5">
       <Table sx={{ minWidth: 700 }} aria-label="customized table">
         <TableHead>
           <TableRow>
@@ -317,14 +418,10 @@ const TodoList = () => {
           ))}
         </TableBody>
       </Table>
-    </TableContainer>
-      {/* <button
-        onClick={deleteCompleteTodos}
-        className="mt-5 bg-red-500 text-white p-2 rounded-md"
-      >
-        Clear Completed Tasks
-      </button> */}
+    </TableContainer> */}
       <ToastContainer />
+
+
     </div>
   );
 };

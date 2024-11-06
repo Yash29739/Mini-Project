@@ -25,6 +25,7 @@
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.4.1",
     "react-icons": "^4.3.1",
+    "react-super-responsive-table": "^6.0.0",
     "react-toastify": "^10.0.6",
     "recharts": "^2.13.0",
     "simplex-noise": "^4.0.3",
