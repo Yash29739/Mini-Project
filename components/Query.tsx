@@ -12,8 +12,11 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import LoadingCursor from "@/app/loading";
+import DotLoader from "./DotLoading";
 
 const Query = () => {
+  const [ml, setml] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,6 +36,7 @@ const Query = () => {
 
   const requestML = async () => {
     console.log("Entered the ml");
+    setml(true);
 
     const data = {
       screen_time: responses.screenTime,
@@ -63,6 +67,8 @@ const Query = () => {
       }
     } catch (error) {
       toast.error("An error occurred: " + error);
+    }finally{
+      setml(false);
     }
   };
 
@@ -116,11 +122,12 @@ const Query = () => {
       setSurveyVisible(false);
     }
     console.log("User Responses:", responses);
-  };
+  };isLoading
 
   // Fetch existing survey responses on component mount
   useEffect(() => {
     const fetchSurveyResponses = async () => {
+      setIsLoading(true);
       try {
         const response = await fetch(
           "https://digital-detox-y73b.onrender.com/survey", // Replace with actual API endpoint
@@ -264,7 +271,7 @@ const Query = () => {
 
   return (
     <div>
-      <div className="flex justify-center items-center mb-[60px] mt-[20px] bg-gray-100">
+      <div className="flex justify-center items-center mb-[60px] mt-20 bg-gray-100">
         <div className="w-full max-w-2xl mx-4">
           {/* Button to open survey */}
           {!isSurveyVisible && (
@@ -582,7 +589,9 @@ const Query = () => {
         </div>
       </div>
 
-      {!isLoading && (
+      {isLoading ? <div className="flex justify-center">
+        <LoadingCursor w={300} h={300}/>
+        </div>:(
         <div className=" my-8 mx-20">
           <h1 className="text-2xl text-center font-bold mb-6">
             Survey Responses
@@ -638,21 +647,24 @@ const Query = () => {
             </div>
           </div>
         </div>
-      )}
+      ) }
       <ToastContainer />
       <div className="flex justify-center h-[30vh] mx-10 border flex-col items-center">
         <p className=" text-[30px] text-ellipsis font-serif text-center ">
-          ML OutPut
+          AI Suggestions
         </p>
         <button
-          className="bg-green-600 text-white py-2 px-4 rounded-md w-[250px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          className="bg-green-600 text-white mt-4 py-2 px-4 rounded-md w-[250px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
           onClick={requestML}
         >
-          Get Suggestions from AI
+          Get some Suggestions 
         </button>
-        <span className="my-2 font-serif">
-          {mlResponse ? `" ${mlResponse} "` : "communicating with the AI......"}
-        </span>
+        {ml? <DotLoader/> : 
+        <span className="my-5 font-serif">
+        {mlResponse ? `" ${mlResponse} "` : " " }
+      </span>
+        }
+        
       </div>
     </div>
   );

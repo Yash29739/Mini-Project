@@ -31,12 +31,12 @@ const Footer = () => {
                   <Link
                     href="/"
                     key={link.label}
-                    className="flex gap-4 md:flex-col lg:flex-row"
+                    className="flex gap-2 md:flex-col lg:flex-row"
                   >
-                    <p className="whitespace-nowrap">
+                    <p className="whitespace-nowrap font-serif">
                       {link.label}:
                     </p>
-                    <p className="medium-14 whitespace-nowrap text-blue-70">
+                    <p className="medium-14 whitespace-nowrap hover:underline hover:text-gray-50 text-gray-30">
                       {link.value}
                     </p>
                   </Link>

@@ -10,7 +10,7 @@ const Home = () => {
     <div className="min-h-screen flex flex-col items-center">
       {/* Header */}
       <Vortex particleCount={210} backgroundColor="black"  rangeY={400} baseRadius={3}>
-        <section className="text-center mt-10 h-[80vh] flex flex-col justify-center items-center">
+        <section className="text-center mt-10 h-[95vh] flex flex-col justify-center items-center">
           <h1 className="text-[50px] font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-pink-500">
             Welcome  <br />
             to Your <br />
