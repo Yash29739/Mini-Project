@@ -676,13 +676,15 @@ const Query = () => {
           AI Suggestions
         </p>
         <button
-          className="bg-green-600 text-white mt-4 py-2 px-4 rounded-md w-[250px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          className="bg-green-600 text-white my-4 py-2 px-4 rounded-md w-[250px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
           onClick={requestML}
         >
           Get some Suggestions
         </button>
         {ml ? (
-          <DotLoader />
+          <div className="mb-10">
+            <DotLoader />
+          </div>
         ) : (
           <span className="my-5 font-serif m-10">
             <div className="text-center">
