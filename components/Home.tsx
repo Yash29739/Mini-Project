@@ -19,6 +19,7 @@ const Home = () => {
             </span>
           </h1>
           <TextGenerateEffect
+          className="text-[20px] text-white opacity-0"
             words="Take control of your screen time and build healthier habits today"
             duration={1}
           />

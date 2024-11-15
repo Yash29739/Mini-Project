@@ -14,6 +14,7 @@ import Paper from "@mui/material/Paper";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import LoadingCursor from "@/app/loading";
 import DotLoader from "./DotLoading";
+import { TextGenerateEffect } from "./ui/text-generate-effect";
 
 const Query = () => {
   const [ml, setml] = useState(false);
@@ -668,10 +669,11 @@ const Query = () => {
         >
           Get some Suggestions
         </button>
-        {ml ? <DotLoader /> :
-          <span className="my-5 font-serif">
-            {mlResponse ? `" ${mlResponse} "` : " "}
-          </span>
+        {ml? <DotLoader/> : 
+        <span className="my-5 font-serif">
+          <TextGenerateEffect words={mlResponse} duration={2} className="text-[20px] text-white opacity-0"/>
+        {mlResponse ? `" ${mlResponse} "` : " " }
+      </span>
         }
 
       </div>

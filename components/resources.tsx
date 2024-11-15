@@ -27,11 +27,11 @@ const VideoGallery: React.FC = () => {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 mt-12">
       {/* Display the selected video */}
       {playingVideo && (
-        <div className="mb-8">
-          <h3 className="text-xl py-3 my-2 font-semibold bg-gray-300 rounded-lg text-center">{playingVideo.title}</h3>
+        <div className="mb-8 ">
+          <h3 className="text-xl py-3 my-2 font-semibold border-2 border-gray-20 rounded-lg text-center">{playingVideo.title}</h3>
           <iframe
             src={`${playingVideo.src}?autoplay=1&rel=0`}  // Play the selected YouTube video with autoplay
             title={playingVideo.title}
@@ -47,13 +47,13 @@ const VideoGallery: React.FC = () => {
         {videos.map((video) => (
           <div
             key={video.id}
-            className="border p-3 rounded-xl bg-gray-200  hover:shadow-[0px_0px_15px_1px_#ec02bf] border-red-600 cursor-pointer transform hover:scale-105 transition duration-300 ease-in"
+            className="border p-3 rounded-xl bg-blue-50  hover:shadow-[0px_0px_15px_1px_blue] border-blue-600 cursor-pointer transform hover:scale-105 transition duration-300 ease-in"
             onClick={() => handleVideoClick(video)}
           >
             <img
               src={video.image}  // Display the thumbnail
               alt={video.title}
-              className="w-full hover:shadow-[0px_0px_1px_1px_#ec02bf] h-40 lg:h-[300px] rounded-lg"
+              className="w-full hover:shadow-[0px_0px_1px_1px_blue] h-40 lg:h-[300px] rounded-lg"
             />
             <h3 className="text-lg mt-2">{video.title}</h3>
           </div>

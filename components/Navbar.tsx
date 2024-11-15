@@ -134,12 +134,12 @@ const Navbar = () => {
       </button>
 
       {isMenuOpen && (
-        <div className="absolute top-8 text-white right-0 bg-gray-800 mt-[30px] shadow-lg rounded-lg z-50">
+        <div className="absolute top-8 text-white right-0 bg-gray-300 mt-[30px] shadow-lg rounded-lg z-50">
           <ul className="flex flex-col p-4">
             <li>
               <Link
                 href="/"
-                className="text-white py-2 block hover:bg-gray-700 hover:rounded-lg p-[20px] transition-all"
+                className="text-black py-2 block hover:bg-gray-700 hover:text-white hover:rounded-lg p-[20px] transition-all"
                 onClick={toggleMenu}
               >
                 Home
@@ -148,7 +148,7 @@ const Navbar = () => {
             <li>
               <Link
                 href="/schedules"
-                className="text-white py-2 block hover:bg-gray-700 hover:rounded-lg p-[20px] transition-all"
+                className="text-black py-2 block hover:bg-gray-700  hover:text-white hover:rounded-lg p-[20px] transition-all"
                 onClick={toggleMenu}
               >
                 Schedules
@@ -157,7 +157,7 @@ const Navbar = () => {
             <li>
               <Link
                 href="/resources"
-                className="text-white py-2 block hover:bg-gray-700 hover:rounded-lg p-[20px] transition-all"
+                className="text-black py-2 block hover:bg-gray-700 hover:text-white  hover:rounded-lg p-[20px] transition-all"
                 onClick={toggleMenu}
               >
                 Resources
@@ -166,7 +166,7 @@ const Navbar = () => {
             <li>
               <Link
                 href="/toDoList"
-                className="text-white py-2 block hover:bg-gray-700 hover:rounded-lg p-[20px] transition-all"
+                className="text-black py-2 block hover:bg-gray-700  hover:text-white hover:rounded-lg p-[20px] transition-all"
                 onClick={toggleMenu}
               >
                 ToDoList
@@ -175,7 +175,7 @@ const Navbar = () => {
             <li>
               <Link
                 href="/tracker"
-                className="text-white py-2 block hover:bg-gray-700 hover:rounded-lg p-[20px] transition-all"
+                className="text-black py-2 block hover:bg-gray-700 hover:text-white hover:rounded-lg p-[20px] transition-all"
                 onClick={toggleMenu}
               >
                 Tracker
@@ -186,7 +186,7 @@ const Navbar = () => {
                 <div className="flex flex-col">
                   <Link
                     href="/Profile"
-                    className="text-white py-2 block hover:bg-green-600 bg-green-700 hover:rounded-lg p-[20px] transition-all"
+                    className="text-white py-2 block hover:bg-green-600 mt-3 bg-green-700 hover:rounded-lg rounded-lg p-[20px] transition-all"
                   >
                     <div className="flex gap-2">
                       <Image
@@ -202,7 +202,7 @@ const Navbar = () => {
                   </Link>
                   <button
                     onClick={logout}
-                    className="text-white py-2 block hover:bg-red-600 hover:rounded-lg p-[20px] transition-all"
+                    className="text-white py-2 block hover:bg-red-600 bg-red-700 mt-3 rounded-lg hover:rounded-lg p-[20px] transition-all"
                   >
                     <div className="flex gap-2">
                       <Image
