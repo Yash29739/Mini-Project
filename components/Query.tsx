@@ -22,6 +22,7 @@ const Query = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [mlResponse, setMlResponse] = useState("");
+  const [cluster, setCluster] = useState(-1);
   const [responses, setResponses] = useState<Record<string, string>>({
     screenTime: "",
     screenActivity: "",
@@ -40,11 +41,18 @@ const Query = () => {
     setml(true);
 
     const data = {
-      screen_time: responses.screenTime,
-      main_activity: responses.screenActivity,
-      social_media_time: responses.socialMediaTime,
-      screen_time_challenges: responses.challengingTask,
-      work_screen_time: responses.workScreenTime,
+      input: {
+        screen_time: responses.screenTime,
+        main_activity: responses.screenActivity,
+        social_media_time: responses.socialMediaTime,
+        reduce_social_media: responses.socialMediaStrategy,
+        tech_free_breaks: responses.workTimeBreaks,
+        detox_goal: responses.primaryGoal,
+        screen_time_challenges: responses.challengingTask,
+        detox_support: responses.whatHelp,
+        detox_priorities: responses.activityPriority
+      },
+      cluster: cluster
     };
     try {
       const response = await fetch(
@@ -68,7 +76,7 @@ const Query = () => {
       }
     } catch (error) {
       toast.error("An error occurred: " + error);
-    }finally{
+    } finally {
       setml(false);
     }
   };
@@ -123,7 +131,7 @@ const Query = () => {
       setSurveyVisible(false);
     }
     console.log("User Responses:", responses);
-  };isLoading
+  }; isLoading
 
   // Fetch existing survey responses on component mount
   useEffect(() => {
@@ -154,6 +162,7 @@ const Query = () => {
         // Ensure result contains the correct data structure
         if (result && result.foundSurvey.responses) {
           setResponses(result.foundSurvey.responses);
+          setCluster(result.foundSurvey.cluster);
         } else {
           console.warn("No responses found in the fetched data");
         }
@@ -193,13 +202,13 @@ const Query = () => {
     setIsEditing(false);
   };
 
-  const StyledTableCell = styled(TableCell)(({ theme }:{theme:Theme}) => ({
+  const StyledTableCell = styled(TableCell)(({ theme }: { theme: Theme }) => ({
     [`&.${tableCellClasses.head}`]: {
       backgroundColor: theme.palette.common.black,
-    color: theme.palette.common.white,
-    fontWeight: 'bold',
-    textAlign: 'left',
-    padding: theme.spacing(1),
+      color: theme.palette.common.white,
+      fontWeight: 'bold',
+      textAlign: 'left',
+      padding: theme.spacing(1),
     },
     [`&.${tableCellClasses.body}`]: {
       fontSize: 14,
@@ -591,8 +600,8 @@ const Query = () => {
       </div>
 
       {isLoading ? <div className="flex justify-center">
-        <LoadingCursor w={300} h={300}/>
-        </div>:(
+        <LoadingCursor w={300} h={300} />
+      </div> : (
         <div className=" my-8 mx-20">
           <h1 className="text-2xl text-center font-bold mb-6">
             Survey Responses
@@ -612,7 +621,7 @@ const Query = () => {
                 <TableHead>
                   <TableRow>
                     <StyledTableCell>Question</StyledTableCell>
-                    <StyledTableCell sx={{ borderLeft: `2px solid ${theme.palette.divider}`}}>Response</StyledTableCell>
+                    <StyledTableCell sx={{ borderLeft: `2px solid ${theme.palette.divider}` }}>Response</StyledTableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -648,7 +657,7 @@ const Query = () => {
             </div>
           </div>
         </div>
-      ) }
+      )}
       <ToastContainer />
       <div className="flex justify-center h-[30vh] mx-10 border flex-col items-center">
         <p className=" text-[30px] text-ellipsis font-serif text-center ">
@@ -658,7 +667,7 @@ const Query = () => {
           className="bg-green-600 text-white mt-4 py-2 px-4 rounded-md w-[250px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
           onClick={requestML}
         >
-          Get some Suggestions 
+          Get some Suggestions
         </button>
         {ml? <DotLoader/> : 
         <span className="my-5 font-serif">
@@ -666,7 +675,7 @@ const Query = () => {
         {mlResponse ? `" ${mlResponse} "` : " " }
       </span>
         }
-        
+
       </div>
     </div>
   );
