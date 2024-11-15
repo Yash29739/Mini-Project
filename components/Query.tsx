@@ -21,7 +21,10 @@ const Query = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
   const [mlResponse, setMlResponse] = useState("");
+  const [Suggestions, setSuggestions] = useState([]);
+
   const [cluster, setCluster] = useState(-1);
   const [responses, setResponses] = useState<Record<string, string>>({
     screenTime: "",
@@ -50,9 +53,9 @@ const Query = () => {
         detox_goal: responses.primaryGoal,
         screen_time_challenges: responses.challengingTask,
         detox_support: responses.whatHelp,
-        detox_priorities: responses.activityPriority
+        detox_priorities: responses.activityPriority,
       },
-      cluster: cluster
+      cluster: cluster,
     };
     try {
       const response = await fetch(
@@ -69,7 +72,9 @@ const Query = () => {
       if (response.ok) {
         // toast.success("Successfully communicated wiht the AI");
         console.log("Log Response", res.prediction);
+        console.log("Log suggestions", res.suggestions);
         setMlResponse(res.prediction);
+        setSuggestions(res.suggestions);
       } else {
         console.log("Log error", res.message);
         toast.success("Communiczation Unsuccessfull");
@@ -131,7 +136,8 @@ const Query = () => {
       setSurveyVisible(false);
     }
     console.log("User Responses:", responses);
-  }; isLoading
+  };
+  isLoading;
 
   // Fetch existing survey responses on component mount
   useEffect(() => {
@@ -206,8 +212,8 @@ const Query = () => {
     [`&.${tableCellClasses.head}`]: {
       backgroundColor: theme.palette.common.black,
       color: theme.palette.common.white,
-      fontWeight: 'bold',
-      textAlign: 'left',
+      fontWeight: "bold",
+      textAlign: "left",
       padding: theme.spacing(1),
     },
     [`&.${tableCellClasses.body}`]: {
@@ -599,10 +605,12 @@ const Query = () => {
         </div>
       </div>
 
-      {isLoading ? <div className="flex justify-center">
-        <LoadingCursor w={300} h={300} />
-      </div> : (
-        <div className=" my-8 mx-20">
+      {isLoading ? (
+        <div className="flex justify-center">
+          <LoadingCursor w={300} h={300} />
+        </div>
+      ) : (
+        <div className=" my-8 mx-10 ">
           <h1 className="text-2xl text-center font-bold mb-6">
             Survey Responses
           </h1>
@@ -621,7 +629,11 @@ const Query = () => {
                 <TableHead>
                   <TableRow>
                     <StyledTableCell>Question</StyledTableCell>
-                    <StyledTableCell sx={{ borderLeft: `2px solid ${theme.palette.divider}` }}>Response</StyledTableCell>
+                    <StyledTableCell
+                      sx={{ borderLeft: `2px solid ${theme.palette.divider}` }}
+                    >
+                      Response
+                    </StyledTableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -659,8 +671,8 @@ const Query = () => {
         </div>
       )}
       <ToastContainer />
-      <div className="flex justify-center h-[30vh] mx-10 border flex-col items-center">
-        <p className=" text-[30px] text-ellipsis font-serif text-center ">
+      <div className="flex justify-center rounded-lg mx-10 border flex-col items-center">
+        <p className=" text-[30px] text-ellipsis mt-4 -font-serif text-center ">
           AI Suggestions
         </p>
         <button
@@ -669,13 +681,22 @@ const Query = () => {
         >
           Get some Suggestions
         </button>
-        {ml? <DotLoader/> : 
-        <span className="my-5 font-serif">
-          <TextGenerateEffect words={mlResponse} duration={2} className="text-[20px] text-white opacity-0"/>
-        {mlResponse ? `" ${mlResponse} "` : " " }
-      </span>
-        }
-
+        {ml ? (
+          <DotLoader />
+        ) : (
+          <span className="my-5 font-serif m-10">
+            <div className="text-center">
+              <TextGenerateEffect
+                words={mlResponse}
+                duration={2}
+                className="text-[20px] text-black text-center opacity-0"
+              />
+            </div>
+            {Suggestions.map((i) => (
+              <div className="my-2 p-5">{i}</div>
+            ))}
+          </span>
+        )}
       </div>
     </div>
   );

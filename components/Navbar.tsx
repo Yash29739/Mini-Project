@@ -220,7 +220,7 @@ const Navbar = () => {
               ) : (
                 <Link
                   href="/login"
-                  className="hover:bg-green-600 text-white py-2 block hover:rounded-lg p-[20px] transition-all"
+                  className="hover:bg-green-500 bg-green-600 focus:ring-green-500 rounded-lg text-white py-2 block hover:rounded-lg p-[20px] transition-all"
                 >
                   <div className="flex gap-2">
                     <Image src="/user.svg" alt="Login" width={20} height={20} />
