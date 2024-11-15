@@ -51,7 +51,7 @@ const Query = () => {
         detox_support: responses.whatHelp,
         detox_priorities: responses.activityPriority
       },
-      cluster: responses.cluster
+      cluster: cluster
     };
     try {
       const response = await fetch(
