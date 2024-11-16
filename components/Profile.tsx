@@ -55,8 +55,10 @@ const Profile = () => {
   };
 
   const handleSave = async () => {
+    console.log("Running Save");
+    
     try {
-      const response = await fetch("https://digital-detox-y73b.onrender.com/update-profile", {
+      const response = await fetch("https://digital-detox-y73b.onrender.com/auth", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
