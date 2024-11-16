@@ -25,6 +25,9 @@ const Query = () => {
   const [mlResponse, setMlResponse] = useState("");
   const [Suggestions, setSuggestions] = useState([]);
 
+  const [Feedback, setFeedback] = useState("");
+  const [FeedbackReaction, setFeedbackReaction] = useState("");
+  const [isSubmitting, setisSubmitting] = useState(false);
   const [cluster, setCluster] = useState(-1);
   const [responses, setResponses] = useState<Record<string, string>>({
     screenTime: "",
@@ -86,15 +89,68 @@ const Query = () => {
     }
   };
 
-  const isMounted = useRef(true);
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setIsSaving(true);
+  const handleEmoji = (emoji: React.SetStateAction<string>) => {
+    setFeedbackReaction(emoji);
+  };
 
-    // Sending survey to backend to store
+  const handleFeedback = async (e: { preventDefault: () => void }) => {
+    setisSubmitting(true);
+    e.preventDefault();
+    
+    // if (!FeedbackReaction || !Feedback) {
+    //   alert("Please select an emoji and write your feedback!");
+    //   setisSubmitting(false);
+    //   return;
+    // }
+    
+    const data = {
+      feedback: Feedback,
+      ratings: FeedbackReaction,
+      cluster:cluster
+    };
+    
+    console.log("Entered the Feedback  Post");
+    
+    
     try {
-      const responsedata = { responses };
       const response = await fetch(
+        "https://digital-detox-ml.onrender.com/feedback",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+        );
+        const res = await response.json();
+        if (response.ok) {
+          console.log("Feedback Submitted" + res);
+          alert("Feedback submitted successfully!");
+          setFeedback("");
+          setFeedbackReaction("");
+        } else {
+          console.log("Feedback Failed" + res);
+          alert("Failed to submit feedback.");
+        }
+      } catch (error) {
+        console.log("Error Occured" + error);
+        alert("Something went wrong. Please try again later.");
+      }finally{
+        setisSubmitting(false);
+        console.log("Entered the Feedback  Post");
+      }
+    };
+    
+    const isMounted = useRef(true);
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      setIsSaving(true);
+      
+      // Sending survey to backend to store
+      try {
+        const responsedata = { responses };
+        const response = await fetch(
         "https://digital-detox-y73b.onrender.com/survey",
         {
           method: isEditing ? "PUT" : "POST",
@@ -699,6 +755,55 @@ const Query = () => {
             ))}
           </span>
         )}
+      </div>
+
+      <div className="flex flex-col lg:my-10 lg:mx-40 mx-10 my-10 space-y-8 items-center p-10 bg-gradient-to-r from-blue-50 via-white to-blue-100 rounded-lg shadow-lg">
+        <p className="text-[25px] lg:text-[30px] font-serif font-extrabold text-blue-800">
+          Provide Feedback
+        </p>
+
+        {/* Emoji Feedback Section */}
+        <div className="flex space-x-3">
+          {[
+            { title: "1", src: "/1.png" },
+            { title: "2", src: "/2.png" },
+            { title: "3", src: "/3.png" },
+            { title: "4", src: "/4.png" },
+            { title: "5", src: "/5.png" },
+          ].map((emoji) => (
+            <button
+              key={emoji.title}
+              className={`transition transform hover:scale-110 focus:outline-none rounded-full ${
+                FeedbackReaction === emoji.title
+                  ? "border border-yellow-500 scale-125"
+                  : ""
+              }`}
+              onClick={() => handleEmoji(emoji.title)}
+              title={emoji.title}
+            >
+              <img src={emoji.src} alt={emoji.title} />
+            </button>
+          ))}
+        </div>
+
+        {/* Feedback Text Area */}
+        <textarea
+          className="w-full max-w-2xl h-[15vh] border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 rounded-lg py-2 px-4 shadow-sm placeholder-gray-500 text-gray-700"
+          name="feedback"
+          placeholder="Write your feedback here..."
+          id="feedback"
+          value={Feedback}
+          onChange={(e) => setFeedback(e.target.value)}
+        />
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          onClick={handleFeedback}
+          className="bg-gradient-to-r from-blue-500 to-blue-700 text-white py-3 px-8 rounded-lg shadow-md hover:shadow-lg hover:from-blue-600 hover:to-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-offset-2 transition duration-300 ease-in-out"
+        >
+          {isSubmitting? "Submitting" : "Submit" }
+        </button>
       </div>
     </div>
   );
