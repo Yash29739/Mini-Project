@@ -351,7 +351,7 @@ const Query = () => {
               onClick={toggleSurvey}
               className="w-full bg-black text-white p-4 font-bold rounded-2xl text-center hover:bg-gray-800"
             >
-              Take a Survey !!
+              Survey for personalized suggestions
             </button>
           )}
 

@@ -15,20 +15,21 @@ interface Todo {
   task_name: string;
   status: boolean;
   priority: boolean;
-  task_limit: number;
+  due_date: string; // Updated to include due date
 }
 
 const TodoList = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
+  const [ctr, setCtr] = useState(0);
   const [inputValue, setInputValue] = useState<string>("");
-  const [taskLimit, setTaskLimit] = useState<number>(0);
+  const [dueDate, setDueDate] = useState("");
   const [loading, setloading] = useState(false);
 
-  // Load todos from the backend on component mount
+  // Fetching the todo list
   const fetchTodos = async () => {
     console.log("started fetch of todolist");
     setloading(true);
-
+  
     try {
       const response = await fetch(
         "https://digital-detox-y73b.onrender.com/toDoList",
@@ -39,14 +40,17 @@ const TodoList = () => {
         }
       );
       const data = await response.json();
-
+  
       if (response.ok) {
-        const sortedTodos = (Array.isArray(data.tasks) ? data.tasks : []).sort(
-          (a: Todo, b: Todo) => {
+        const sortedTodos = (Array.isArray(data.tasks) ? data.tasks : [])
+          .map((task: Todo) => ({
+            ...task,
+            due_date: task.due_date.split("T")[0], // Extract only the date
+          }))
+          .sort((a: Todo, b: Todo) => {
             if (a.status !== b.status) return a.status ? 1 : -1; // Move completed tasks to the end
             return b.priority ? 1 : -1; // Among uncompleted tasks, prioritize those with priority
-          }
-        );
+          });
         setTodos(sortedTodos);
       } else {
         toast.error("Failed to fetch tasks.");
@@ -58,21 +62,53 @@ const TodoList = () => {
       console.log("Ending fetch of todolist");
     }
   };
+  
 
   useEffect(() => {
-    fetchTodos();
-  }, []);
+
+    // Run fetch only once
+    if (ctr === 0) {
+      fetchTodos();
+      setCtr(1);
+    }
+
+    //Check for notification permission
+    if (Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+
+    const interval = setInterval(checkOverdueTasks, 60000); // Check every minute
+    return () => clearInterval(interval); // Cleanup on component unmount
+  }, [todos]);
+
+  const checkOverdueTasks = () => {
+    const currentDate = new Date();
+    todos.forEach((todo) => {
+      const dueDate = new Date(todo.due_date);
+
+      if (!todo.status && dueDate < currentDate) {
+        // Notify user if the task is overdue
+        new Notification("Task Overdue", {
+          body: `The task "${todo.task_name}" is overdue!`,
+        });
+      }
+    });
+  };
 
   const addTodo = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedInput = inputValue.trim();
 
-    if (trimmedInput === "" || taskLimit <= 0) {
-      toast.info("Please fill the input correctly.");
+    if (trimmedInput === "" || dueDate === "") {
+      toast.info("Please fill all fields correctly.");
       return;
     }
-    if (todos.some((todo) => todo.task_name === trimmedInput)) {
-      toast.error("Task already exists!");
+
+    const currentDate = new Date();
+    const selectedDate = new Date(dueDate);
+
+    if (selectedDate < currentDate) {
+      toast.error("Due date cannot be in the past.");
       return;
     }
 
@@ -80,24 +116,21 @@ const TodoList = () => {
       task_name: trimmedInput,
       status: false,
       priority: false,
-      task_limit: taskLimit,
+      due_date: dueDate,
     };
 
     try {
-      const response = await fetch(
-        "https://digital-detox-y73b.onrender.com/toDoList",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newTodo),
-          credentials: "include",
-        }
-      );
+      const response = await fetch("https://digital-detox-y73b.onrender.com/toDoList", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newTodo),
+        credentials: "include",
+      });
+
       if (response.ok) {
         setTodos((prevTodos) => [...prevTodos, newTodo]);
-        toast.success("Task added successfully!");
         setInputValue("");
-        setTaskLimit(0);
+        setDueDate("");
       } else {
         toast.error("Failed to add task.");
       }
@@ -105,6 +138,7 @@ const TodoList = () => {
       toast.error("An error occurred while adding the task.");
     }
   };
+
 
   const toggleTodo = async (taskName: string) => {
     const updatedTodos = todos.map((todo) =>
@@ -120,9 +154,10 @@ const TodoList = () => {
           status: updatedTodos.find((todo) => todo.task_name === taskName)
             ?.status,
         }),
-        credentials: "include",
+        credentials: "include"
       });
-      toast.success("Task status updated successfully!");
+      console.log("Updated to do list");
+
     } catch (error) {
       toast.error("An error occurred while toggling task status.");
     }
@@ -151,10 +186,8 @@ const TodoList = () => {
         setTodos((prevTodos) =>
           prevTodos.filter((todo) => todo.task_name !== taskName)
         );
-        toast.success("Task deleted successfully.");
       } else {
-        toast.error("Failed to delete task.");
-        // console.log("delete ", res.message);
+        console.log("deleted message");
       }
     } catch (error) {
       toast.error("An error occurred while deleting the task.");
@@ -168,7 +201,8 @@ const TodoList = () => {
 
     const currentTodo = todos.find((todo) => todo.task_name === taskName);
     if (currentTodo && currentTodo.status) {
-      toast.info("Cannot update priority for completed tasks.");
+      console.log("Error saving to do list");
+
       return; // Exit the function if the task is completed
     }
 
@@ -185,7 +219,6 @@ const TodoList = () => {
         }),
         credentials: "include",
       });
-      toast.success("Priority updated successfully!");
     } catch (error) {
       toast.error("An error occurred while updating priority.");
     }
@@ -199,17 +232,10 @@ const TodoList = () => {
     );
   };
 
-  const sortedTodos = [...todos].sort(
-    (a, b) => (b.priority ? 1 : 0) - (a.priority ? 1 : 0)
-  );
-
   return (
     <div className="max-w-full min-h-[85vh] mx-5 md:mx-10 mt-5 md:mt-10 p-10 border rounded-lg shadow-lg bg-white">
       <h1 className="text-4xl font-bold text-center mb-10">Todo List</h1>
-      <form
-        onSubmit={addTodo}
-        className="flex w-full sm:flex-row flex-col space-x-5 justify-center items-center mb-5"
-      >
+      <form onSubmit={addTodo} className="flex w-full sm:flex-row flex-col space-x-5 justify-center items-center mb-5">
         <input
           type="text"
           value={inputValue}
@@ -218,11 +244,10 @@ const TodoList = () => {
           placeholder="Task name"
         />
         <input
-          type="number"
-          value={taskLimit}
-          onChange={(e) => setTaskLimit(Number(e.target.value))}
+          type="date" // Changed input type to date
+          value={dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
           className="p-2 border mb-4 w-full rounded-lg"
-          placeholder="Time limit (minutes)"
         />
         <button
           type="submit"
@@ -231,7 +256,8 @@ const TodoList = () => {
           Add Task
         </button>
       </form>
-      
+
+
       <h2 className="text-2xl font-bold mb-4">Tasks In Progress</h2>
       {loading ? (
         <div className="flex justify-center">
@@ -248,7 +274,7 @@ const TodoList = () => {
                 align="center"
                 className="bg-black text-white border border-white px-4 py-2"
               >
-                Time Limit
+                Due Date
               </Th>
               <Th
                 align="center"
@@ -268,35 +294,29 @@ const TodoList = () => {
             {todos
               .filter((todo) => !todo.status)
               .map((todo) => (
-                <Tr key={todo.task_name} className="bg-white">
-                  <Td className="border border-slate-300 px-4 py-2 flex items-center">
+                <Tr
+                  key={todo.task_name}
+                  className="border border-slate-300"
+                >
+                  <Td className="border border-slate-300 px-4 py-2">
                     <Checkbox
                       checked={todo.status}
                       onChange={() => toggleTodo(todo.task_name)}
                       color="primary"
-                    />
-                    <span className="ml-2">{todo.task_name}</span>
+                    />{todo.task_name}
                   </Td>
-                  <Td
-                    align="center"
-                    className="border border-slate-300 px-4 py-2"
-                  >
-                    {todo.task_limit}
+
+                  <Td className="border border-slate-300" align="center">
+                    {todo.due_date}
                   </Td>
-                  <Td
-                    align="center"
-                    className="border border-slate-300 px-4 py-2"
-                  >
+                  <Td align="center">
                     <IconButton onClick={() => updatePriority(todo.task_name)}>
                       <StarIcon
                         style={{ color: todo.priority ? "#fbc02d" : "#b3b3b3" }}
                       />
                     </IconButton>
                   </Td>
-                  <Td
-                    align="center"
-                    className="border border-slate-300 px-4 py-2"
-                  >
+                  <Td align="center" className="border border-slate-300">
                     <IconButton
                       onClick={() => deleteTodo(todo.task_name)}
                       color="error"
@@ -307,6 +327,7 @@ const TodoList = () => {
                 </Tr>
               ))}
           </Tbody>
+
         </Table>
       )}
 
@@ -316,27 +337,27 @@ const TodoList = () => {
           <LoadingCursor w={100} h={100} />
         </div>
       ) : (
-        <Table className="mt-5 border border-black">
+        <Table className="table-responsive mt-5">
           <Thead>
             <Tr>
-              <Th className="bg-black text-white border border-white">
+              <Th className="bg-black text-white border border-white px-4 py-2">
                 Task Name
               </Th>
               <Th
                 align="center"
-                className="bg-black text-white border border-white"
+                className="bg-black text-white border border-white px-4 py-2"
               >
-                Time Limit
+                Due Date
               </Th>
               <Th
                 align="center"
-                className="bg-black text-white border border-white"
+                className="bg-black text-white border border-white px-4 py-2"
               >
                 Priority
               </Th>
               <Th
                 align="center"
-                className="bg-black text-white border border-white"
+                className="bg-black text-white border border-white px-4 py-2"
               >
                 Actions
               </Th>
@@ -350,16 +371,16 @@ const TodoList = () => {
                   key={todo.task_name}
                   className="bg-green-100 border border-slate-300"
                 >
-                  <Td>
+                  <Td className="border border-slate-300 px-4 py-2">
                     <Checkbox
                       checked={todo.status}
                       onChange={() => toggleTodo(todo.task_name)}
                       color="primary"
-                    />
-                    {todo.task_name}
+                    />{todo.task_name}
                   </Td>
+
                   <Td className="border border-slate-300" align="center">
-                    {todo.task_limit}
+                    {todo.due_date}
                   </Td>
                   <Td align="center">
                     <IconButton onClick={() => updatePriority(todo.task_name)}>
