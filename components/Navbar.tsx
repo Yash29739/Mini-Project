@@ -5,9 +5,10 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 
 const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // State to manage mobile menu
-  const { isLoggedIn, setIsLoggedIn, logout } = useLogin(); // Destructure context values
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isLoggedIn, setIsLoggedIn, logout } = useLogin();
 
+  // Check login state and expiry
   useEffect(() => {
     const isLoggedIn = JSON.parse(
       localStorage.getItem("isLoggedIn") || "false"
@@ -16,217 +17,148 @@ const Navbar = () => {
     const currentTime = Date.now();
 
     if (isLoggedIn && currentTime < expiry) {
-      setIsLoggedIn(true); // Set login state if still valid
+      setIsLoggedIn(true);
     } else {
-      localStorage.removeItem("isLoggedIn"); // Clear the login state if expired
-      localStorage.removeItem("loginExpiry"); // Clear the expiry time
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("loginExpiry");
     }
   }, []);
 
   const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
+    setIsMenuOpen((prev) => !prev);
   };
 
+  const menuLinks = [
+    { href: "/", label: "Home" },
+    { href: "/schedules", label: "Schedules" },
+    { href: "/resources", label: "Resources" },
+    { href: "/toDoList", label: "To-Do List" },
+    { href: "/tracker", label: "Tracker" },
+  ];
+
   return (
-    <nav className="flexBetween fixed max-container w-full padding-container z-30 backdrop-blur-md bg-black/60 rounded-xl top-0">
-      <Link href="/" aria-label="Home">
-        <Image
-          src="/logo.png"
-          alt="logo"
-          className="rounded-3xl min-w-[100px]"
-          width={10}
-          height={59}
-        />
-      </Link>
+    <nav className="fixed w-full z-30 top-0 bg-blue-800/70 backdrop-blur-md shadow-md">
+      <div className="flex items-center justify-between max-w-7xl mx-auto px-6 py-4">
+        {/* Leftmost Logo */}
+        <Link href="/" aria-label="Home">
+          <Image
+            src="/logo.png"
+            alt="logo"
+            className="rounded-full"
+            width={60}
+            height={60}
+          />
+        </Link>
 
-      <ul
-        className={`md:flex h-full ml-5 hidden gap-8 ${
-          isMenuOpen ? "flex" : "hidden"
-        } md:items-center`}
-      >
-        <li>
-          <Link
-            href="/"
-            className="regular-16 text-white flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold"
-          >
-            Home
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/schedules"
-            className="regular-16 text-white flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold"
-          >
-            Schedules
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/resources"
-            className="regular-16 text-white flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold"
-          >
-            Resources
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/toDoList"
-            className="regular-16 text-white flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold"
-          >
-            ToDoList
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/tracker"
-            className="regular-16 text-white flexCenter cursor-pointer pb-1.5 transition-all hover:font-bold"
-          >
-            Tracker
-          </Link>
-        </li>
-
-        <li>
-          {isLoggedIn ? (
-            <div className="flex items-center">
-              <Link href="/Profile">
-                <button className="flex items-center gap-2 px-5 py-2 bg-green-700 text-white rounded-2xl hover:border-white border-none">
-                  <Image src="/user.svg" alt="Profile" width={20} height={20} />
-                  <span className="font-bold whitespace-nowrap cursor-pointer">
-                    Profile
-                  </span>
+        {/* Desktop Menu */}
+        <ul className="hidden md:flex items-center gap-8 text-white font-medium">
+          {menuLinks.map((link) => (
+            <li key={link.label}>
+              <Link
+                href={link.href}
+                className="hover:text-blue-300 transition duration-200"
+              >
+                {link.label}
+              </Link>
+            </li>
+          ))}
+          <li>
+            {isLoggedIn ? (
+              <div className="flex items-center gap-4">
+                <Link href="/Profile">
+                  <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-500 transition">
+                    <Image src="/user.svg" alt="Profile" width={20} height={20} />
+                    <span>Profile</span>
+                  </button>
+                </Link>
+                <button
+                  onClick={logout}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-500 transition"
+                >
+                  <Image src="/logout.svg" alt="Logout" width={20} height={20} />
+                  <span>Logout</span>
+                </button>
+              </div>
+            ) : (
+              <Link href="/login">
+                <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-500 transition">
+                  <Image src="/user.svg" alt="Login" width={20} height={20} />
+                  <span>Log In</span>
                 </button>
               </Link>
-              <button
-                onClick={logout}
-                className="ml-4 flex items-center gap-2 px-5 py-2 bg-red-700 text-white rounded-2xl border border-red-600 hover:bg-red-600 hover:border-white"
-              >
-                <Image src="/logout.svg" alt="Logout" width={20} height={20} />
-                <span className="font-bold whitespace-nowrap cursor-pointer">
-                  Logout
-                </span>
-              </button>
-            </div>
-          ) : (
-            <Link href="/login">
-              <button className="flexCenter gap-2 px-3 py-2 hover:border-red-50 bg-green-700 hover:bg-green-600 text-white rounded-2xl border btn">
-                <Image src="/user.svg" alt="Login" width={20} height={14} />
-                <label className="bold-10 whitespace-nowrap cursor-pointer">
-                  LogIn
-                </label>
-              </button>
-            </Link>
-          )}
-        </li>
-      </ul>
+            )}
+          </li>
+        </ul>
 
-      <button
-        onClick={toggleMenu}
-        aria-label="Toggle Menu"
-        className="md:hidden"
-      >
-        <Image
-          src="/menu.svg"
-          alt="menu"
-          width={32}
-          height={32}
-          className="inline-block cursor-pointer"
-        />
-      </button>
+        {/* Mobile Menu Toggle */}
+        <button
+          onClick={toggleMenu}
+          aria-label="Toggle Menu"
+          className="md:hidden focus:outline-none"
+        >
+          <Image
+            src="/menu.svg"
+            alt="Menu"
+            width={32}
+            height={32}
+            className="cursor-pointer"
+          />
+        </button>
+      </div>
 
+      {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="absolute top-8 text-white right-0 bg-gray-300 mt-[30px] shadow-lg rounded-lg z-50">
-          <ul className="flex flex-col p-4">
+        <div className="absolute top-16 right-6 w-64 bg-blue-900 text-white rounded-xl shadow-lg">
+          <ul className="flex flex-col gap-4 p-4">
+            {menuLinks.map((link) => (
+              <li key={link.label}>
+                <Link
+                  href={link.href}
+                  className="block py-2 px-4 rounded-lg hover:bg-blue-700 transition"
+                  onClick={toggleMenu}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
             <li>
-              <Link
-                href="/"
-                className="text-black py-2 block hover:bg-gray-700 hover:text-white hover:rounded-lg p-[20px] transition-all"
-                onClick={toggleMenu}
-              >
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/schedules"
-                className="text-black py-2 block hover:bg-gray-700  hover:text-white hover:rounded-lg p-[20px] transition-all"
-                onClick={toggleMenu}
-              >
-                Schedules
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/resources"
-                className="text-black py-2 block hover:bg-gray-700 hover:text-white  hover:rounded-lg p-[20px] transition-all"
-                onClick={toggleMenu}
-              >
-                Resources
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/toDoList"
-                className="text-black py-2 block hover:bg-gray-700  hover:text-white hover:rounded-lg p-[20px] transition-all"
-                onClick={toggleMenu}
-              >
-                ToDoList
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/tracker"
-                className="text-black py-2 block hover:bg-gray-700 hover:text-white hover:rounded-lg p-[20px] transition-all"
-                onClick={toggleMenu}
-              >
-                Tracker
-              </Link>
-            </li>
-            <li className="flex flex-col justify-center">
               {isLoggedIn ? (
-                <div className="flex flex-col">
+                <div className="flex flex-col gap-2">
                   <Link
                     href="/Profile"
-                    className="text-white py-2 block hover:bg-green-600 mt-3 bg-green-700 hover:rounded-lg rounded-lg p-[20px] transition-all"
+                    className="block py-2 px-4 bg-blue-600 rounded-lg hover:bg-blue-500 transition"
+                    onClick={toggleMenu}
                   >
-                    <div className="flex gap-2">
+                    <div className="flex items-center gap-2">
                       <Image
                         src="/user.svg"
                         alt="Profile"
                         width={20}
                         height={20}
                       />
-                      <label className="bold-10 whitespace-nowrap cursor-pointer">
-                        Profile
-                      </label>
+                      <span>Profile</span>
                     </div>
                   </Link>
                   <button
-                    onClick={logout}
-                    className="text-white py-2 block hover:bg-red-600 bg-red-700 mt-3 rounded-lg hover:rounded-lg p-[20px] transition-all"
+                    onClick={() => {
+                      logout();
+                      toggleMenu();
+                    }}
+                    className="flex items-center gap-2 py-2 px-4 bg-red-600 rounded-lg hover:bg-red-500 transition"
                   >
-                    <div className="flex gap-2">
-                      <Image
-                        src="/logout.svg"
-                        alt="Logout"
-                        width={20}
-                        height={20}
-                      />
-                      <label className="bold-10 whitespace-nowrap cursor-pointer">
-                        Logout
-                      </label>
-                    </div>
+                    <Image src="/logout.svg" alt="Logout" width={20} height={20} />
+                    <span>Logout</span>
                   </button>
                 </div>
               ) : (
                 <Link
                   href="/login"
-                  className="hover:bg-green-500 bg-green-600 focus:ring-green-500 rounded-lg text-white py-2 block hover:rounded-lg p-[20px] transition-all"
+                  className="block py-2 px-4 bg-blue-600 rounded-lg hover:bg-blue-500 transition"
+                  onClick={toggleMenu}
                 >
-                  <div className="flex gap-2">
+                  <div className="flex items-center gap-2">
                     <Image src="/user.svg" alt="Login" width={20} height={20} />
-                    <label className="bold-10 whitespace-nowrap cursor-pointer">
-                      Login
-                    </label>
+                    <span>Log In</span>
                   </div>
                 </Link>
               )}
