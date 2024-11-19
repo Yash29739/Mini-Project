@@ -27,7 +27,6 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
     const storedIsLoggedIn = JSON.parse(localStorage.getItem('isLoggedIn') || 'false');
     const expiryTime = JSON.parse(localStorage.getItem('loginExpiry') || '0');
     const currentTime = Date.now();
-
     if (storedIsLoggedIn && currentTime < expiryTime) {
       setIsLoggedIn(true);
     } else {

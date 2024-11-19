@@ -5,16 +5,16 @@ import Link from "next/link";
 
 const Home = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-100 flex flex-col items-center">
+    <div className="min-h-screen bg-gradient-to-b from-white  to-gray-100 mt-16 mx-4 flex flex-col items-center">
       {/* Header */}
       <header className="text-center flex flex-col justify-center items-center h-[90vh]">
-        <h1 className="text-[45px] md:text-[60px] font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-800 to-gray-700">
+        <h1 className="text-[45px] md:text-[60px] font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-800 to-blue-700">
           Welcome to Your <br />
           <span>
             Digital Detox Journey
           </span>
         </h1>
-        <p className="text-lg text-gray-600 mt-4">
+        <p className="text-lg text-gray-600 font-semibold mt-4">
           Take control of your screen time and build healthier habits today.
         </p>
       </header>
@@ -24,7 +24,7 @@ const Home = () => {
         <h2 className="text-4xl font-bold text-center text-gray-800 mb-10">
           Features
         </h2>
-        <div className="flex flex-wrap justify-center gap-8">
+        <div className="flex flex-wrap justify-center gap-16">
           <FeatureCard
             title="Track Your Screen Time"
             description="Monitor your daily usage and stay on track with your digital detox goals."
@@ -86,9 +86,9 @@ const FeatureCard = ({
   image: string;
 }) => {
   return (
-    <div className="bg-white shadow-lg rounded-xl p-6 w-[90%] md:w-[30rem]">
-      <h3 className="text-xl font-bold text-gray-800 mb-2">{title}</h3>
-      <p className="text-gray-600 text-sm mb-4">{description}</p>
+    <div className="bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-400 via-blue-600 to-blue-800 shadow-lg rounded-xl p-6 w-[90%] md:w-[30rem]">
+      <h3 className="text-xl font-bold text-gray-10 mb-2">{title}</h3>
+      <p className="text-gray-10 text-sm mb-4">{description}</p>
       <Image
         src={image}
         height={1000}
