@@ -9,263 +9,172 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+const regexPatterns = {
+  username: /^[a-zA-Z0-9_]{3,}$/,
+  password: /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z0-9.+_%]{6,}$/,
+  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+};
+
 const LogIn = () => {
-  const [action, setAction] = useState("");
-  const [loginData, setLoginData] = useState({ username: "", password: "" });
-  const [signupData, setSignupData] = useState({
+  const [formType, setFormType] = useState<"login" | "signup">("login");
+  const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
   });
-
   const [loading, setLoading] = useState(false);
   const { setIsLoggedIn } = useLogin();
   const router = useRouter();
 
-  // Regex patterns for validation
-  const usernameRegex = /^[a-zA-Z0-9_]{3,}$/;
-  const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z0-9.+_%]{6,}$/;
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const validateInput = (): string | null => {
+    const { username, email, password } = formData;
 
-  // Validation Function
-  const validate = (type: string) => {
-    if (type === "signup") {
-      if (!usernameRegex.test(signupData.username)) {
-        return "Username must be at least 3 characters long and alphanumeric.";
-      }
-      if (!emailRegex.test(signupData.email)) {
-        return "Invalid email format.";
-      }
-      if (!passwordRegex.test(signupData.password)) {
-        return "Password must be at least 6 characters long, with at least one letter and one number.";
-      }
-    } else if (type === "login") {
-      if (!usernameRegex.test(loginData.username)) {
-        return "Username must be at least 3 characters long and alphanumeric.";
-      }
-      if (!passwordRegex.test(loginData.password)) {
-        return "Password must be at least 6 characters long, with at least one letter and one number.";
-      }
+    if (!regexPatterns.username.test(username)) {
+      return "Username must be at least 3 characters long and alphanumeric.";
+    }
+    if (formType === "signup" && !regexPatterns.email.test(email)) {
+      return "Invalid email format.";
+    }
+    if (!regexPatterns.password.test(password)) {
+      return "Password must be at least 6 characters long, with at least one letter and one number.";
     }
     return null;
   };
 
-  // Toggle between login and signup form
-  const registerLink = () => setAction("active");
-  const logInLink = () => setAction("");
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-  // Handle Signup Form Submission
-  const handleSignUp = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    const error = validate("signup");
+    const error = validateInput();
     if (error) {
       toast.error(error);
       setLoading(false);
       return;
     }
 
+    const endpoint = formType === "login" ? "/auth" : "/register";
+    const url = `https://digital-detox-y73b.onrender.com${endpoint}`;
+
     try {
-      const response = await fetch("https://digital-detox-y73b.onrender.com/register", {
+      const response = await fetch(url, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(signupData),
+        body: JSON.stringify(formData),
       });
 
       const result = await response.json();
       if (response.ok) {
-        toast.success("Sign-up successful!");
-        setAction("");
+        toast.success(`${formType === "login" ? "Login" : "Sign-up"} successful!`);
+        if (formType === "login") {
+          setIsLoggedIn(true);
+          localStorage.setItem("isLoggedIn", "true");
+          localStorage.setItem("loginExpiry", `${Date.now() + 24 * 60 * 60 * 1000}`);
+          router.push("/");
+        } else {
+          setFormType("login");
+        }
       } else {
-        toast.error(result.message || "Signup error");
+        toast.error(result.message || `${formType === "login" ? "Login" : "Signup"} error`);
       }
-    } catch (error) {
-      toast.error("An error occurred: " + error);
+    } catch (err) {
+      toast.error(`An error occurred: ${err}`);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleLogIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    const error = validate("login");
-    if (error) {
-      toast.error(error);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const response = await fetch("https://digital-detox-y73b.onrender.com/auth", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(loginData),
-      });
-
-      const result = await response.json();
-      if (response.ok) {
-        toast.success("Login successful!");
-        setIsLoggedIn(true);
-
-        // Store login state in local storage with an expiry time
-        const expiryTime = Date.now() + 23 * 60 * 60 * 1000; // 1 day in milliseconds
-        localStorage.setItem('isLoggedIn', JSON.stringify(true));
-        localStorage.setItem('loginExpiry', JSON.stringify(expiryTime));
-
-        router.push("/"); // Redirect to home page
-      } else {
-        toast.error(result.message || "Login error");
-      }
-    } catch (error) {
-      toast.error("An error occurred: " + error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
-  // Handle Input Changes
-  const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLoginData({ ...loginData, [e.target.name]: e.target.value });
-  };
-
-  const handleSignupChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSignupData({ ...signupData, [e.target.name]: e.target.value });
   };
 
   return (
-    <div
-      className={`relative w-[500px] ${action === "active" ? "h-[750px]" : "h-[700px]"
-        } bg-transparent backdrop-blur-lg rounded-[10px] flex items-center transition-all ease-in-out duration-500 overflow-hidden text-black`}
-    >
-      {/* Toast Notification Container */}
+    <div className="relative w-[500px] h-[700px] bg-transparent backdrop-blur-lg rounded-2xl flex flex-col justify-center items-center transition-all duration-500 overflow-hidden text-black">
       <ToastContainer />
 
-      {/* Login Form */}
-      <div
-        className={`w-full p-10 ${action === "active" ? "translate-x-[-600px]" : "translate-x-0"
-          } transition-transform duration-500 ease-in-out`}
-      >
-        <form onSubmit={handleLogIn}>
-          <h6 className="text-[35px] text-center font-semibold underline font-serif">
-            Log-In
-          </h6>
-          <div className="relative w-full h-[40px] my-10">
-            <input
-              type="text"
-              name="username"
-              placeholder="Username"
-              value={loginData.username}
-              onChange={handleLoginChange}
-              required
-              className="w-full h-[50px] bg-transparent outline-none border border-[3px] border-gray-300 rounded-full text-[15px] p-1 pl-5"
-            />
-            <FaUser className="absolute right-4 top-6 transform -translate-y-1/2 text-[18px]" />
-          </div>
-          <div className="relative w-full h-[70px] ">
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={loginData.password}
-              onChange={handleLoginChange}
-              required
-              className="w-full h-[50px] bg-transparent outline-none border border-[3px] border-gray-300 rounded-full text-[15px] p-5 pl-5"
-            />
-          </div>
-          <div className="flex justify-between text-[12px] mb-6">
-            <label>
-              <input type="checkbox" className="accent-white mr-2" /> Remember Me
-            </label>
-            <Link href="/ForgotPassword" className="text-black hover:underline cursor-pointer">
-              Forgot password?
-            </Link>
-          </div>
-          <button
-            type="submit"
-            className="w-full h-[45px] text-white bg-black border-2 border-gray-400 shadow-md cursor-pointer font-bold rounded-full text-[15px] hover:scale-105 transition-transform duration-300"
-          >
-            {loading ? <LoadingSpinner /> : "Log In"}
-          </button>
-          <div className="text-[13px] text-center my-7">
-            <p>
-              Don't have an Account?{" "}
-              <a href="#" onClick={registerLink} className="text-black font-semibold hover:underline">
-                Register
-              </a>
-            </p>
-          </div>
-        </form>
-      </div>
+      <h1 className="text-3xl font-bold text-center underline font-serif mb-8">
+        {formType === "login" ? "Log In" : "Sign Up"}
+      </h1>
 
-      {/* Signup Form */}
-      <div
-        className={`absolute w-full p-10 ${action === "active" ? "translate-x-0" : "translate-x-[600px]"
-          } transition-transform duration-500 ease-in-out`}
-      >
-        <form onSubmit={handleSignUp}>
-          <h1 className="text-[35px] text-center font-bold underline font-serif">
-            Sign-Up
-          </h1>
-          <div className="relative w-full h-[40px] my-10">
-            <input
-              type="text"
-              name="username"
-              placeholder="Username"
-              value={signupData.username}
-              onChange={handleSignupChange}
-              required
-              className="w-full h-[50px] bg-transparent outline-none border border-[3px] border-gray-300 rounded-full text-[15px] p-5 pl-5"
-            />
-            <FaUser className="absolute right-4 top-6 transform -translate-y-1/2 text-[18px]" />
-          </div>
-          <div className="relative w-full h-[40px] my-10">
+      <form onSubmit={handleSubmit} className="w-full px-8 space-y-6">
+        <div className="relative">
+          <input
+            type="text"
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+            placeholder="Username"
+            required
+            className="w-full h-12 px-5 bg-transparent border-2 border-gray-300 rounded-full outline-none"
+          />
+          <FaUser className="absolute right-4 top-3 text-gray-400" />
+        </div>
+
+        {formType === "signup" && (
+          <div className="relative">
             <input
               type="email"
               name="email"
+              value={formData.email}
+              onChange={handleChange}
               placeholder="Email"
-              value={signupData.email}
-              onChange={handleSignupChange}
               required
-              className="w-full h-[50px] bg-transparent outline-none border border-[3px] border-gray-300 rounded-full text-[15px] p-5 pl-5"
+              className="w-full h-12 px-5 bg-transparent border-2 border-gray-300 rounded-full outline-none"
             />
-            <MdEmail className="absolute right-4 top-6 transform -translate-y-1/2 text-[18px]" />
+            <MdEmail className="absolute right-4 top-3 text-gray-400" />
           </div>
-          <div className="relative w-full h-[40px]">
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={signupData.password}
-              onChange={handleSignupChange}
-              required
-              className="w-full h-[50px] bg-transparent outline-none border border-[3px] border-gray-300 rounded-full text-[15px] p-5 pl-5"
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full h-[45px] mt-10 text-white bg-black border-2 border-gray-400 shadow-md cursor-pointer font-bold rounded-full text-[15px] hover:scale-105 transition-transform duration-300"
-          >
-            {loading ? <LoadingSpinner /> : "Sign Up"}
-          </button>
-          <div className="text-[13px] text-center my-7">
+        )}
+
+        <div className="relative">
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Password"
+            required
+            className="w-full h-12 px-5 bg-transparent border-2 border-gray-300 rounded-full outline-none"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full h-12 text-white bg-black border-2 border-gray-400 rounded-full font-bold transition-transform duration-300 hover:scale-105"
+        >
+          {loading ? <LoadingSpinner /> : formType === "login" ? "Log In" : "Sign Up"}
+        </button>
+      </form>
+
+      <div className="mt-6 text-sm text-center">
+        {formType === "login" ? (
+          <>
             <p>
-              Already have an Account?{" "}
-              <a href="#" onClick={logInLink} className="text-black font-semibold hover:underline">
-                Log In
-              </a>
+              Don't have an account?{" "}
+              <button
+                type="button"
+                onClick={() => setFormType("signup")}
+                className="font-semibold text-blue-500 hover:underline"
+              >
+                Register
+              </button>
             </p>
-          </div>
-        </form>
+            <Link href="/ForgotPassword" className="text-blue-500 hover:underline">
+              Forgot password?
+            </Link>
+          </>
+        ) : (
+          <p>
+            Already have an account?{" "}
+            <button
+              type="button"
+              onClick={() => setFormType("login")}
+              className="font-semibold text-blue-500 hover:underline"
+            >
+              Log In
+            </button>
+          </p>
+        )}
       </div>
     </div>
   );

@@ -1,121 +1,101 @@
 import React from "react";
 import { TextGenerateEffect } from "./ui/text-generate-effect";
-import { CardBody, CardItem, CardContainer } from "./ui/3d-card";
 import Image from "next/image";
 import Link from "next/link";
-import { Vortex } from "./ui/vortex";
 
 const Home = () => {
   return (
-    <div className="min-h-screen flex flex-col items-center">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-100 flex flex-col items-center">
       {/* Header */}
-      <Vortex particleCount={210} backgroundColor="black"  rangeY={400} baseRadius={3}>
-        <section className="text-center mt-10 h-[95vh] flex flex-col justify-center items-center">
-          <h1 className="text-[50px] font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-pink-500">
-            Welcome  <br />
-            to Your <br />
-            <span className="font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-pink-500">
-              Digital Detox Journey
-            </span>
-          </h1>
-          <TextGenerateEffect
-          className="text-[20px] text-white opacity-0"
-            words="Take control of your screen time and build healthier habits today"
-            duration={1}
-          />
-        </section>
-      </Vortex>
-
-      {/* card details */}
-      <div className="hedaing mt-[200px] ">
-        <h1 className="text-black text-center text-7xl font-bold font-serif">
-          Features
+      <header className="text-center flex flex-col justify-center items-center h-[90vh]">
+        <h1 className="text-[45px] md:text-[60px] font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-800 to-gray-700">
+          Welcome to Your <br />
+          <span>
+            Digital Detox Journey
+          </span>
         </h1>
-      </div>
-      <div className="flex flex-col lg:flex-row">
-        <CardContainer className="inter-var m-4 mx-7">
-          <CardBody className="bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-black via-purple-800 to-slate-950 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-auto sm:w-[30rem] h-auto rounded-xl p-6 border  ">
-            <CardItem translateZ="50" className="text-xl font-bold text-white">
-              Track Your Screen Time
-            </CardItem>
-            <CardItem
-              as="p"
-              translateZ="60"
-              className=" text-sm max-w-full text-white mt-2 "
-            >
-              Monitor your daily usage and stay on track with your digital detox
-              goals.
-            </CardItem>
+        <p className="text-lg text-gray-600 mt-4">
+          Take control of your screen time and build healthier habits today.
+        </p>
+      </header>
 
-            <CardItem translateZ="100" className="w-full mt-4">
-              <Image
-                src="/Time.webp"
-                height="1000"
-                width="1000"
-                className="h-60 w-full object-cover rounded-xl group-hover/card:shadow-xl"
-                alt="thumbnail"
-              />
-            </CardItem>
-          </CardBody>
-        </CardContainer>
-        <CardContainer className="inter-var m-3 mx-7">
-          <CardBody className="bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-black via-purple-800 to-slate-950 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-auto sm:w-[30rem] h-auto rounded-xl p-6 border  ">
-            <CardItem translateZ="50" className="text-xl font-bold text-white">
-              Manage Your Schedule
-            </CardItem>
-            <CardItem
-              as="p"
-              translateZ="60"
-              className=" text-sm max-w-full text-white mt-2 "
-            >
-              Set reminders and schedules for screen breaks and limit your usage
-            </CardItem>
-
-            <CardItem translateZ="100" className="w-full mt-4">
-              <Image
-                src="/schedules.webp"
-                height="1000"
-                width="1000"
-                className="h-60 w-full object-cover rounded-xl group-hover/card:shadow-xl"
-                alt="thumbnail"
-              />
-            </CardItem>
-          </CardBody>
-        </CardContainer>
-      </div>
+      {/* Features Section */}
+      <section className="my-20 w-full max-w-6xl px-6">
+        <h2 className="text-4xl font-bold text-center text-gray-800 mb-10">
+          Features
+        </h2>
+        <div className="flex flex-wrap justify-center gap-8">
+          <FeatureCard
+            title="Track Your Screen Time"
+            description="Monitor your daily usage and stay on track with your digital detox goals."
+            image="/Time.webp"
+          />
+          <FeatureCard
+            title="Manage Your Schedule"
+            description="Set reminders and schedules for screen breaks and limit your usage."
+            image="/schedules.webp"
+          />
+        </div>
+      </section>
 
       {/* Quick Start Section */}
-      <section className="m-20 text-center">
-        <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">
+      <section className="my-16 text-center px-6">
+        <h2 className="text-3xl font-bold text-gray-800">
           Ready to Start Your Detox Journey?
         </h2>
-        <p className="text-lg text-gray-400 mt-2">
+        <p className="text-lg text-gray-600 mt-2">
           Take control of your digital habits today.
         </p>
-        <button className="mt-6 px-10 py-3 bg-gradient-to-r from-red-500 to-orange-600 text-white rounded-full shadow-lg transform transition-transform duration-300 hover:scale-105 hover:bg-gradient-to-r hover:from-orange-600 hover:to-red-500">
-          <Link href="/schedules">Start Detox</Link>
-        </button>
+        <Link href="/schedules">
+          <button className="mt-6 px-10 py-3 bg-blue-600 text-white rounded-full shadow-md hover:bg-blue-700 transition-all duration-300">
+            Start Detox
+          </button>
+        </Link>
       </section>
 
       {/* Daily Stats Summary */}
-      <section className="m-20 p-8 bg-gradient-to-r lg:w-[500px] lg:h-auto text-center from-blue-100 to-white shadow-lg rounded-xl max-w-lg mx-auto">
-        <h2 className="text-2xl font-bold text-blue-800 mb-4">
+      <section className="my-16 bg-white shadow-md rounded-xl p-8 text-center max-w-lg mx-auto">
+        <h2 className="text-2xl font-bold text-gray-800">
           Today's Screen Time:
-          <span className="block text-4xl mt-2 text-blue-600">3 hours</span>
         </h2>
-        <button className="mt-4 px-8 py-2 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-full shadow-lg hover:from-blue-600 hover:to-blue-800 transition-all duration-300">
-         <Link href="/tracker">
-          Check The usage
-         </Link>
-        </button>
+        <p className="text-4xl text-blue-600 font-extrabold mt-2">3 hours</p>
+        <Link href="/tracker">
+          <button className="mt-6 px-10 py-2 bg-blue-600 text-white rounded-full shadow-md hover:bg-blue-700 transition-all duration-300">
+            Check Usage
+          </button>
+        </Link>
       </section>
 
       {/* Motivational Quote */}
-      <section className="m-12 text-center">
-        <blockquote className="text-xl italic text-gray-700 border-l-4 border-r-4 border-blue-500 pr-4 pl-4">
+      <section className="my-12 text-center px-6">
+        <blockquote className="text-xl italic text-gray-600 border-l-4 border-blue-600 pl-4">
           "Take control of your habits before they control you."
         </blockquote>
       </section>
+    </div>
+  );
+};
+
+const FeatureCard = ({
+  title,
+  description,
+  image,
+}: {
+  title: string;
+  description: string;
+  image: string;
+}) => {
+  return (
+    <div className="bg-white shadow-lg rounded-xl p-6 w-[90%] md:w-[30rem]">
+      <h3 className="text-xl font-bold text-gray-800 mb-2">{title}</h3>
+      <p className="text-gray-600 text-sm mb-4">{description}</p>
+      <Image
+        src={image}
+        height={1000}
+        width={1000}
+        alt={title}
+        className="rounded-xl h-48 w-full object-cover"
+      />
     </div>
   );
 };

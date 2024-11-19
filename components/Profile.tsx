@@ -15,66 +15,62 @@ const Profile = () => {
     email: "johndoe@example.com",
   });
 
-  const [isEditing, setIsEditing] = useState(false); // State for edit mode
-  const [editedUser, setEditedUser] = useState<User>(user); // Temp state for editing
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedUser, setEditedUser] = useState<User>(user);
 
+  // Fetch user details on mount
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
         const response = await fetch("https://digital-detox-y73b.onrender.com/auth", {
           method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           credentials: "include",
         });
 
-        const result = await response.json();
-
         if (response.ok) {
+          const result = await response.json();
           setUser(result.foundUser);
         } else {
-          toast.error(result.message || "Login error");
+          const error = await response.json();
+          toast.error(error.message || "Login error");
         }
       } catch (error) {
         toast.error("An error occurred: " + error);
       }
     };
-
     fetchUserDetails();
   }, []);
 
+  // Toggle edit mode
   const handleEditToggle = () => {
-    setIsEditing((prev) => !prev);
-    setEditedUser(user); // Reset edits when toggling
+    setIsEditing(!isEditing);
+    setEditedUser(user);
   };
 
+  // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setEditedUser((prev) => ({ ...prev, [name]: value }));
+    setEditedUser({ ...editedUser, [name]: value });
   };
 
+  // Save edited profile details
   const handleSave = async () => {
-    console.log("Running Save");
-    
     try {
       const response = await fetch("https://digital-detox-y73b.onrender.com/auth", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(editedUser),
       });
 
-      const result = await response.json();
-
       if (response.ok) {
         toast.success("Profile updated successfully!");
-        setUser(editedUser); // Update the main user state
-        setIsEditing(false); // Exit edit mode
+        setUser(editedUser);
+        setIsEditing(false);
       } else {
-        toast.error(result.message || "Failed to update profile");
+        const error = await response.json();
+        toast.error(error.message || "Failed to update profile");
       }
     } catch (error) {
       toast.error("An error occurred: " + error);
@@ -82,47 +78,47 @@ const Profile = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#f0f4f8]">
+    <div className="flex items-center justify-center min-h-screen bg-[#e7f0fd]">
       <div className="bg-white shadow-lg rounded-lg p-8 mx-4 max-w-lg">
         <div className="flex flex-col items-center">
           {/* Profile Picture */}
-          <div className="rounded-full w-[10rem] h-[10rem] bg-blue-50 flex justify-center items-center border-4 border-blue-200 overflow-hidden mb-6">
-            <p className="text-[120px] font-serif text-[#00008b] font-bold">{user.username[0]}</p>
+          <div className="rounded-full w-40 h-40 bg-blue-200 flex justify-center items-center border-4 border-blue-300 overflow-hidden mb-6">
+            <p className="text-[100px] font-serif text-[#1e3a8a] font-bold">{user.username[0]}</p>
           </div>
 
           {/* User Info */}
-          <div className="flex flex-col items-start w-full">
+          <div className="w-full">
             {isEditing ? (
               <>
                 <div className="flex items-center mb-4">
-                  <FaUserCircle className="text-gray-600 mr-2" />
+                  <FaUserCircle className="text-blue-600 mr-2" />
                   <input
                     type="text"
                     name="username"
                     value={editedUser.username}
                     onChange={handleInputChange}
-                    className="border border-gray-300 rounded-md p-2 w-full"
+                    className="border border-gray-300 rounded-md p-2 w-full focus:border-blue-500"
                   />
                 </div>
                 <div className="flex items-center mb-6">
-                  <FaEnvelope className="text-gray-600 mr-2" />
+                  <FaEnvelope className="text-blue-600 mr-2" />
                   <input
                     type="email"
                     name="email"
                     value={editedUser.email}
                     onChange={handleInputChange}
-                    className="border border-gray-300 rounded-md p-2 w-full"
+                    className="border border-gray-300 rounded-md p-2 w-full focus:border-blue-500"
                   />
                 </div>
               </>
             ) : (
               <>
                 <div className="flex items-center mb-4">
-                  <FaUserCircle className="text-gray-600 mr-2" />
+                  <FaUserCircle className="text-blue-600 mr-2" />
                   <span className="text-lg font-semibold text-gray-800">Name: {user.username}</span>
                 </div>
                 <div className="flex items-center mb-6">
-                  <FaEnvelope className="text-gray-600 mr-2" />
+                  <FaEnvelope className="text-blue-600 mr-2" />
                   <span className="text-lg font-semibold text-gray-800">Email: {user.email}</span>
                 </div>
               </>
@@ -134,13 +130,13 @@ const Profile = () => {
                 <>
                   <button
                     onClick={handleSave}
-                    className="px-6 py-2 text-white bg-green-500 hover:bg-green-600 rounded-md transition duration-200"
+                    className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200"
                   >
                     Save
                   </button>
                   <button
                     onClick={handleEditToggle}
-                    className="px-6 py-2 text-white bg-gray-500 hover:bg-gray-600 rounded-md transition duration-200"
+                    className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition duration-200"
                   >
                     Cancel
                   </button>
@@ -148,12 +144,12 @@ const Profile = () => {
               ) : (
                 <button
                   onClick={handleEditToggle}
-                  className="px-6 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md transition duration-200"
+                  className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200"
                 >
                   Edit Profile
                 </button>
               )}
-              <button className="px-6 py-2 text-white bg-red-500 hover:bg-red-600 rounded-md transition duration-200">
+              <button className="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-200">
                 LogOut
               </button>
             </div>
