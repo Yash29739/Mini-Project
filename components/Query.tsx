@@ -234,12 +234,12 @@ const Query = () => {
 
   return (
     <div>
-      <div className="flex justify-center items-center mb-16 mt-20 bg-blue-100">
-        <div className="w-full max-w-2xl mx-4">
+      <div className="flex justify-center items-center mb-16 mt-20 bg-blue-50">
+        <div className="w-full my-5 max-w-2xl mx-4">
           {!isSurveyVisible && (
             <button
               onClick={toggleSurvey}
-              className="w-full bg-blue-600 text-white p-4 font-bold rounded-2xl text-center hover:bg-blue-700"
+              className="w-full bg-blue-600 my-6 text-white p-4 font-bold rounded-2xl text-center hover:bg-blue-700"
             >
               Survey for personalized suggestions
             </button>

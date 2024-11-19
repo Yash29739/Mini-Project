@@ -107,7 +107,7 @@ const TodoList = () => {
     const currentDate = new Date();
     const selectedDate = new Date(dueDate);
 
-    if (selectedDate < currentDate) {
+    if (selectedDate > currentDate) {
       toast.error("Due date cannot be in the past.");
       return;
     }
@@ -138,7 +138,6 @@ const TodoList = () => {
       toast.error("An error occurred while adding the task.");
     }
   };
-
 
   const toggleTodo = async (taskName: string) => {
     const updatedTodos = todos.map((todo) =>
