@@ -23,34 +23,6 @@ const LoginContext = createContext<LoginContextProps>({
 // Create a provider component
 export const LoginProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Manage login state
-  const router = useRouter()
-  const refreshToken = async () => {
-    try {
-      const response = await fetch("https://digital-detox-y73b.onrender.com/refresh", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include"
-      });
-
-      const result = await response.json();
-      if (response.ok) {
-        toast.success(result.message);
-        setIsLoggedIn(true)
-        // Store login state in local storage with an expiry time
-        const expiryTime = Date.now() + 23 * 60 * 60 * 1000; // 1 day in milliseconds
-        localStorage.setItem('isLoggedIn', JSON.stringify(true));
-        localStorage.setItem('loginExpiry', JSON.stringify(expiryTime));
-      } else {
-        toast.error(result.message);
-        router.push('/')
-      }
-    } catch (error) {
-      toast.error("An error occurred: " + error);
-    }
-  }
-
   useEffect(() => {
     const storedIsLoggedIn = JSON.parse(localStorage.getItem('isLoggedIn') || 'false');
     const expiryTime = JSON.parse(localStorage.getItem('loginExpiry') || '0');
@@ -61,7 +33,6 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
     } else {
       localStorage.removeItem('isLoggedIn');
       localStorage.removeItem('loginExpiry');
-      refreshToken();
     }
   }, []);
 
