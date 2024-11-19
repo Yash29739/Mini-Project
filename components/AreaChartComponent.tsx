@@ -1,13 +1,18 @@
+"use client";
+
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   Legend,
   ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
 } from "recharts";
 import LoadingCursor from "@/app/loading";
 
@@ -16,18 +21,25 @@ const formatDate = (dateString: string): string => {
   return `${date.getDate()}/${date.getMonth() + 1}`;
 };
 
-const groupByDate = (data: { date: string; usage: number }[]) => {
-  const groupedData = new Map<string, number>();
+// Function to group data by date
+const groupByDate = (data: { date: string; entries: { category: string, timeSpent: number }[] }[]) => {
+  const groupedData = new Map<string, { category: string, timeSpent: number }[]>();
 
   data.forEach((entry) => {
     const formattedDate = formatDate(entry.date);
-    groupedData.set(
-      formattedDate,
-      (groupedData.get(formattedDate) || 0) + entry.usage
-    );
+    const existingEntries = groupedData.get(formattedDate) || [];
+    entry.entries.forEach((subEntry) => {
+      const existingCategory = existingEntries.find((e) => e.category === subEntry.category);
+      if (existingCategory) {
+        existingCategory.timeSpent += subEntry.timeSpent; // Aggregate timeSpent by category
+      } else {
+        existingEntries.push(subEntry);
+      }
+    });
+    groupedData.set(formattedDate, existingEntries);
   });
 
-  return Array.from(groupedData, ([date, screenTime]) => ({ date, screenTime })).sort(
+  return Array.from(groupedData, ([date, entries]) => ({ date, entries })).sort(
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
   );
 };
@@ -37,36 +49,16 @@ interface ScreenTimeGraphProps {
   dotThreshold?: number;
 }
 
-const CustomizedDot: React.FC<{
-  cx?: number;
-  cy?: number;
-  value?: number;
-  dotThreshold: number;
-}> = React.memo(({ cx, cy, value, dotThreshold }) => {
-  if (!cx || !cy || value === undefined) return null;
-
-  const isBelowThreshold = value < dotThreshold;
-  const fill = isBelowThreshold ? "green" : "red";
-  const path = isBelowThreshold
-    ? "M512 1009.984c-274.912 0-497.76-222.848-497.76-497.76s222.848-497.76 497.76-497.76c274.912 0 497.76 222.848 497.76 497.76s-222.848 497.76-497.76 497.76zM340.768 295.936c-39.488 0-71.52 32.8-71.52 73.248s32.032 73.248 71.52 73.248c39.488 0 71.52-32.8 71.52-73.248s-32.032-73.248-71.52-73.248zM686.176 296.704c-39.488 0-71.52 32.8-71.52 73.248s32.032 73.248 71.52 73.248c39.488 0 71.52-32.8 71.52-73.248s-32.032-73.248-71.52-73.248zM772.928 555.392c-18.752-8.864-40.928-0.576-49.632 18.528-40.224 88.576-120.256 143.552-208.832 143.552-85.952 0-164.864-52.64-205.952-137.376-9.184-18.912-31.648-26.592-50.08-17.28-18.464 9.408-21.216 21.472-15.936 32.64 52.8 111.424 155.232 186.784 269.76 186.784 117.984 0 217.12-70.944 269.76-186.784 8.672-19.136 9.568-31.2-9.12-40.096z"
-    : "M517.12 53.248q95.232 0 179.2 36.352t145.92 98.304 98.304 145.92 36.352 179.2-36.352 179.2-98.304 145.92-145.92 98.304-179.2 36.352-179.2-36.352-145.92-98.304-98.304-145.92-36.352-179.2 36.352-179.2 98.304-145.92 145.92-98.304 179.2-36.352zM663.552 261.12q-15.36 0-28.16 6.656t-23.04 18.432-15.872 27.648-5.632 33.28q0 35.84 21.504 61.44t51.2 25.6 51.2-25.6 21.504-61.44q0-17.408-5.632-33.28t-15.872-27.648-23.04-18.432-28.16-6.656zM373.76 261.12q-29.696 0-50.688 25.088t-20.992 60.928 20.992 61.44 50.688 25.6 50.176-25.6 20.48-61.44-20.48-60.928-50.176-25.088zM520.192 602.112q-51.2 0-97.28 9.728t-82.944 27.648-62.464 41.472-35.84 51.2q-1.024 1.024-1.024 2.048-1.024 3.072-1.024 8.704t2.56 11.776 7.168 11.264 12.8 6.144q25.6-27.648 62.464-50.176 31.744-19.456 79.36-35.328t114.176-15.872q67.584 0 116.736 15.872t81.92 35.328q37.888 22.528 63.488 50.176 17.408-5.12 19.968-18.944t0.512-18.944-3.072-7.168-1.024-3.072q-26.624-55.296-100.352-88.576t-176.128-33.28z";
-
-  return (
-    <svg x={cx - 10} y={cy - 10} width={20} height={20} fill={fill} viewBox="0 0 1024 1024">
-      <path d={path} />
-    </svg>
-  );
-});
-
 const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, dotThreshold = 6 }) => {
   const [state, setState] = useState<{
     loading: boolean;
-    data: { date: string; screenTime: number }[];
+    data: { date: string; entries: { category: string, timeSpent: number }[] }[];
   }>({
     loading: true,
     data: [],
   });
 
+  // Fetching data from the backend
   const fetchData = useCallback(async () => {
     setState((prev) => ({ ...prev, loading: true }));
     try {
@@ -76,7 +68,7 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, dotThre
         credentials: "include",
       });
       const result = await response.json();
-      const groupedData = groupByDate(result.existingTracker.weeklyUsage);
+      const groupedData = groupByDate(result.data); // Adjusted to new schema
       setState({ loading: false, data: groupedData });
     } catch (error) {
       console.error("Error in the fetch", error);
@@ -90,34 +82,177 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, dotThre
 
   const chartData = useMemo(() => state.data, [state.data]);
 
+  // Calculate average time spent from an array of time entries
+  const calculateAverage = (entries: { timeSpent: number }[]) => {
+    const total = entries.reduce((sum, entry) => sum + entry.timeSpent, 0);
+    return total / entries.length || 0;
+  };
+
+  // Get today's screen time stats
+  const getDailyStats = () => {
+    const today = new Date().toLocaleDateString();
+    const todayData = chartData.filter((entry) => entry.date === today);
+    return todayData.length ? todayData : null;
+  };
+
+  // Get weekly screen time stats
+  const getWeeklyStats = () => {
+    const currentWeekStart = new Date();
+    currentWeekStart.setDate(currentWeekStart.getDate() - currentWeekStart.getDay());
+    const currentWeekEnd = new Date();
+    currentWeekEnd.setDate(currentWeekEnd.getDate() + (6 - currentWeekEnd.getDay()));
+
+    const weeklyData = chartData.filter((entry) => {
+      const entryDate = new Date(entry.date);
+      return entryDate >= currentWeekStart && entryDate <= currentWeekEnd;
+    });
+
+    return weeklyData.length ? weeklyData : null;
+  };
+
+  // Get monthly screen time stats
+  const getMonthlyStats = () => {
+    const currentMonthStart = new Date();
+    currentMonthStart.setDate(1);
+    const currentMonthEnd = new Date();
+    currentMonthEnd.setMonth(currentMonthEnd.getMonth() + 1);
+    currentMonthEnd.setDate(0);
+
+    const monthlyData = chartData.filter((entry) => {
+      const entryDate = new Date(entry.date);
+      return entryDate >= currentMonthStart && entryDate <= currentMonthEnd;
+    });
+
+    return monthlyData.length ? monthlyData : null;
+  };
+
+  // Calculate statistics for daily, weekly, and monthly data
+  const dailyStats = getDailyStats();
+  const weeklyStats = getWeeklyStats();
+  const monthlyStats = getMonthlyStats();
+
   return (
-    <div className="w-full h-80">
+    <div className="w-full h-full bg-blue-50 py-10 px-5">
       {state.loading ? (
         <div className="flex justify-center items-center">
           <LoadingCursor w={300} h={300} />
         </div>
-      ) : chartData.length > 0 ? (
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart
-            data={chartData}
-            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="screenTime"
-              stroke="#8884d8"
-              activeDot={{ r: 8 }}
-              dot={<CustomizedDot dotThreshold={dotThreshold} />}
-            />
-          </LineChart>
-        </ResponsiveContainer>
       ) : (
-        <div className="text-center">No data available</div>
+        <div>
+          {/* Daily Stats */}
+          <div className="bg-white p-5 rounded-lg shadow-lg mb-5">
+            <h2 className="text-xl font-semibold text-center text-blue-700">Daily Screen Time</h2>
+            {dailyStats ? (
+              <div className="text-center">
+                {dailyStats.map((entry: any) => (
+                  <p className="text-lg text-blue-600" key={entry.date}>
+                    {entry.category}: {entry.timeSpent} minutes
+                  </p>
+                ))}
+                <p className="text-md text-blue-600">
+                  Average Screen Time: {calculateAverage(dailyStats.flatMap((e) => e.entries)).toFixed(2)} minutes
+                </p>
+              </div>
+            ) : (
+              <p className="text-center text-red-600">No data available for today.</p>
+            )}
+          </div>
+
+          {/* Weekly Stats */}
+          <div className="bg-white p-5 rounded-lg shadow-lg mb-5">
+            <h2 className="text-xl font-semibold text-center text-blue-700">Weekly Screen Time</h2>
+            {weeklyStats ? (
+              <div className="text-center">
+                {weeklyStats.map((entry: any) => (
+                  <p className="text-lg text-blue-600" key={entry.date}>
+                    {entry.category}: {entry.timeSpent} minutes
+                  </p>
+                ))}
+                <p className="text-md text-blue-600">
+                  Average Screen Time This Week: {calculateAverage(weeklyStats.flatMap((e) => e.entries)).toFixed(2)} minutes
+                </p>
+              </div>
+            ) : (
+              <p className="text-center text-red-600">No data available for this week.</p>
+            )}
+          </div>
+
+          {/* Monthly Stats */}
+          <div className="bg-white p-5 rounded-lg shadow-lg mb-5">
+            <h2 className="text-xl font-semibold text-center text-blue-700">Monthly Screen Time</h2>
+            {monthlyStats ? (
+              <div className="text-center">
+                {monthlyStats.map((entry: any) => (
+                  <p className="text-lg text-blue-600" key={entry.date}>
+                    {entry.category}: {entry.timeSpent} minutes
+                  </p>
+                ))}
+                <p className="text-md text-blue-600">
+                  Average Screen Time This Month: {calculateAverage(monthlyStats.flatMap((e) => e.entries)).toFixed(2)} minutes
+                </p>
+              </div>
+            ) : (
+              <p className="text-center text-red-600">No data available for this month.</p>
+            )}
+          </div>
+
+          {/* Bar Chart */}
+          <div className="bg-white p-5 rounded-lg shadow-lg mb-5">
+            <h2 className="text-xl font-semibold text-center text-blue-700">Screen Time Chart</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart
+                data={chartData.flatMap((entry) =>
+                  entry.entries.map((subEntry) => ({
+                    date: entry.date,
+                    category: subEntry.category,
+                    timeSpent: subEntry.timeSpent,
+                  }))
+                )}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="timeSpent" fill="#4C9FEF" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Pie Chart */}
+          <div className="bg-white p-5 rounded-lg shadow-lg">
+            <h2 className="text-xl font-semibold text-center text-blue-700">Screen Time Distribution</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={chartData.flatMap((entry) =>
+                    entry.entries.map((subEntry) => ({
+                      name: subEntry.category,
+                      value: subEntry.timeSpent,
+                    }))
+                  )}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={120}
+                  fill="#4C9FEF"
+                  label
+                >
+                  {chartData.flatMap((entry) =>
+                    entry.entries.map((subEntry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={index % 2 === 0 ? "#4C9FEF" : "#6CC8FF"}
+                      />
+                    ))
+                  )}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
       )}
     </div>
   );
