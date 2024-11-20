@@ -23,8 +23,6 @@ const LoginContext = createContext<LoginContextProps>({
 // Create a provider component
 export const LoginProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Manage login state
-  const router = useRouter()
-
   useEffect(() => {
     const storedIsLoggedIn = JSON.parse(localStorage.getItem('isLoggedIn') || 'false');
     const expiryTime = JSON.parse(localStorage.getItem('loginExpiry') || '0');
@@ -34,7 +32,6 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
     } else {
       localStorage.removeItem('isLoggedIn');
       localStorage.removeItem('loginExpiry');
-      router.push('/login')
     }
   }, []);
 

@@ -1,21 +1,33 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ScreenTimeGraph from "@/components/AreaChartComponent"; // Graph component
-import { toast, ToastContainer } from "react-toastify"; // Notification library
+import ScreenTimeGraph from "@/components/AreaChartComponent";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LoadingSpinner from "./LoadingSpinner";
 
+interface Entry {
+  category: string;
+  timeSpent: number;
+  sessions: number;
+}
 
 const Track = () => {
-  const [screenTime, setScreenTime] = useState("");
+  const [entries, setEntries] = useState<Entry[]>([]);
+  const [newEntry, setNewEntry] = useState({
+    category: "",
+    timeSpent: "",
+    sessions: "",
+  });
   const [date, setDate] = useState("");
-  const [limitUsage, setLimitUsage] = useState(7);
   const [loading, setLoading] = useState(false);
-  const [refreshGraph, setRefreshGraph] = useState(false);
+  const [limitUsage, setLimitUsage] = useState(7); // Default screen time limit in hours
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [refreshGraph, setRefreshGraph] = useState(false);
+
   useEffect(() => {
+    getWeeklyData();
     getLimit();
   }, [refreshGraph]);
 
@@ -23,7 +35,7 @@ const Track = () => {
     try {
       setSaving(true);
       const response = await fetch(
-        "https://digital-detox-y73b.onrender.com/tracker",
+        "https://digital-detox-y73b.onrender.com/tracker/limit",
         {
           method: "PUT",
           headers: {
@@ -35,11 +47,8 @@ const Track = () => {
       );
 
       if (response.ok) {
-        const result = await response.json();
-        console.log("Update successful:", result);
         toast.success("Screen time limit updated!");
       } else {
-        console.error("Failed to update limit:", response);
         toast.error("Failed to update limit.");
       }
     } catch (error) {
@@ -53,42 +62,86 @@ const Track = () => {
   const getLimit = async () => {
     try {
       const response = await fetch(
-        "https://digital-detox-y73b.onrender.com/tracker",
+        "https://digital-detox-y73b.onrender.com/tracker/limit",
         {
           method: "GET",
-          headers: {
-            Content_Type: "application/json",
-          },
           credentials: "include",
         }
       );
       const result = await response.json();
-      console.log(result);
-
-      setLimitUsage(result.existingTracker.limitedUsage);
+      setLimitUsage(result.limitedUsage);
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching limit:", error);
     }
   };
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-    const screenTimeNum = Number(screenTime);
-    if (isNaN(screenTimeNum) || screenTimeNum <= 0 || screenTimeNum > 24) {
-      toast.error("Please enter valid screen time between 1 and 24 hours.");
+  const getWeeklyData = async () => {
+    try {
+      const response = await fetch(
+        "https://digital-detox-y73b.onrender.com/tracker",
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+      const result = await response.json();
+      setEntries(result.entries || []);
+    } catch (error) {
+      console.error("Error fetching weekly data:", error);
+    }
+  };
+
+  const handleAddEntry = () => {
+    const { category, timeSpent, sessions } = newEntry;
+    const timeSpentNum = Number(timeSpent);
+    const sessionsNum = Number(sessions);
+
+    if (
+      isNaN(timeSpentNum) ||
+      isNaN(sessionsNum) ||
+      timeSpentNum <= 0 ||
+      sessionsNum <= 0
+    ) {
+      toast.error("Please enter valid time spent and sessions.");
       return;
     }
+
+    if (entries.some((entry) => entry.category === category)) {
+      toast.error(`The category "${category}" has already been added.`);
+      return;
+    }
+
+    setEntries((prevEntries) => [
+      ...prevEntries,
+      { category, timeSpent: timeSpentNum, sessions: sessionsNum },
+    ]);
+    setNewEntry({ category: "", timeSpent: "", sessions: "" });
+  };
+
+  const handleRemoveEntry = (index: number) => {
+    setEntries((prevEntries) => prevEntries.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (entries.length === 0) {
+      toast.error("Please add at least one entry before submitting.");
+      return;
+    }
+
     const selectedDate = new Date(date);
     const today = new Date();
     if (selectedDate > today) {
       toast.error("Please select a valid past date.");
       return;
     }
-    const weeklyUsage = {
-      usage: screenTimeNum,
+
+    const dataToSend = {
       date: selectedDate.toISOString(),
+      entries,
     };
-    const limitedUsage = limitUsage;
+
     setLoading(true);
     try {
       const response = await fetch(
@@ -99,23 +152,22 @@ const Track = () => {
             "Content-Type": "application/json",
           },
           credentials: "include",
-          body: JSON.stringify({ weeklyUsage, limitedUsage }),
+          body: JSON.stringify(dataToSend),
         }
       );
 
       if (response.ok) {
         toast.success("Screen time data saved!");
-        setScreenTime("");
+        setEntries([]);
         setDate("");
         setRefreshGraph((prev) => !prev);
       } else {
-        const errorData = await response.json();
-        console.error("Error:", errorData);
-        toast.error("Error saving data");
+        const result = await response.json();
+        toast.error(result.message);
       }
     } catch (error) {
-      console.error("Error:", error);
-      toast.error("Error saving data");
+      console.error("Error saving data:", error);
+      toast.error("Error saving data.");
     } finally {
       setLoading(false);
     }
@@ -143,12 +195,34 @@ const Track = () => {
 
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
-            Screen Time (hrs)
+            Category
+          </label>
+          <select
+            value={newEntry.category}
+            onChange={(e) =>
+              setNewEntry({ ...newEntry, category: e.target.value })
+            }
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            required
+          >
+            <option value="">Select Category</option>
+            <option value="Social Media">Social Media</option>
+            <option value="Productivity">Productivity</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Time Spent (mins)
           </label>
           <input
             type="number"
-            value={screenTime}
-            onChange={(e) => setScreenTime(e.target.value)}
+            value={newEntry.timeSpent}
+            onChange={(e) =>
+              setNewEntry({ ...newEntry, timeSpent: e.target.value })
+            }
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             required
           />
@@ -156,8 +230,48 @@ const Track = () => {
 
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
-            Date
+            Sessions
           </label>
+          <input
+            type="number"
+            value={newEntry.sessions}
+            onChange={(e) =>
+              setNewEntry({ ...newEntry, sessions: e.target.value })
+            }
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            required
+          />
+        </div>
+
+        <button
+          type="button"
+          onClick={handleAddEntry}
+          className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Add Entry
+        </button>
+
+        <div className="mt-4">
+          {entries.map((entry, index) => (
+            <div
+              key={index}
+              className="flex justify-between items-center border p-2 mb-2 rounded"
+            >
+              <p>
+                {entry.category} - {entry.timeSpent} mins, {entry.sessions} sessions
+              </p>
+              <button
+                onClick={() => handleRemoveEntry(index)}
+                className="text-red-600 hover:text-red-800"
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">Date</label>
           <input
             type="date"
             value={date}
@@ -167,7 +281,7 @@ const Track = () => {
           />
         </div>
 
-        {loading ? < LoadingSpinner/> : ""}
+        {loading && <LoadingSpinner />}
         <button
           type="submit"
           className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -177,18 +291,17 @@ const Track = () => {
         </button>
       </form>
 
-      <div className="mt-10 mx-auto max-w-[1000px] ">
-        <p className="text-center font-semibold text-[30px] mb-8">Screen Time Usage</p>
-        <ScreenTimeGraph
-          refreshGraph={refreshGraph}
-          dotThreshold={limitUsage}
-        />
+      {/* Display Graph */}
+      <div className="mt-10 mx-auto max-w-[1000px]">
+        <p className="text-center font-semibold text-[30px] mb-8">
+          Screen Time Usage
+        </p>
+        <ScreenTimeGraph refreshGraph={refreshGraph} dotThreshold={limitUsage} />
       </div>
 
-      {/* Default Screen limit */}
-
-      <div className="mb-4 mt-10 space-x-3 flex mx-auto justify-center flex-row items-center ">
-        <label className="block text-sm font-medium  text-gray-700">
+      {/* Edit Screen Time Limit */}
+      <div className="mb-4 mt-10 space-x-3 flex mx-auto justify-center flex-row items-center">
+        <label className="block text-sm font-medium text-gray-700">
           Default Screen Time Limit (hrs):
         </label>
         <input
@@ -196,10 +309,11 @@ const Track = () => {
           value={limitUsage}
           onChange={(e) => setLimitUsage(Number(e.target.value))}
           disabled={!isEditing}
-          className="mt-1 w-20 disabled block px-3 py-2 border disable  border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          className="mt-1 w-20 block px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           min="1"
         />
       </div>
+
       <div className="flex space-x-3 mb-5 justify-center flex-row mt-3">
         <button
           className="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
@@ -213,7 +327,7 @@ const Track = () => {
           onClick={handleSaveClick}
           disabled={!isEditing}
         >
-          {saving ? "Saving" : "Save"}
+          {saving ? "Saving..." : "Save"}
         </button>
       </div>
       <ToastContainer />
