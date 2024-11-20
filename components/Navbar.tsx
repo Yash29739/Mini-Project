@@ -50,10 +50,10 @@ const Navbar = () => {
 
   const menuLinks = [
     { href: "/", label: "Home" },
-    { href: "/schedules", label: "Schedules" },
-    { href: "/resources", label: "Resources" },
+    { href: "/schedules", label: "Suggestions" },
     { href: "/toDoList", label: "To-Do List" },
     { href: "/tracker", label: "Tracker" },
+    { href: "/resources", label: "Resources" },
   ];
 
   return (
