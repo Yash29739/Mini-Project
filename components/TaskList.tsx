@@ -10,6 +10,7 @@ import StarIcon from "@mui/icons-material/Star";
 import { Table, Thead, Tbody, Tr, Th, Td } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import LoadingCursor from "@/app/loading";
+import { useRouter } from "next/navigation";
 
 interface Todo {
   task_name: string;
@@ -24,6 +25,7 @@ const TodoList = () => {
   const [dueDate, setDueDate] = useState("");
   const [loading, setloading] = useState(false);
   const [showCompleted, setShowCompleted] = useState(false);
+  const router = useRouter();
 
   const fetchTodos = async () => {
     setloading(true);
@@ -47,10 +49,12 @@ const TodoList = () => {
           });
         setTodos(sortedTodos);
       } else {
-        toast.error("Failed to fetch tasks.");
+        console.log("Failed to fetch tasks.");
+        router.push("/login")
       }
     } catch (error) {
-      toast.error("An error occurred while fetching tasks.");
+      console.log("An error occurred while fetching tasks.");
+      router.push("/login")
     } finally {
       setloading(false);
     }
@@ -63,7 +67,7 @@ const TodoList = () => {
   const updateTodos = (updatedTodos: Todo[]) => {
     setTodos([...updatedTodos].sort((a, b) => {
       if (a.status !== b.status) return a.status ? 1 : -1;
-      return b.priority ? -1 : 1;
+      return b.priority ? 1 : -1;
     }));
   };
 
@@ -192,7 +196,10 @@ const TodoList = () => {
   };
 
   const renderTasks = (taskList: Todo[], showActions = true) =>
-    taskList.map((todo) => (
+  taskList.map((todo) => {
+    const isOverdue = new Date(todo.due_date) < new Date() && !todo.status;
+
+    return (
       <Tr key={todo.task_name} className="border border-blue-300">
         <Td
           className="border border-blue-300 px-4 py-2 cursor-pointer"
@@ -211,7 +218,9 @@ const TodoList = () => {
           {todo.task_name}
         </Td>
         <Td
-          className="border border-blue-300 cursor-pointer"
+          className={`border border-blue-300 px-4 py-2 cursor-pointer ${
+            isOverdue ? "text-red-500 font-semibold" : ""
+          }`}
           align="center"
           onClick={() => {
             const newDate = prompt("Enter new due date (YYYY-MM-DD):", todo.due_date) || todo.due_date;
@@ -235,30 +244,32 @@ const TodoList = () => {
           </Td>
         )}
       </Tr>
-    ));
+    );
+  });
+
 
   return (
-    <div className="max-w-full min-h-[85vh] mx-5 md:mx-10 mt-5 md:mt-10 p-10 border rounded-lg shadow-lg bg-blue-50">
+    <div className="max-w-full h-full mx-5 md:mx-10 mt-32 p-10 border rounded-lg shadow-lg bg-blue-50">
       <h1 className="text-4xl font-bold text-center mb-10 text-blue-600">Todo List</h1>
-      <form onSubmit={addTodo} className="flex w-full sm:flex-row flex-col space-x-5 justify-center items-center mb-5">
+      <form onSubmit={addTodo} className="flex w-full sm:flex-row flex-col md:space-x-5 justify-center items-center mb-5">
         <input
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder="Task Name"
-          className="px-4 py-2 border border-blue-300 rounded-lg mb-2 sm:mb-0"
+          className="px-4 py-2 border w-full border-blue-300 rounded-lg mb-2 sm:mb-0"
           required
         />
         <input
           type="date"
           value={dueDate}
           onChange={(e) => setDueDate(e.target.value)}
-          className="px-4 py-2 border border-blue-300 rounded-lg mb-2 sm:mb-0"
+          className="px-4 py-2 border w-full border-blue-300 rounded-lg mb-2 sm:mb-0"
           required
         />
         <button
           type="submit"
-          className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 focus:outline-none"
+          className="px-4 py-2 rounded-lg w-full bg-blue-600 text-white hover:bg-blue-700 focus:outline-none"
         >
           Add Task
         </button>

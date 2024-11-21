@@ -5,6 +5,7 @@ import ScreenTimeGraph from "@/components/AreaChartComponent";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LoadingSpinner from "./LoadingSpinner";
+import { useRouter } from "next/navigation";
 
 interface Entry {
   category: string;
@@ -25,6 +26,7 @@ const Track = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [refreshGraph, setRefreshGraph] = useState(false);
+  const router = useRouter(); 
 
   useEffect(() => {
     getWeeklyData();
@@ -69,8 +71,14 @@ const Track = () => {
         }
       );
       const result = await response.json();
-      setLimitUsage(result.limitedUsage);
+      if(response.ok){
+        setLimitUsage(result.limitedUsage);
+      }else{
+        console.log("Error fetchinng the limit");
+        router.push("/login");
+      }
     } catch (error) {
+      router.push("/login");
       console.error("Error fetching limit:", error);
     }
   };

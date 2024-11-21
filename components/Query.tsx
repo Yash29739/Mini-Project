@@ -16,6 +16,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import LoadingCursor from "@/app/loading";
 import DotLoader from "./DotLoading";
 import { TextGenerateEffect } from "./ui/text-generate-effect";
+import { useRouter } from "next/navigation";
 
 const StyledTableCell = styled(TableCell)(({ theme }: { theme: Theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -66,6 +67,7 @@ const Query = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isMounted = useRef(true);
   const [isSurveyVisible, setSurveyVisible] = useState(false);
+  const router = useRouter();
 
   const questions = [
     { question: "How many hours per day do you spend on screens?", responseKey: "screenTime" },
@@ -201,14 +203,17 @@ const Query = () => {
           credentials: "include",
         });
 
-        if (!response.ok) throw new Error(`Error: ${response.status} ${response.statusText}`);
+        if (!response.ok) {
+          router.push("/login")
+        }
+
         const result = await response.json();
         if (result && result.foundSurvey.responses) {
           setResponses(result.foundSurvey.responses);
           setCluster(result.foundSurvey.cluster);
         }
       } catch (error) {
-        toast.error("Error fetching survey responses: " + error);
+        console.log("Error fetching survey responses: " + error);
       } finally {
         setIsLoading(false);
         setSurveyVisible(false);

@@ -50,6 +50,7 @@ const Navbar = () => {
 
   const menuLinks = [
     { href: "/", label: "Home" },
+    { href: "/info", label: "About" },
     { href: "/schedules", label: "Suggestions" },
     { href: "/toDoList", label: "To-Do List" },
     { href: "/tracker", label: "Tracker" },
@@ -58,7 +59,7 @@ const Navbar = () => {
 
   return (
     <nav className="fixed w-full z-30 top-0 bg-blue-50/70 backdrop-blur-md shadow-md">
-      <div className="flex items-center justify-between max-w-7xl px-6 py-4">
+      <div className="flex items-center justify-between max-w-full px-6 py-4">
         {/* Leftmost Logo */}
         <Link href="/" aria-label="Home">
           <Image
@@ -71,9 +72,9 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop Menu */}
-        <ul className="hidden md:flex justify-end items-center text-black font-medium">
+        <ul className="hidden lg:flex justify-end items-center text-black font-medium">
           {menuLinks.map((link) => (
-            <li key={link.label} className="hover:bg-blue-100 rounded-xl px-5 py-2 m-1 transition duration-200">
+            <li key={link.label} className="hover:bg-blue-100 rounded-xl px-3 py-2 m-1 transition duration-200">
               <Link
                 href={link.href}
                 className=" "
@@ -84,7 +85,7 @@ const Navbar = () => {
           ))}
           <li>
             {isLoggedIn ? (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center ml-2 gap-4">
                 <Link href="/Profile">
                   <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-500 transition">
                     <Image src="/user.svg" alt="Profile" width={20} height={20} />
@@ -114,7 +115,7 @@ const Navbar = () => {
         <button
           onClick={toggleMenu}
           aria-label="Toggle Menu"
-          className="md:hidden focus:outline-none"
+          className="lg:hidden focus:outline-none"
         >
           <Image
             src={"/menu.svg"}
