@@ -122,18 +122,18 @@ const Query = () => {
   const handleFeedback = async (e : any) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const data = { feedback, ratings: feedbackReaction, cluster };
 
     try {
-      const response = await fetch("https://digital-detox-ml.onrender.com/feedback", {
+      const response = await fetch("https://digital-detox-y73b.onrender.com/survey/feedback", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ feedback: feedback }),
+        credentials: "include"
       });
       if (response.ok) {
-        toast.success("Feedback submitted successfully!");
+        toast.success("Feedback submitted successfully.");
         setFeedback("");
         setFeedbackReaction("");
       } else {
