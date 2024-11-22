@@ -17,6 +17,7 @@ import LoadingCursor from "@/app/loading";
 import DotLoader from "./DotLoading";
 import { TextGenerateEffect } from "./ui/text-generate-effect";
 import { useRouter } from "next/navigation";
+import { useLogin } from "@/context/LoginContext";
 
 const StyledTableCell = styled(TableCell)(({ theme }: { theme: Theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -50,6 +51,7 @@ const Query = () => {
   const [feedbackReaction, setFeedbackReaction] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cluster, setCluster] = useState(-1);
+  const { isLoggedIn } = useLogin();
   const [responses, setResponses] = useState({
     screenTime: "",
     screenActivity: "",
@@ -194,6 +196,11 @@ const Query = () => {
   useEffect(() => {
     const fetchSurveyResponses = async () => {
       setIsLoading(true);
+
+      if(!isLoggedIn){
+        router.push("/login")
+      }
+
       try {
         const response = await fetch("https://digital-detox-y73b.onrender.com/survey", {
           method: "GET",
@@ -202,10 +209,6 @@ const Query = () => {
           },
           credentials: "include",
         });
-
-        if (!response.ok) {
-          router.push("/login")
-        }
 
         const result = await response.json();
         if (result && result.foundSurvey.responses) {

@@ -32,7 +32,7 @@ const Home = () => {
 
   {/* Footer Section */}
   <footer className="absolute bottom-5 text-gray-500 text-sm">
-    <p>© 2023 Digital Detox. All rights reserved.</p>
+    <pre>© 2023 Digital Detox. All rights reserved.</pre>
   </footer>
 </div>
 
