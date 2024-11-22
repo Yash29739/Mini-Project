@@ -15,19 +15,6 @@ const Footer = () => {
 
           <div className="flex flex-wrap gap-10 sm:justify-between md:flex-1">
             {/* Footer Links */}
-            {FOOTER_LINKS.map((columns, index) => (
-              <FooterColumn title={columns.title} key={`footer-links-${index}`}>
-                <ul className="regular-14 flex flex-col gap-4 text-gray-30">
-                  {columns.links.map((link, linkIndex) => (
-                    <li key={`link-${linkIndex}`}>
-                      <Link href="/" className="hover:underline">
-                        {link}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </FooterColumn>
-            ))}
 
             {/* Contact Information */}
             <FooterColumn title={FOOTER_CONTACT_INFO.title}>
