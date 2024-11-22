@@ -26,13 +26,16 @@ const TodoList = () => {
   const [dueDate, setDueDate] = useState("");
   const [loading, setloading] = useState(false);
   const [showCompleted, setShowCompleted] = useState(false);
+  const [editingTask, setEditingTask] = useState<string | null>(null);
+  const [editingValue, setEditingValue] = useState<string>("");
+  const [editingDate, setEditingDate] = useState<string>("");
   const { isLoggedIn } = useLogin();
   const router = useRouter();
 
   const fetchTodos = async () => {
     setloading(true);
     try {
-      if(!isLoggedIn){
+      if (!isLoggedIn) {
         router.push("/login");
       }
       const response = await fetch("https://digital-detox-y73b.onrender.com/toDoList", {
@@ -48,7 +51,7 @@ const TodoList = () => {
             ...task,
             due_date: task.due_date.split("T")[0],
           }))
-          .sort((a: any, b : any) => {
+          .sort((a: any, b: any) => {
             if (a.status !== b.status) return a.status ? 1 : -1;
             return b.priority ? -1 : 1;
           });
@@ -91,8 +94,9 @@ const TodoList = () => {
       task_name: inputValue.trim(),
       status: false,
       priority: false,
-      due_date: dueDate,
+      due_date: dueDate || "", // Allow due_date to be an empty string.
     };
+
 
     updateTodos([...todos, newTodo]);
 
@@ -183,7 +187,7 @@ const TodoList = () => {
     updateTodos(updatedTodos);
 
     try {
-      await fetch("https://digital-detox-y73b.onrender.com/toDoList", {
+      await fetch("https://digital-detox-y73b.onrender.com/toDoList/update", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -199,56 +203,83 @@ const TodoList = () => {
   };
 
   const renderTasks = (taskList: Todo[], showActions = true) =>
-  taskList.map((todo) => {
-    const isOverdue = new Date(todo.due_date) < new Date() && !todo.status;
-
-    return (
-      <Tr key={todo.task_name} className="border border-blue-300">
-        <Td
-          className="border border-blue-300 px-4 py-2 cursor-pointer"
-          onDoubleClick={() => {
-            const newName = prompt("Enter new task name:", todo.task_name) || todo.task_name;
-            if (newName !== todo.task_name) {
-              editTask(todo.task_name, newName, todo.due_date);
-            }
-          }}
-        >
-          <Checkbox
-            checked={todo.status}
-            onChange={() => toggleTodo(todo.task_name)}
-            color="primary"
-          />
-          {todo.task_name}
-        </Td>
-        <Td
-          className={`border border-blue-300 px-4 py-2 cursor-pointer ${
-            isOverdue ? "text-red-500 font-semibold" : ""
-          }`}
-          align="center"
-          onClick={() => {
-            const newDate = prompt("Enter new due date (YYYY-MM-DD):", todo.due_date) || todo.due_date;
-            if (newDate !== todo.due_date) {
-              editTask(todo.task_name, todo.task_name, newDate);
-            }
-          }}
-        >
-          {todo.due_date}
-        </Td>
-        <Td align="center">
-          <IconButton onClick={() => updatePriority(todo.task_name)}>
-            <StarIcon style={{ color: todo.priority ? "#1e90ff" : "#b3b3b3" }} />
-          </IconButton>
-        </Td>
-        {showActions && (
-          <Td align="center" className="border border-blue-300">
-            <IconButton onClick={() => deleteTodo(todo.task_name)} color="error">
-              <DeleteIcon />
+    taskList.map((todo) => {
+      const isOverdue = new Date(todo.due_date) < new Date() && !todo.status;
+  
+      return (
+        <Tr key={todo.task_name} className="border border-blue-300">
+          <Td className="border border-blue-300 px-4 py-2">
+            {editingTask === todo.task_name ? (
+              <input
+                type="text"
+                value={editingValue}
+                onChange={(e) => setEditingValue(e.target.value)}
+                onBlur={() => {
+                  if (editingValue !== todo.task_name) {
+                    editTask(todo.task_name, editingValue, editingDate || todo.due_date);
+                  }
+                  setEditingTask(null);
+                }}
+                autoFocus
+              />
+            ) : (
+              <div
+                onDoubleClick={() => {
+                  setEditingTask(todo.task_name);
+                  setEditingValue(todo.task_name);
+                  setEditingDate(todo.due_date);
+                }}
+              >
+                <Checkbox
+                  checked={todo.status}
+                  onChange={() => toggleTodo(todo.task_name)}
+                  color="primary"
+                />
+                {todo.task_name}
+              </div>
+            )}
+          </Td>
+          <Td className={`border border-blue-300 px-4 py-2 ${isOverdue ? "text-red-500 font-semibold" : ""}`}>
+            {editingTask === todo.task_name ? (
+              <input
+                type="date"
+                value={editingDate}
+                onChange={(e) => setEditingDate(e.target.value)}
+                onBlur={() => {
+                  if (editingDate !== todo.due_date) {
+                    editTask(todo.task_name, editingValue, editingDate);
+                  }
+                  setEditingTask(null);
+                }}
+              />
+            ) : (
+              <div
+                onDoubleClick={() => {
+                  setEditingTask(todo.task_name);
+                  setEditingValue(todo.task_name);
+                  setEditingDate(todo.due_date);
+                }}
+              >
+                {todo.due_date || "No due date"}
+              </div>
+            )}
+          </Td>
+          <Td align="center">
+            <IconButton onClick={() => updatePriority(todo.task_name)}>
+              <StarIcon style={{ color: todo.priority ? "#1e90ff" : "#b3b3b3" }} />
             </IconButton>
           </Td>
-        )}
-      </Tr>
-    );
-  });
+          {showActions && (
+            <Td align="center" className="border border-blue-300">
+              <IconButton onClick={() => deleteTodo(todo.task_name)} color="error">
+                <DeleteIcon />
+              </IconButton>
+            </Td>
+          )}
+        </Tr>
+      );
+    });
+  
 
 
   return (
