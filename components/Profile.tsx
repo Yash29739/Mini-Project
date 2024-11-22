@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { FaUserCircle, FaEnvelope } from "react-icons/fa";
+import { useLogin } from "@/context/LoginContext";
 
 interface User {
   username: string;
@@ -14,6 +15,7 @@ const Profile = () => {
     username: "User Name",
     email: "johndoe@example.com",
   });
+  const { isLoggedIn, setIsLoggedIn, logout } = useLogin();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState<User>(user);
@@ -149,7 +151,12 @@ const Profile = () => {
                   Edit Profile
                 </button>
               )}
-              <button className="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-200">
+              <button 
+                onClick={() => {
+                  logout();
+                }}
+                className="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-200"
+                >
                 LogOut
               </button>
             </div>

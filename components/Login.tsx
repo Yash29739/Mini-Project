@@ -140,7 +140,7 @@ const LogIn = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full h-12 text-white bg-black border-2 border-gray-400 rounded-full font-bold transition-transform duration-300 hover:scale-105"
+          className="w-full h-12 text-white bg-blue-600 hover:bg-blue-500 border-2 border-gray-400 rounded-full"
         >
           {loading ? <LoadingSpinner /> : formType === "login" ? "Log In" : "Sign Up"}
         </button>
