@@ -18,22 +18,22 @@ const articles = [
     link: 'https://www.reddit.com/r/nosurf/comments/7p9cin/how_i_curbed_my_internet_addiction_8_steps/',
   },
   {
-    title: 'Understanding JavaScript Closures',
-    description: 'An in-depth article on closures and their applications in JavaScript.',
-    image: '/images/js-closures.jpg',
-    link: 'https://example.com/js-closures',
+    title: 'Nosurf Made Simple: Reclaim Your Life',
+    description: 'A practical guide to breaking free from digital distractions and finding peace.',
+    image: '/redit2.1.png',
+    link: 'https://www.reddit.com/r/nosurf/comments/7eszt3/a_bulletproof_and_simple_way_to_succeed_in_nosurf/',
   },
   {
-    title: 'CSS Grid vs Flexbox',
-    description: 'Learn when to use CSS Grid and Flexbox for your layouts.',
-    image: '/images/css-grid-flexbox.jpg',
-    link: 'https://example.com/css-grid-flexbox',
+    title: 'Mastering Digital Discipline: A Practical Guide',
+    description: 'Tips and tools to build a healthier, more intentional relationship with technology.',
+    image: '/redit3.1.png',
+    link: 'https://www.reddit.com/r/nosurf/comments/6lrot7/a_guide_to_better_internet_and_computer_uselong/',
   },
   {
-    title: 'CSS Grid vs Flexbox',
-    description: 'Learn when to use CSS Grid and Flexbox for your layouts.',
-    image: '/images/css-grid-flexbox.jpg',
-    link: 'https://example.com/css-grid-flexbox',
+    title: 'Digital Detox: Reclaim Balance and Ease Tech Stress',
+    description: 'Practical strategies to reduce tech dependency, ease stress, and restore balance in a digital-driven life.',
+    image: '/redit4.png',
+    link: 'https://www.reddit.com/r/DopamineDetoxing/comments/1cbby6l/digital_detox_10_practical_tips_to_free_your_body/',
   },
 ];
 
@@ -56,7 +56,7 @@ const VideoGallery: React.FC = () => {
   return (
     <div className="p-4 my-12">
       {/* Display the selected video */}
-      {/* {playingVideo && (
+      {playingVideo && (
         <div className="mb-8 ">
           <h3 className="text-xl py-3 my-2 font-semibold border-2 border-gray-20 rounded-lg text-center">{playingVideo.title}</h3>
           <iframe
@@ -67,7 +67,7 @@ const VideoGallery: React.FC = () => {
             allowFullScreen
           />
         </div>
-      )} */}
+      )}
 
       {/* Video Thumbnails */}
       <div className="grid my-5  grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -88,7 +88,7 @@ const VideoGallery: React.FC = () => {
       </div>
 
       <div className="article">
-        <h2 className="text-3xl text-center my-20 font-bold mb-4">Digital Detox Articles:</h2>
+        <h2 className="text-3xl text-center my-20 font-bold mb-4">Digital Detox Articles</h2>
           <ArticleGrid articles={articles}/>
       </div>
 

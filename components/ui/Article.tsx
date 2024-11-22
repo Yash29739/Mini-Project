@@ -18,7 +18,7 @@ const ArticleGrid: React.FC<ArticleGridProps> = ({ articles }) => {
       {articles.map((article, index) => (
         <div
           key={index}
-          className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-blue-500 hover:drop-shadow-2xl transition-shadow duration-300"
+          className="bg-blue-100 rounded-lg shadow-md overflow-hidden hover:shadow-blue-500 hover:drop-shadow-2xl transition-shadow duration-300"
         >
           <div className="relative w-full h-56">
             <Image
@@ -28,7 +28,7 @@ const ArticleGrid: React.FC<ArticleGridProps> = ({ articles }) => {
               objectFit=""
             /> 
           </div>
-          <div className=" bg-blue-100 p-4">
+          <div className=" p-4">
             <h2 className="text-lg font-semibold text-gray-800">
               {article.title}
             </h2>
@@ -39,7 +39,7 @@ const ArticleGrid: React.FC<ArticleGridProps> = ({ articles }) => {
               href={article.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-4 inline-block text-blue-500 hover:text-blue-700 text-sm font-medium"
+              className="mt-4 inline-block hover:border-white bg-white px-3 py-2 border border-blue-200 rounded-xl text-blue-500 hover:text-blue-700 text-sm font-medium"
             >
               Read More →
             </a>

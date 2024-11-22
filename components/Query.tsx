@@ -18,6 +18,7 @@ import DotLoader from "./DotLoading";
 import { TextGenerateEffect } from "./ui/text-generate-effect";
 import { useRouter } from "next/navigation";
 import { useLogin } from "@/context/LoginContext";
+import { FaRegEdit } from "react-icons/fa";
 
 const StyledTableCell = styled(TableCell)(({ theme }: { theme: Theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -320,18 +321,12 @@ const Query = () => {
                 </TableBody>
               </Table>
             </TableContainer>
-            <div className="text-center my-5 space-x-5">
+            <div className="justify-center text-center items-center flex my-5 space-x-5">
               <button
-                className="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700"
+                className="bg-red-600 inline-flex text-white py-2 px-4 rounded-md hover:bg-red-700"
                 onClick={handleEdit}
               >
-                Edit
-              </button>
-              <button
-                className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700"
-                onClick={() => setIsEditing(false)}
-              >
-                Save
+                <FaRegEdit className={"h-5 w-5 mr-2"}/><span>Edit</span>
               </button>
             </div>
           </div>
