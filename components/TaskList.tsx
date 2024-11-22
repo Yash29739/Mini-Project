@@ -11,6 +11,7 @@ import { Table, Thead, Tbody, Tr, Th, Td } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import LoadingCursor from "@/app/loading";
 import { useRouter } from "next/navigation";
+import { useLogin } from "@/context/LoginContext";
 
 interface Todo {
   task_name: string;
@@ -25,11 +26,15 @@ const TodoList = () => {
   const [dueDate, setDueDate] = useState("");
   const [loading, setloading] = useState(false);
   const [showCompleted, setShowCompleted] = useState(false);
+  const { isLoggedIn } = useLogin();
   const router = useRouter();
 
   const fetchTodos = async () => {
     setloading(true);
     try {
+      if(!isLoggedIn){
+        router.push("/login");
+      }
       const response = await fetch("https://digital-detox-y73b.onrender.com/toDoList", {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -50,11 +55,9 @@ const TodoList = () => {
         setTodos(sortedTodos);
       } else {
         console.log("Failed to fetch tasks.");
-        router.push("/login")
       }
     } catch (error) {
       console.log("An error occurred while fetching tasks.");
-      router.push("/login")
     } finally {
       setloading(false);
     }

@@ -6,6 +6,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LoadingSpinner from "./LoadingSpinner";
 import { useRouter } from "next/navigation";
+import { useLogin } from "@/context/LoginContext";
 
 interface Entry {
   category: string;
@@ -26,6 +27,7 @@ const Track = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [refreshGraph, setRefreshGraph] = useState(false);
+  const { isLoggedIn } = useLogin();
   const router = useRouter(); 
 
   useEffect(() => {
@@ -63,6 +65,11 @@ const Track = () => {
 
   const getLimit = async () => {
     try {
+
+      if(!isLoggedIn){
+        router.push('/login')
+      }
+
       const response = await fetch(
         "https://digital-detox-y73b.onrender.com/tracker/limit",
         {
@@ -75,7 +82,6 @@ const Track = () => {
         setLimitUsage(result.limitedUsage);
       }else{
         console.log("Error fetchinng the limit");
-        router.push("/login");
       }
     } catch (error) {
       router.push("/login");
