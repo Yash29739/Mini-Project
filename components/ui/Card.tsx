@@ -36,7 +36,7 @@ const Card: React.FC<CardProps> = ({ title, description, image, frontText, link,
           <h2 className="text-xl font-semibold px-5 text-gray-800 text-center mb-2">
             {title}
           </h2>
-          <p className="text-gray-600 text-sm px-5 pb-1 text-center line-clamp-3">
+          <p className="text-gray-600 w-[400px] text-sm px-5 pb-1 text-center line-clamp-3">
             {description}
           </p>
           {link && (

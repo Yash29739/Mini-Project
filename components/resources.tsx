@@ -54,7 +54,7 @@ const VideoGallery: React.FC = () => {
   };
 
   return (
-    <div className="p-4 my-12">
+    <div className="p-4 my-20">
       {/* Display the selected video */}
       {playingVideo && (
         <div className="mb-8 ">
