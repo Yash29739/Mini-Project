@@ -8,59 +8,44 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
-  PieChart,
+  Line,
+  Legend,
   Pie,
-  Cell,
+  PieChart,
+  Cell
 } from "recharts";
 import LoadingCursor from "@/app/loading";
+import "react-datepicker/dist/react-datepicker.css";
 
-const formatDate = (dateString: string): string => {
-  const date = new Date(dateString);
-  // Use ISO format (YYYY-MM-DD) for consistency in comparisons
-  return date.toISOString().split("T")[0];
-};
+interface ScreenTimeEntry {
+  category: string;
+  timeSpent: number; // in minutes
+}
 
-
-// Function to group data by date
-const groupByDate = (data: { date: string; entries: { category: string, timeSpent: number }[] }[]) => {
-  const groupedData = new Map<string, { category: string, timeSpent: number }[]>();
-
-  data.forEach((entry) => {
-    const formattedDate = formatDate(entry.date);
-    const existingEntries = groupedData.get(formattedDate) || [];
-    entry.entries.forEach((subEntry) => {
-      const existingCategory = existingEntries.find((e) => e.category === subEntry.category);
-      if (existingCategory) {
-        existingCategory.timeSpent += subEntry.timeSpent; // Aggregate timeSpent by category
-      } else {
-        existingEntries.push(subEntry);
-      }
-    });
-    groupedData.set(formattedDate, existingEntries);
-  });
-
-  return Array.from(groupedData, ([date, entries]) => ({ date, entries })).sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
-};
+interface ScreenTimeData {
+  date: string;
+  entries: ScreenTimeEntry[];
+}
 
 interface ScreenTimeGraphProps {
   refreshGraph: boolean;
-  dotThreshold?: number;
+  limitedUsage: number; // Passed from parent component
 }
 
-const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, dotThreshold = 6 }) => {
+const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, limitedUsage }) => {
   const [state, setState] = useState<{
     loading: boolean;
-    data: { date: string; entries: { category: string, timeSpent: number }[] }[];
+    data: ScreenTimeData[];
   }>({
     loading: true,
     data: [],
   });
 
-  // Fetching data from the backend
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
+  const [startDate, endDate] = dateRange;
+
+  // Fetch data from backend
   const fetchData = useCallback(async () => {
     setState((prev) => ({ ...prev, loading: true }));
     try {
@@ -69,11 +54,16 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, dotThre
         headers: { "Content-Type": "application/json" },
         credentials: "include",
       });
+
       const result = await response.json();
-      const groupedData = groupByDate(result.data); // Adjusted to new schema
-      setState({ loading: false, data: groupedData });
+      const groupedData = groupByDate(result.data);
+
+      setState({
+        loading: false,
+        data: groupedData,
+      });
     } catch (error) {
-      console.error("Error in the fetch", error);
+      console.error("Error fetching data:", error);
       setState({ loading: false, data: [] });
     }
   }, []);
@@ -82,36 +72,45 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, dotThre
     fetchData();
   }, [fetchData, refreshGraph]);
 
-  const chartData = useMemo(() => state.data, [state.data]);
+  // Group data by date
+  const groupByDate = (data: ScreenTimeData[]): ScreenTimeData[] => {
+    const grouped = new Map<string, ScreenTimeEntry[]>();
 
-  // Calculate average time spent from an array of time entries
-  const calculateAverage = (entries: { timeSpent: number }[]) => {
-    const total = entries.reduce((sum, entry) => sum + entry.timeSpent, 0);
-    return total / entries.length || 0;
-  };
-
-  const getDailyStats = () => {
-    const today = new Date().toISOString().split("T")[0];
-    return chartData.find((entry) => entry.date === today) || null;
-  };
-
-  const getWeeklyStats = () => {
-    const now = new Date();
-    const weekStart = new Date(now);
-    weekStart.setDate(now.getDate() - now.getDay());
-    const weekEnd = new Date(now);
-    weekEnd.setDate(weekStart.getDate() + 6);
-
-    return chartData.filter((entry) => {
-      const entryDate = new Date(entry.date);
-      return entryDate >= weekStart && entryDate <= weekEnd;
+    data.forEach((entry) => {
+      const existing = grouped.get(entry.date) || [];
+      entry.entries.forEach((subEntry) => {
+        const existingCategory = existing.find((e) => e.category === subEntry.category);
+        if (existingCategory) {
+          existingCategory.timeSpent += subEntry.timeSpent;
+        } else {
+          existing.push(subEntry);
+        }
+      });
+      grouped.set(entry.date, existing);
     });
+
+    return Array.from(grouped.entries())
+      .map(([date, entries]) => ({ date, entries }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  };
+
+  // Calculate total time
+  const calculateTotalTime = (entries: ScreenTimeEntry[]): number =>
+    entries.reduce((sum, entry) => sum + entry.timeSpent, 0);
+
+  // Calculate threshold percentage
+  const calculateThresholdPercentage = (average: number): string => {
+    const difference = average - limitedUsage;
+    const percentage = (Math.abs(difference) / limitedUsage) * 100;
+    return difference > 0
+      ? `You are ${percentage.toFixed(2)}% above the screen limit`
+      : `You are ${percentage.toFixed(2)}% below the screen limit`;
   };
 
   const getCategoryWiseData = () => {
     const categoryData: Record<string, number> = {};
 
-    chartData.flatMap((entry) => entry.entries).forEach((subEntry) => {
+    state.data.flatMap((entry) => entry.entries).forEach((subEntry) => {
       categoryData[subEntry.category] = (categoryData[subEntry.category] || 0) + subEntry.timeSpent;
     });
 
@@ -121,22 +120,58 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, dotThre
     }));
   };
 
+  const formatXAxisDate = (date: string) => {
+    const newDate = new Date(date);
+    // Format date to show day and month (e.g., "07 Nov", "15 Nov")
+    return newDate.toLocaleDateString("en-US", { day: "numeric", month: "short" });
+  };
 
-  const getMonthlyStats = () => {
-    const now = new Date();
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-    return chartData.filter((entry) => {
+  // Filter data by date range
+  const filteredData = useMemo(() => {
+    if (!startDate || !endDate) return state.data;
+    return state.data.filter((entry) => {
       const entryDate = new Date(entry.date);
-      return entryDate >= monthStart && entryDate <= monthEnd;
+      return entryDate >= startDate && entryDate <= endDate;
+    });
+  }, [state.data, startDate, endDate]);
+
+  // Weekly and Monthly Stats
+  const getRangeStats = (range: "weekly" | "monthly"): ScreenTimeData[] => {
+    const now = new Date();
+    let start: Date, end: Date;
+
+    if (range === "weekly") {
+      start = new Date(now);
+      start.setDate(now.getDate() - now.getDay());
+      end = new Date(start);
+      end.setDate(start.getDate() + 6);
+    } else {
+      start = new Date(now.getFullYear(), now.getMonth(), 1);
+      end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    }
+
+    return state.data.filter((entry) => {
+      const entryDate = new Date(entry.date);
+      return entryDate >= start && entryDate <= end;
     });
   };
 
-  // Calculate statistics for daily, weekly, and monthly data
-  const dailyStats = getDailyStats();
-  const weeklyStats = getWeeklyStats();
-  const monthlyStats = getMonthlyStats();
+  const weeklyStats = useMemo(() => getRangeStats("weekly"), [state.data]);
+  const monthlyStats = useMemo(() => getRangeStats("monthly"), [state.data]);
+
+  const renderAverageStats = (label: string, data: ScreenTimeData[]) => {
+    const total = data.flatMap((entry) => entry.entries).reduce((sum, e) => sum + e.timeSpent, 0);
+    const average = total / data.length || 0;
+    const percentageMessage = calculateThresholdPercentage(average);
+
+    return (
+      <div className="text-center">
+        <p className="text-lg text-blue-600">
+          Average Screen Time {label}: {average.toFixed(2)} minutes ({percentageMessage})
+        </p>
+      </div>
+    );
+  };
 
   return (
     <div className="w-full h-full bg-blue-50 py-10 px-5">
@@ -148,165 +183,135 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, dotThre
         <div>
           {/* Daily Stats */}
           <div className="bg-white p-5 rounded-lg shadow-lg mb-5">
-            <h2 className="text-xl font-semibold text-center text-blue-700">Daily Screen Time</h2>
-            {dailyStats ? (
-              <div className="text-center">
-                {dailyStats.entries.map((entry) => (
-                  <p className="text-lg text-blue-600" key={entry.category}>
-                    {entry.category}: {entry.timeSpent} minutes
-                  </p>
-                ))}
-                <p className="text-md text-blue-600">
-                  Average Screen Time: {calculateAverage(dailyStats.entries).toFixed(2)} minutes
-                </p>
-              </div>
-            ) : (
-              <p className="text-center text-red-600">No data available for today.</p>
-            )}
+            <h2 className="text-xl font-semibold text-center text-blue-700">
+              Daily Screen Time
+            </h2>
+            {renderAverageStats("Today", filteredData)}
           </div>
 
           {/* Weekly Stats */}
           <div className="bg-white p-5 rounded-lg shadow-lg mb-5">
-            <h2 className="text-xl font-semibold text-center text-blue-700">Weekly Screen Time</h2>
-            {weeklyStats ? (
-              <div className="text-center">
-                {weeklyStats.map((entry: any) => (
-                  <div key={entry.date} className="mb-2">
-                    <p className="text-lg font-semibold text-blue-700">{entry.date}</p>
-                    {entry.entries.map((subEntry: any) => (
-                      <p className="text-lg text-blue-600" key={subEntry.category}>
-                        {subEntry.category}: {subEntry.timeSpent} minutes
-                      </p>
-                    ))}
-                  </div>
-                ))}
-                <p className="text-md text-blue-600">
-                  Average Screen Time This Week: {calculateAverage(weeklyStats.flatMap((e) => e.entries)).toFixed(2)} minutes
-                </p>
-              </div>
-            ) : (
-              <p className="text-center text-red-600">No data available for this week.</p>
-            )}
+            <h2 className="text-xl font-semibold text-center text-blue-700">
+              Weekly Screen Time
+            </h2>
+            {renderAverageStats("This Week", weeklyStats)}
           </div>
-
 
           {/* Monthly Stats */}
           <div className="bg-white p-5 rounded-lg shadow-lg mb-5">
-            <h2 className="text-xl font-semibold text-center text-blue-700">Monthly Screen Time</h2>
-            {monthlyStats ? (
-              <div className="text-center">
-                {monthlyStats.map((entry: any) => (
-                  <div key={entry.date} className="mb-2">
-                    <p className="text-lg font-semibold text-blue-700">{entry.date}</p>
-                    {entry.entries.map((subEntry: any) => (
-                      <p className="text-lg text-blue-600" key={subEntry.category}>
-                        {subEntry.category}: {subEntry.timeSpent} minutes
-                      </p>
-                    ))}
-                  </div>
-                ))}
-                <p className="text-md text-blue-600">
-                  Average Screen Time This Month: {calculateAverage(monthlyStats.flatMap((e) => e.entries)).toFixed(2)} minutes
-                </p>
-              </div>
-            ) : (
-              <p className="text-center text-red-600">No data available for this month.</p>
-            )}
+            <h2 className="text-xl font-semibold text-center text-blue-700">
+              Monthly Screen Time
+            </h2>
+            {renderAverageStats("This Month", monthlyStats)}
           </div>
 
-
-          {/* Bar Chart */}
           <div className="bg-white p-5 rounded-lg shadow-lg mb-5">
-            <h2 className="text-xl font-semibold text-center text-blue-700">Screen Time Chart</h2>
+            <h2 className="text-xl font-semibold text-center text-blue-700">
+              Total Screen Time with Threshold
+            </h2>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart
-                data={chartData.flatMap((entry) =>
-                  entry.entries.map((subEntry) => ({
-                    date: entry.date,
-                    category: subEntry.category,
-                    timeSpent: subEntry.timeSpent,
-                  }))
-                )}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                data={filteredData.map((entry) => ({
+                  date: entry.date,
+                  total: calculateTotalTime(entry.entries),
+                  threshold: limitedUsage,
+                }))}
               >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
+                <XAxis
+                  dataKey="date"
+                  tickFormatter={formatXAxisDate}  // Format the X-axis labels for better readability
+                  angle={-45}  // Rotate labels to avoid congestion
+                  textAnchor="end"  // Align labels to the right
+                  height={80}  // Increase space for the X-axis labels
+                />
                 <YAxis />
                 <Tooltip />
-                <Legend />
-                <Bar dataKey="timeSpent" fill="#4C9FEF" />
+                <Bar dataKey="total" fill="#4C9FEF" />
+                <Line
+                  type="monotone"
+                  dataKey="threshold"
+                  stroke="red"
+                  dot={false}
+                  isAnimationActive={false}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
-
-          {/* Pie Chart */}
           <div className="bg-white p-5 rounded-lg shadow-lg">
-            <h2 className="text-xl font-semibold text-center text-blue-700">Screen Time Distribution</h2>
+            <h2 className="text-xl font-semibold text-center text-blue-700">Category-Wise Distribution</h2>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={chartData.flatMap((entry) =>
-                    entry.entries.map((subEntry) => ({
-                      name: subEntry.category,
-                      value: subEntry.timeSpent,
-                    }))
-                  )}
-                  dataKey="value"
-                  nameKey="name"
+                  data={getCategoryWiseData()}
+                  dataKey="timeSpent"
+                  nameKey="category"
                   cx="50%"
                   cy="50%"
                   outerRadius={120}
-                  fill="#4C9FEF"
-                  label
+                  labelLine={false}  // Remove the line connecting the label to the pie slice
+                  // Custom label rendering
+                  label={({ cx, cy, midAngle, innerRadius, outerRadius, value, index, name }) => {
+                    const RADIAN = Math.PI / 180;
+                    const radius = outerRadius + 10;
+                    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+                    // Return custom label with category name and time spent
+                    return (
+                      <text
+                        x={x}
+                        y={y}
+                        fill="white"
+                        textAnchor={x > cx ? "start" : "end"}
+                        dominantBaseline="central"
+                        fontSize={12}
+                      >
+                        {value} min
+                      </text>
+                    );
+                  }}
                 >
-                  {chartData.flatMap((entry) =>
-                    entry.entries.map((subEntry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={index % 2 === 0 ? "#4C9FEF" : "#6CC8FF"}
-                      />
-                    ))
-                  )}
+                  {getCategoryWiseData().map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={
+                        index % 3 === 0
+                          ? "#4C9FEF"  // First color
+                          : index % 3 === 1
+                            ? "#6CC8FF"  // Second color
+                            : "#F2A900"  // Third color
+                      }
+                    />
+                  ))}
                 </Pie>
+                {/* Add Legend to display category names */}
+                <Legend
+                  verticalAlign="bottom"
+                  align="center"
+                  iconSize={20}
+                  iconType="circle"
+                  layout="horizontal"
+                  payload={getCategoryWiseData().map((entry, index) => ({
+                    value: entry.category,
+                    type: "square", // You can use 'circle' or 'square' for the legend icon
+                    color:
+                      index % 3 === 0
+                        ? "#4C9FEF"  // First color
+                        : index % 3 === 1
+                          ? "#6CC8FF"  // Second color
+                          : "#F2A900", // Third color
+                  }))}
+                  wrapperStyle={{
+                    paddingTop: "20px",  // Add some padding between pie chart and legend
+                  }}
+                />
               </PieChart>
             </ResponsiveContainer>
           </div>
         </div>
-      )}
-      <div className="bg-white p-5 rounded-lg shadow-lg mb-5">
-        <h2 className="text-xl font-semibold text-center text-blue-700">Category-Wise Screen Time</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={getCategoryWiseData()} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="category" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="timeSpent" fill="#4C9FEF" />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-      <div className="bg-white p-5 rounded-lg shadow-lg">
-        <h2 className="text-xl font-semibold text-center text-blue-700">Category-Wise Distribution</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
-            <Pie
-              data={getCategoryWiseData()}
-              dataKey="timeSpent"
-              nameKey="category"
-              cx="50%"
-              cy="50%"
-              outerRadius={120}
-              fill="#4C9FEF"
-              label
-            >
-              {getCategoryWiseData().map((_, index) => (
-                <Cell key={`cell-${index}`} fill={index % 2 === 0 ? "#4C9FEF" : "#6CC8FF"} />
-              ))}
-            </Pie>
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
 
+      )}
     </div>
   );
 };
