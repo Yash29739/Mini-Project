@@ -310,7 +310,7 @@ const Track = () => {
         <p className="text-center font-semibold text-[30px] mb-8">
           Screen Time Usage
         </p>
-        <ScreenTimeGraph refreshGraph={refreshGraph} dotThreshold={limitUsage} />
+        <ScreenTimeGraph refreshGraph={refreshGraph} limitedUsage={limitUsage * 60} />
       </div>
 
       {/* Edit Screen Time Limit */}
