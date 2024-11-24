@@ -1,0 +1,7 @@
+.stroke-white {
+    -webkit-text-stroke: 2px white;
+  }
+  .stroke-2 {
+    -webkit-text-stroke-width: 2px;
+  }
+  
