@@ -29,8 +29,7 @@ const Home = () => {
     Take control of your screen time and build healthier habits today.
   </p>
   <button className="relative mt-6 px-6 py-3 bg-gradient-to-r from-blue-700 to-blue-500 text-white text-lg font-semibold rounded-full shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-200 ease-in-out">
-    <span className="absolute inset-0 bg-white/50 rounded-lg blur-md -z-10"></span>
-    Get Started
+    <Link href="/info">Get Started</Link>
   </button>
 </header>
 
