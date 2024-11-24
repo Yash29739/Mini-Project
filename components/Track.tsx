@@ -118,7 +118,7 @@ const Track = () => {
 
     setEntries((prevEntries) => [
       ...prevEntries,
-      { category, timeSpent: timeSpentNum / 60 },
+      { category, timeSpent: timeSpentNum },
     ]);
     setNewEntry({ category: "", timeSpent: "" });
   };

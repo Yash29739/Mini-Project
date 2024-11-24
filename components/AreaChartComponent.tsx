@@ -57,6 +57,7 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, limited
 
       const result = await response.json();
       const groupedData = groupByDate(result.data);
+      console.log("Grouped Data:", groupedData);
 
       setState({
         loading: false,
@@ -110,7 +111,7 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, limited
   const getRangeStats = (range: "weekly" | "monthly"): ScreenTimeData[] => {
     const now = new Date();
     let start: Date, end: Date;
-  
+
     if (range === "weekly") {
       start = new Date(now);
       start.setDate(now.getDate() - now.getDay());
@@ -120,16 +121,16 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, limited
       start = new Date(now.getFullYear(), now.getMonth(), 1); // First day of the month
       end = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Last day of the month
     }
-  
+
     return state.data.filter((entry) => {
       const entryDate = new Date(entry.date);
       return entryDate >= start && entryDate <= end;
     });
   };
-  
+
   const monthlyStats = useMemo(() => getRangeStats("monthly"), [state.data]);
   const weeklyStats = useMemo(() => getRangeStats("weekly"), [state.data])
-  
+
 
   const getCategoryWiseData = () => {
     const categoryData: Record<string, number> = {};
@@ -174,7 +175,7 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, limited
 
   const renderDailyTotalStats = (data: ScreenTimeData[]) => {
     const totalTime = data.flatMap((entry) => entry.entries).reduce((sum, e) => sum + e.timeSpent, 0);
-  
+
     return (
       <div className="text-center">
         <p className="text-lg text-blue-600">
