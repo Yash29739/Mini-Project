@@ -11,7 +11,6 @@ import { useLogin } from "@/context/LoginContext";
 interface Entry {
   category: string;
   timeSpent: number;
-  sessions: number;
 }
 
 const Track = () => {
@@ -19,7 +18,6 @@ const Track = () => {
   const [newEntry, setNewEntry] = useState({
     category: "",
     timeSpent: "",
-    sessions: "",
   });
   const [date, setDate] = useState("");
   const [loading, setLoading] = useState(false);
@@ -28,7 +26,7 @@ const Track = () => {
   const [saving, setSaving] = useState(false);
   const [refreshGraph, setRefreshGraph] = useState(false);
   const { isLoggedIn } = useLogin();
-  const router = useRouter(); 
+  const router = useRouter();
 
   useEffect(() => {
     getWeeklyData();
@@ -65,9 +63,8 @@ const Track = () => {
 
   const getLimit = async () => {
     try {
-
-      if(!isLoggedIn){
-        router.push('/login')
+      if (!isLoggedIn) {
+        router.push("/login");
       }
 
       const response = await fetch(
@@ -78,10 +75,10 @@ const Track = () => {
         }
       );
       const result = await response.json();
-      if(response.ok){
+      if (response.ok) {
         setLimitUsage(result.limitedUsage);
-      }else{
-        console.log("Error fetchinng the limit");
+      } else {
+        console.log("Error fetching the limit");
       }
     } catch (error) {
       router.push("/login");
@@ -106,17 +103,11 @@ const Track = () => {
   };
 
   const handleAddEntry = () => {
-    const { category, timeSpent, sessions } = newEntry;
+    const { category, timeSpent } = newEntry;
     const timeSpentNum = Number(timeSpent);
-    const sessionsNum = Number(sessions);
 
-    if (
-      isNaN(timeSpentNum) ||
-      isNaN(sessionsNum) ||
-      timeSpentNum <= 0 ||
-      sessionsNum <= 0
-    ) {
-      toast.error("Please enter valid time spent and sessions.");
+    if (isNaN(timeSpentNum) || timeSpentNum <= 0) {
+      toast.error("Please enter valid time spent.");
       return;
     }
 
@@ -127,9 +118,9 @@ const Track = () => {
 
     setEntries((prevEntries) => [
       ...prevEntries,
-      { category, timeSpent: timeSpentNum, sessions: sessionsNum },
+      { category, timeSpent: timeSpentNum },
     ]);
-    setNewEntry({ category: "", timeSpent: "", sessions: "" });
+    setNewEntry({ category: "", timeSpent: "" });
   };
 
   const handleRemoveEntry = (index: number) => {
@@ -199,111 +190,109 @@ const Track = () => {
   return (
     <div className="my-20">
       {/* Form for screen time tracking */}
-      <form
-        onSubmit={handleSubmit}
-        className="max-w-md mt-28 mb-20 mx-auto p-6 bg-white shadow-md rounded-lg"
-      >
-        <h2 className="text-2xl font-semibold mb-4 text-center">
-          Track Screen Time
-        </h2>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Category
-          </label>
-          <select
-            value={newEntry.category}
-            onChange={(e) =>
-              setNewEntry({ ...newEntry, category: e.target.value })
-            }
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            required
-          >
-            <option value="">Select Category</option>
-            <option value="Social Media">Social Media</option>
-            <option value="Productivity">Productivity</option>
-            <option value="Entertainment">Entertainment</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Time Spent (mins)
-          </label>
-          <input
-            type="number"
-            value={newEntry.timeSpent}
-            onChange={(e) =>
-              setNewEntry({ ...newEntry, timeSpent: e.target.value })
-            }
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Sessions
-          </label>
-          <input
-            type="number"
-            value={newEntry.sessions}
-            onChange={(e) =>
-              setNewEntry({ ...newEntry, sessions: e.target.value })
-            }
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            required
-          />
-        </div>
-
-        <button
-          type="button"
-          onClick={handleAddEntry}
-          className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      <div className="max-w-md mt-28 mb-20 mx-auto p-6 bg-white shadow-md rounded-lg">
+        {/* First Form: Add Entries */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleAddEntry();
+          }}
+          className="mb-8"
         >
-          Add Entry
-        </button>
+          <h2 className="text-2xl font-semibold mb-4 text-center">Add Entry</h2>
 
-        <div className="mt-4">
-          {entries.map((entry, index) => (
-            <div
-              key={index}
-              className="flex justify-between items-center border p-2 mb-2 rounded"
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Category</label>
+            <select
+              value={newEntry.category}
+              onChange={(e) =>
+                setNewEntry({ ...newEntry, category: e.target.value })
+              }
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              required
             >
-              <p>
-                {entry.category} - {entry.timeSpent} mins, {entry.sessions} sessions
-              </p>
-              <button
-                onClick={() => handleRemoveEntry(index)}
-                className="text-red-600 hover:text-red-800"
+              <option value="">Select Category</option>
+              <option value="Social Media">Social Media</option>
+              <option value="Productivity">Productivity</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">
+              Time Spent (mins)
+            </label>
+            <input
+              type="number"
+              value={newEntry.timeSpent}
+              onChange={(e) =>
+                setNewEntry({ ...newEntry, timeSpent: e.target.value })
+              }
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Add Entry
+          </button>
+        </form>
+
+        {/* Display Added Entries */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4 text-center">Entries</h2>
+          {entries.length > 0 ? (
+            entries.map((entry, index) => (
+              <div
+                key={index}
+                className="flex justify-between items-center border p-2 mb-2 rounded"
               >
-                Remove
-              </button>
-            </div>
-          ))}
+                <p>
+                  {entry.category} - {entry.timeSpent} mins
+                </p>
+                <button
+                  onClick={() => handleRemoveEntry(index)}
+                  className="text-red-600 hover:text-red-800"
+                >
+                  Remove
+                </button>
+              </div>
+            ))
+          ) : (
+            <p className="text-center text-gray-500">No entries added yet.</p>
+          )}
         </div>
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Date</label>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            required
-          />
-        </div>
+        {/* Second Form: Submit Entries */}
+        <form onSubmit={handleSubmit}>
+          <h2 className="text-2xl font-semibold mb-4 text-center">Submit Entries</h2>
 
-        {loading && <LoadingSpinner />}
-        <button
-          type="submit"
-          className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          disabled={loading}
-        >
-          {loading ? "Submitting..." : "Submit"}
-        </button>
-      </form>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Date</label>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              required
+            />
+          </div>
+
+          {loading && <LoadingSpinner />}
+          <button
+            type="submit"
+            className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            disabled={loading}
+          >
+            {loading ? "Submitting..." : "Submit"}
+          </button>
+        </form>
+      </div>
+
 
       {/* Display Graph */}
       <div className="mt-10 mx-auto max-w-[1000px]">

@@ -208,17 +208,19 @@ const TodoList = () => {
   
       return (
         <Tr key={todo.task_name} className="border border-blue-300">
+          {/* Task Name */}
           <Td className="border border-blue-300 px-4 py-2">
             {editingTask === todo.task_name ? (
               <input
                 type="text"
                 value={editingValue}
                 onChange={(e) => setEditingValue(e.target.value)}
-                onBlur={() => {
-                  if (editingValue !== todo.task_name) {
+                onBlur={(e) => {
+                  // Ensure blur doesn't immediately close edit mode
+                  if (!e.relatedTarget || e.relatedTarget.tagName !== "INPUT") {
                     editTask(todo.task_name, editingValue, editingDate || todo.due_date);
+                    setEditingTask(null);
                   }
-                  setEditingTask(null);
                 }}
                 autoFocus
               />
@@ -239,19 +241,43 @@ const TodoList = () => {
               </div>
             )}
           </Td>
-          <Td className={`border border-blue-300 px-4 py-2 ${isOverdue ? "text-red-500 font-semibold" : ""}`}>
+  
+          {/* Due Date */}
+          <Td
+            className={`border border-blue-300 px-4 py-2 ${
+              isOverdue ? "text-red-500 font-semibold" : ""
+            }`}
+          >
             {editingTask === todo.task_name ? (
-              <input
-                type="date"
-                value={editingDate}
-                onChange={(e) => setEditingDate(e.target.value)}
-                onBlur={() => {
-                  if (editingDate !== todo.due_date) {
+              <div>
+                <input
+                  type="date"
+                  value={editingDate}
+                  onChange={(e) => setEditingDate(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      editTask(todo.task_name, editingValue, editingDate);
+                      setEditingTask(null);
+                    }
+                  }}
+                  onBlur={(e) => {
+                    // Prevent premature blur if Save button or date input is clicked
+                    if (!e.relatedTarget || e.relatedTarget.tagName !== "BUTTON") {
+                      editTask(todo.task_name, editingValue, editingDate);
+                      setEditingTask(null);
+                    }
+                  }}
+                />
+                <button
+                  onClick={() => {
                     editTask(todo.task_name, editingValue, editingDate);
-                  }
-                  setEditingTask(null);
-                }}
-              />
+                    setEditingTask(null);
+                  }}
+                  className="ml-2 px-2 py-1 text-sm text-white bg-blue-600 rounded"
+                >
+                  Save
+                </button>
+              </div>
             ) : (
               <div
                 onDoubleClick={() => {
@@ -264,11 +290,15 @@ const TodoList = () => {
               </div>
             )}
           </Td>
+  
+          {/* Priority */}
           <Td align="center">
             <IconButton onClick={() => updatePriority(todo.task_name)}>
               <StarIcon style={{ color: todo.priority ? "#1e90ff" : "#b3b3b3" }} />
             </IconButton>
           </Td>
+  
+          {/* Actions */}
           {showActions && (
             <Td align="center" className="border border-blue-300">
               <IconButton onClick={() => deleteTodo(todo.task_name)} color="error">

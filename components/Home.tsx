@@ -1,46 +1,46 @@
+"use client"
+
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import './global.css';
 
 
 const Home = () => {
+  const router = useRouter()
   return (
     <div className="min-h-screen bg-gradient-to-b from-white  to-gray-100 mt-16 mx-4 flex flex-col items-center">
       {/* Header */}
       <div className="min-h-[90vh] w-full bg-gradient-to-b from-white to-gray-100 flex flex-col items-center relative overflow-hidden">
-  {/* Floating Elements with Different Blue Shades */}
-  <div className="absolute lg:top-14 lg:left-28 lg:w-28 lg:h-28 top-10 left-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-300 via-blue-600 to-blue-950 w-24 h-24 rounded-full animate-floatUpDown shadow-lg"></div>
-  <div className="absolute lg:h-36 lg:w-36 top-20 right-20 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-300 via-blue-600 to-blue-950 w-20 h-20 rounded-full animate-floatUpDown shadow-lg"></div>
-  <div className="absolute lg:h-36 lg:w-36 bottom-36 right-40 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-300 via-blue-600 to-blue-950 w-20 h-20 rounded-full animate-floatUpDown shadow-lg"></div>
-  <div className="absolute bottom-12 lg:bottom-10 left-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-300 via-blue-600 to-blue-950 w-36 h-36 rounded-full animate-floatUpDown shadow-lg"></div>
-  <div className="absolute lg:h-28 lg:w-28 bottom-20 right-12 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-300 via-blue-600 to-blue-950 w-28 h-28 rounded-full animate-floatUpDown shadow-lg"></div>
-  <div className="absolute lg:w-38 lg:h-38 lg:top-32 lg:left-56 top-28 left-28 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-300 via-blue-600 to-blue-950 w-32 h-32 rounded-full animate-floatUpDown shadow-lg"></div>
+        {/* Floating Elements with Different Blue Shades */}
+        <div className="absolute lg:top-14 lg:left-28 lg:w-28 lg:h-28 top-10 left-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-300 via-blue-600 to-blue-950 w-24 h-24 rounded-full animate-floatUpDown shadow-lg"></div>
+        <div className="absolute lg:h-36 lg:w-36 top-20 right-20 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-300 via-blue-600 to-blue-950 w-20 h-20 rounded-full animate-floatUpDown shadow-lg"></div>
+        <div className="absolute lg:h-36 lg:w-36 bottom-36 right-40 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-300 via-blue-600 to-blue-950 w-20 h-20 rounded-full animate-floatUpDown shadow-lg"></div>
+        <div className="absolute bottom-12 lg:bottom-10 left-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-300 via-blue-600 to-blue-950 w-36 h-36 rounded-full animate-floatUpDown shadow-lg"></div>
+        <div className="absolute lg:h-28 lg:w-28 bottom-20 right-12 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-300 via-blue-600 to-blue-950 w-28 h-28 rounded-full animate-floatUpDown shadow-lg"></div>
+        <div className="absolute lg:w-38 lg:h-38 lg:top-32 lg:left-56 top-28 left-28 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-300 via-blue-600 to-blue-950 w-32 h-32 rounded-full animate-floatUpDown shadow-lg"></div>
 
-  {/* Header Section */}
-  <header className="z-10 flex flex-col justify-center items-center h-[90vh] text-center px-4">
-  <h1 className="text-[45px] md:text-[60px] font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-800 to-blue-700 leading-tight relative">
-    <span className="absolute inset-0 bg-white/50 rounded-lg blur-md -z-10"></span>
-    Welcome to Your <br />
-    <span className="text-blue-900 relative">Digital Detox Journey</span>
-  </h1>
-  <p className="relative text-lg md:text-xl text-gray-600 font-medium mt-4 max-w-lg">
-    <span className="absolute inset-0 bg-white/50 rounded-lg blur-md -z-10"></span>
-    Take control of your screen time and build healthier habits today.
-  </p>
-  <button className="relative mt-6 px-6 py-3 bg-gradient-to-r from-blue-700 to-blue-500 text-white text-lg font-semibold rounded-full shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-200 ease-in-out">
-    <Link href="/info">Get Started</Link>
-  </button>
-</header>
+        {/* Header Section */}
+        <header className="flex flex-col justify-center items-center h-[90vh] text-center px-4">
+          <h1 className="text-[45px] md:text-[60px] font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-800 to-blue-700 leading-tight">
+            Welcome to Your <br />
+            <span className="text-blue-900">Digital Detox Journey</span>
+          </h1>
+          <p className="text-lg md:text-xl text-gray-600 font-medium mt-4 max-w-lg">
+            Take control of your screen time and build healthier habits today.
+          </p>
+          <button className="mt-6 px-6 py-3 bg-gradient-to-r from-blue-700 to-blue-500 text-white text-lg font-semibold rounded-full shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-200 ease-in-out"
+            onClick={() => router.push('/info')}
+          >
+            Get Started</button>
+        </header>
 
-
-
-
-  {/* Footer Section */}
-  <footer className="absolute bottom-5 text-gray-500 text-sm">
-    <pre>© 2024 Digital Detox. All rights reserved.</pre>
-  </footer>
-</div>
+        {/* Footer Section */}
+        <footer className="absolute bottom-5 text-gray-500 text-sm">
+          <pre>© 2023 Digital Detox. All rights reserved.</pre>
+        </footer>
+      </div>
 
       {/* Features Section */}
       <section className="my-20 w-full max-w-6xl px-6">
@@ -79,12 +79,11 @@ const Home = () => {
       {/* Daily Stats Summary */}
       <section className="my-16 bg-white shadow-md rounded-xl p-8 text-center max-w-lg mx-auto">
         <h2 className="text-2xl font-bold text-gray-800">
-          Today's Screen Time:
+          Add Today's Screen Time
         </h2>
-        <p className="text-4xl text-blue-600 font-extrabold mt-2">3 hours</p>
         <Link href="/tracker">
           <button className="mt-6 px-10 py-2 bg-blue-600 text-white rounded-full shadow-md hover:bg-blue-700 transition-all duration-300">
-            Check Usage
+            Check And Add Usage
           </button>
         </Link>
       </section>
