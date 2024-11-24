@@ -197,11 +197,11 @@ const Track = () => {
   };
 
   return (
-    <div>
+    <div className="my-20">
       {/* Form for screen time tracking */}
       <form
         onSubmit={handleSubmit}
-        className="max-w-md my-20 mx-auto p-6 bg-white shadow-md rounded-lg"
+        className="max-w-md mt-28 mb-20 mx-auto p-6 bg-white shadow-md rounded-lg"
       >
         <h2 className="text-2xl font-semibold mb-4 text-center">
           Track Screen Time
