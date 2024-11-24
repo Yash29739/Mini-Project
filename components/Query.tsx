@@ -124,7 +124,7 @@ const Query = () => {
     }
   };
 
-  const handleFeedback = async (e : any) => {
+  const handleFeedback = async (e: any) => {
     e.preventDefault();
     setIsSubmitting(true);
 
@@ -198,7 +198,7 @@ const Query = () => {
     const fetchSurveyResponses = async () => {
       setIsLoading(true);
 
-      if(!isLoggedIn){
+      if (!isLoggedIn) {
         router.push("/login")
       }
 
@@ -326,36 +326,47 @@ const Query = () => {
                 className="bg-red-600 inline-flex text-white py-2 px-4 rounded-md hover:bg-red-700"
                 onClick={handleEdit}
               >
-                <FaRegEdit className={"h-5 w-5 mr-2"}/><span>Edit</span>
+                <FaRegEdit className={"h-5 w-5 mr-2"} /><span>Edit</span>
               </button>
             </div>
           </div>
         </div>
       )}
       <ToastContainer />
-      <div className="flex justify-center rounded-lg mx-10 border flex-col items-center">
-        <p className="text-[30px] text-ellipsis mt-4 font-serif text-center">AI Suggestions</p>
+      <div className="flex justify-center rounded-lg mx-10 border flex-col items-center p-6 bg-gray-100 shadow-lg">
+        <p className="text-[36px] font-serif mt-4 text-center text-indigo-600">
+          ML Suggestions
+        </p>
         <button
-          className="bg-blue-600 text-white my-4 py-2 px-4 rounded-md w-[250px] hover:bg-blue-700"
+          className="bg-blue-600 text-white my-4 py-3 px-5 rounded-lg w-[250px] text-lg hover:bg-blue-700 transition-all duration-200"
           onClick={requestML}
         >
-          Get some Suggestions
+          Get Some Suggestions
         </button>
         {ml ? (
           <div className="mb-10">
             <DotLoader />
           </div>
         ) : (
-          <span className="my-5 font-serif m-10">
-            <div className="text-center">
-              <TextGenerateEffect words={mlResponse} duration={2} className="text-[20px] text-black text-center" />
+          <div className="my-6 font-serif w-full max-w-[800px]">
+            <div className="text-center mb-4">
+              <TextGenerateEffect
+                words={mlResponse}
+                duration={2}
+                className="text-[24px] text-gray-800 text-center"
+              />
             </div>
-            {suggestions.map((i, index) => (
-              <div key={index} className="my-2 p-5">{i}</div>
-            ))}
-          </span>
+            <ul className="list-disc list-inside space-y-4 text-[22px] text-gray-700">
+              {suggestions.map((i, index) => (
+                <li key={index} className="leading-relaxed">
+                  {i}
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
+
 
       <div className="flex flex-col lg:my-10 lg:mx-40 mx-10 my-10 space-y-8 items-center p-10 bg-gradient-to-r from-blue-50 via-white to-blue-100 rounded-lg shadow-lg">
         <p className="text-[25px] lg:text-[30px] font-serif font-extrabold text-blue-800">Provide Feedback</p> <div className="flex space-x-3">
@@ -368,9 +379,8 @@ const Query = () => {
           ].map((emoji) => (
             <button
               key={emoji.title}
-              className={`transition transform hover:scale-110 focus:outline-none rounded-full ${
-                feedbackReaction === emoji.title ? "border border-yellow-500 scale-125" : ""
-              }`}
+              className={`transition transform hover:scale-110 focus:outline-none rounded-full ${feedbackReaction === emoji.title ? "border border-yellow-500 scale-125" : ""
+                }`}
               onClick={() => setFeedbackReaction(emoji.title)}
               title={emoji.title}
             >
