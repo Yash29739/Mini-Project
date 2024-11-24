@@ -73,17 +73,84 @@ const Query = () => {
   const router = useRouter();
 
   const questions = [
-    { question: "How many hours per day do you spend on screens?", responseKey: "screenTime" },
-    { question: "What is your most frequent screen activity?", responseKey: "screenActivity" },
-    { question: "How much time do you spend on social media each day?", responseKey: "socialMediaTime" },
-    { question: "Which strategy would you consider to reduce social media usage?", responseKey: "socialMediaStrategy" },
-    { question: "How much of your screen time is work-related?", responseKey: "workScreenTime" },
-    { question: "Would you be open to scheduling tech-free work breaks throughout the day?", responseKey: "workTimeBreaks" },
-    { question: "What is your primary goal for a digital detox?", responseKey: "primaryGoal" },
-    { question: "Which activities do you want to prioritize 1st during your detox?", responseKey: "activityPriority" },
-    { question: "What do you find most challenging about reducing your screen time?", responseKey: "challengingTask" },
-    { question: "What would help you stick to a detox plan?", responseKey: "whatHelp" },
+    {
+      question: "How many hours per day do you spend on screens?",
+      responseKey: "screenTime",
+      options: ["Less than 2 hours", "2-4 hours", "4-6 hours", "More than 6 hours"],
+    },
+    {
+      question: "What is your most frequent screen activity?",
+      responseKey: "screenActivity",
+      options: ["Social media", "Work-related tasks", "Streaming services", "Gaming"],
+    },
+    {
+      question: "How much time do you spend on social media each day?",
+      responseKey: "socialMediaTime",
+      options: ["Less than 1 hour", "1-2 hours", "2-4 hours", "More than 4 hours"],
+    },
+    {
+      question: "Which strategy would you consider to reduce social media usage?",
+      responseKey: "socialMediaStrategy",
+      options: [
+        "Disable notifications",
+        "Set daily limits on apps",
+        "Use social media only at set times",
+        "Take a break from social media",
+      ],
+    },
+    {
+      question: "How much of your screen time is work-related?",
+      responseKey: "workScreenTime",
+      options: ["None", "less than 2 hours", "2-4 hours", "More than 4 hours"],
+    },
+    {
+      question: "Would you be open to scheduling tech-free work breaks throughout the day?",
+      responseKey: "workTimeBreaks",
+      options: ["Yes", "No"],
+    },
+    {
+      question: "What is your primary goal for reducing screen time?",
+      responseKey: "primaryGoal",
+      options: [
+        "Reduce stress",
+        "Improve sleep quality",
+        "Increase focus/productivity",
+        "Improve mental well-being",
+      ],
+    },
+    {
+      question: "What activities would you prioritize during reduced screen time?",
+      responseKey: "activityPriority",
+      options: [
+        "Physical exercise",
+        "Spending time with family/friends",
+        "Reading",
+        "Meditation/mindfulness",
+        "Outdoor activities",
+      ],
+    },
+    {
+      question: "What do you find most challenging about reducing your screen time?",
+      responseKey: "challengingTask",
+      options: [
+        "Work requirements",
+        "Social media habits",
+        "Entertainment",
+        "Habitual device checking",
+      ],
+    },
+    {
+      question: "What would help you stick to a detox plan?",
+      responseKey: "whatHelp",
+      options: [
+        "Daily reminders/notifications",
+        "Clear goals and progress tracking",
+        "Accountability from others",
+        "Rewards for milestones reached",
+      ],
+    },
   ];
+
 
   const requestML = async () => {
     setMl(true);
@@ -261,25 +328,29 @@ const Query = () => {
               />
               <h1 className="text-2xl font-bold mb-6 text-center">Survey</h1>
               <form onSubmit={handleSubmit} className="space-y-8">
-                {questions.map((item, index) => (
-                  <div key={index}>
-                    <h2 className="text-xl font-semibold mb-4">{index + 1}. {item.question}</h2>
-                    <div className="space-y-2">
-                      {["Less than 2 hours", "2-4 hours", "4-6 hours", "More than 6 hours"].map((option) => (
-                        <label key={option} className="flex items-center">
-                          <input
-                            type="radio"
-                            name={item.responseKey}
-                            value={option}
-                            onChange={handleChange}
-                            className="mr-2"
-                          />
-                          {option}
-                        </label>
-                      ))}
+                <div>
+                  {questions.map((item, index) => (
+                    <div key={index}>
+                      <h2 className="text-xl font-semibold mb-4">
+                        {index + 1}. {item.question}
+                      </h2>
+                      <div className="space-y-2">
+                        {item.options.map((option) => (
+                          <label key={option} className="flex items-center">
+                            <input
+                              type="radio"
+                              name={item.responseKey}
+                              value={option}
+                              onChange={handleChange}
+                              className="mr-2"
+                            />
+                            {option}
+                          </label>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
                 <div className="text-center">
                   <button
                     type="submit"
