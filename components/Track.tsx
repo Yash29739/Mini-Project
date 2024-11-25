@@ -10,7 +10,7 @@ import { useLogin } from "@/context/LoginContext";
 
 interface Entry {
   category: string;
-  timeSpent: number;
+  timeSpent: number; // In hours
 }
 
 const Track = () => {
@@ -221,7 +221,7 @@ const Track = () => {
 
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">
-              Time Spent (mins)
+              Time Spent (hrs)
             </label>
             <input
               type="number"
@@ -252,7 +252,7 @@ const Track = () => {
                 className="flex justify-between items-center border p-2 mb-2 rounded"
               >
                 <p>
-                  {entry.category} - {entry.timeSpent} mins
+                  {entry.category} - {entry.timeSpent.toFixed(2)} hrs
                 </p>
                 <button
                   onClick={() => handleRemoveEntry(index)}
@@ -293,13 +293,12 @@ const Track = () => {
         </form>
       </div>
 
-
       {/* Display Graph */}
       <div className="mt-10 mx-auto max-w-[1000px]">
         <p className="text-center font-semibold text-[30px] mb-8">
           Screen Time Usage
         </p>
-        <ScreenTimeGraph refreshGraph={refreshGraph} limitedUsage={limitUsage * 60} />
+        <ScreenTimeGraph refreshGraph={refreshGraph} limitedUsage={limitUsage} />
       </div>
 
       {/* Edit Screen Time Limit */}
