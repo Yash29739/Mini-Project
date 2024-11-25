@@ -286,6 +286,7 @@ const Query = () => {
         }
       } catch (error) {
         console.log("Error fetching survey responses: " + error);
+        toast.error("Internal server error");
       } finally {
         setIsLoading(false);
         setSurveyVisible(false);
