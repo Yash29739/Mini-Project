@@ -367,7 +367,12 @@ const TodoList = () => {
           <Tbody>{renderTasks(todos.filter((todo) => todo.status), false)}</Tbody>
         </Table>
       </details>
-      {loading && <LoadingCursor w={50} h={50} />}
+      {loading && (
+  <div className="flex justify-center items-center w-full h-full">
+    <LoadingCursor w={250} h={250} />
+  </div>
+)}
+
       <ToastContainer />
     </div>
   );
