@@ -257,6 +257,7 @@ const Query = () => {
       toast.error("An error occurred: " + error);
     } finally {
       setIsSaving(false);
+      setIsEditing(false);
       setSurveyVisible(false);
     }
   };

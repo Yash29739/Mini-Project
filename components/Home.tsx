@@ -22,19 +22,21 @@ const Home = () => {
         <div className="absolute lg:w-38 lg:h-38 lg:top-32 lg:left-56 top-28 left-28 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-300 via-blue-600 to-blue-950 w-32 h-32 rounded-full animate-floatUpDown shadow-lg"></div>
 
         {/* Header Section */}
-        <header className="flex flex-col justify-center items-center h-[90vh] text-center px-4">
-          <h1 className="text-[45px] md:text-[60px] font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-800 to-blue-700 leading-tight">
-            Welcome to Your <br />
-            <span className="text-blue-900">Digital Detox Journey</span>
-          </h1>
-          <p className="text-lg md:text-xl text-gray-600 font-medium mt-4 max-w-lg">
-            Take control of your screen time and build healthier habits today.
-          </p>
-          <button className="mt-6 px-6 py-3 bg-gradient-to-r from-blue-700 to-blue-500 text-white text-lg font-semibold rounded-full shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-200 ease-in-out"
-            onClick={() => router.push('/info')}
-          >
-            Get Started</button>
-        </header>
+        <header className="z-10 flex flex-col justify-center items-center h-[90vh] text-center px-4">
+  <h1 className="text-[45px] md:text-[60px] font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-800 to-blue-700 leading-tight relative">
+    <span className="absolute inset-0 bg-white/50 rounded-lg blur-md -z-10"></span>
+    Welcome to Your <br />
+    <span className="text-blue-900 relative">Digital Detox Journey</span>
+  </h1>
+  <p className="relative text-lg md:text-xl text-gray-600 font-medium mt-4 max-w-lg">
+    <span className="absolute inset-0 bg-white/50 rounded-lg blur-md -z-10"></span>
+    Take control of your screen time and build healthier habits today.
+  </p>
+  <button className="relative mt-6 px-6 py-3 bg-gradient-to-r from-blue-700 to-blue-500 text-white text-lg font-semibold rounded-full shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-200 ease-in-out">
+    <Link href={'/info'}> Get Started </Link>
+  </button>
+</header>
+
 
         {/* Footer Section */}
         <footer className="absolute bottom-5 text-gray-500 text-sm">
