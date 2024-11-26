@@ -1,19 +1,15 @@
 "use client";
+
 import { useLogin } from "@/context/LoginContext";
 import React, { useState } from "react";
 import { FaUser } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-const regexPatterns = {
-  username: /^[a-zA-Z0-9_]{3,}$/,
-  password: /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z0-9.+_%]{6,}$/,
-  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-};
 
 const LogIn = () => {
   const [formType, setFormType] = useState<"login" | "signup">("login");
@@ -25,6 +21,12 @@ const LogIn = () => {
   const [loading, setLoading] = useState(false);
   const { setIsLoggedIn } = useLogin();
   const router = useRouter();
+
+  const regexPatterns = {
+    username: /^[a-zA-Z0-9_]{3,}$/, // At least 3 characters, alphanumeric
+    password: /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z0-9.+_%]{6,}$/, // 6+ characters, with letters and numbers
+    email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Valid email format
+  };
 
   const validateInput = (): string | null => {
     const { username, email, password } = formData;
@@ -140,9 +142,16 @@ const LogIn = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full h-12 text-white bg-blue-600 hover:bg-blue-500 border-2 border-gray-400 rounded-full"
+          className="w-full h-12 text-white bg-blue-600 hover:bg-blue-500 border-2 border-gray-400 rounded-full flex justify-center items-center"
         >
-          {loading ? <LoadingSpinner /> : formType === "login" ? "Log In" : "Sign Up"}
+          {loading ? (
+            <>
+              <FontAwesomeIcon icon={faSpinner} spin className="text-white" />
+              <span className="ml-2">{formType === "login" ? "Logging-In...":"Registering..."}</span>
+            </>
+          ) : (
+            formType === "login" ? "Log In" : "Sign Up"
+          )}
         </button>
       </form>
 

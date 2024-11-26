@@ -65,7 +65,7 @@ const Query = () => {
     challengingTask: "",
     whatHelp: "",
   });
-
+  const surveyHeadingRef = useRef<HTMLHeadingElement>(null); // Create a ref for the heading
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isMounted = useRef(true);
@@ -250,6 +250,8 @@ const Query = () => {
         }
         setIsEditing(false);
         toast.success("Submission successful");
+        fetchSurveyResponses();
+
       } else {
         toast.error("Submission error");
       }
@@ -262,37 +264,36 @@ const Query = () => {
     }
   };
 
+  const fetchSurveyResponses = async () => {
+    setIsLoading(true);
+
+    if (!isLoggedIn) {
+      router.push("/login")
+    }
+
+    try {
+      const response = await fetch("https://digital-detox-y73b.onrender.com/survey", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      const result = await response.json();
+      if (result && result.foundSurvey.responses) {
+        setResponses(result.foundSurvey.responses);
+        setCluster(result.foundSurvey.cluster);
+      }
+    } catch (error) {
+      console.log("Error fetching survey responses: " + error);
+      // toast.error("Internal server error");
+    } finally {
+      setIsLoading(false);
+      setSurveyVisible(false);
+    }
+  };
   useEffect(() => {
-    const fetchSurveyResponses = async () => {
-      setIsLoading(true);
-
-      if (!isLoggedIn) {
-        router.push("/login")
-      }
-
-      try {
-        const response = await fetch("https://digital-detox-y73b.onrender.com/survey", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        });
-
-        const result = await response.json();
-        if (result && result.foundSurvey.responses) {
-          setResponses(result.foundSurvey.responses);
-          setCluster(result.foundSurvey.cluster);
-        }
-      } catch (error) {
-        console.log("Error fetching survey responses: " + error);
-        toast.error("Internal server error");
-      } finally {
-        setIsLoading(false);
-        setSurveyVisible(false);
-      }
-    };
-
     fetchSurveyResponses();
     return () => {
       isMounted.current = false;
@@ -306,14 +307,17 @@ const Query = () => {
 
   const toggleSurvey = () => setSurveyVisible(!isSurveyVisible);
   const handleEdit = () => {
+    surveyHeadingRef.current?.scrollIntoView({ behavior: "smooth" });
+
+    // Set survey visibility and edit state
     setIsEditing(true);
     setSurveyVisible(true);
   };
 
   return (
-    <div>
-      <div className="flex justify-center items-center mb-16 mt-20 bg-blue-50">
-        <div className="w-full my-5 max-w-2xl mx-4">
+    <div ref={surveyHeadingRef}>
+      <div className="flex justify-center items-center mb-16 mt-20 bg-blue-50" >
+        <div className="w-full my-5 max-w-2xl mx-4"  >
           {!isSurveyVisible && (
             <button
               onClick={toggleSurvey}
@@ -328,7 +332,7 @@ const Query = () => {
                 onClick={toggleSurvey}
                 className="text-3xl text-red-600 absolute top-4 right-4 cursor-pointer hover:text-red-800"
               />
-              <h1 className="text-2xl font-bold mb-6 text-center">Survey</h1>
+              <h1 className="text-2xl font-bold mb-6 text-center" >Survey</h1>
               <form onSubmit={handleSubmit} className="space-y-8">
                 <div>
                   {questions.map((item, index) => (
@@ -411,11 +415,14 @@ const Query = () => {
           ML Suggestions
         </p>
         <button
-          className="bg-blue-600 text-white my-4 py-3 px-5 rounded-lg w-[250px] text-lg hover:bg-blue-700 transition-all duration-200"
-          onClick={requestML}
-        >
-          Get Some Suggestions
-        </button>
+  className={`bg-blue-600 text-white my-4 py-3 px-5 rounded-lg w-[250px] text-lg ${
+    ml ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700 transition-all duration-200"
+  }`}
+  onClick={requestML}
+  disabled={ml}
+>
+  {ml ? "Getting ML Suggestions..." : "Get Some Suggestions"}
+</button>
         {ml ? (
           <div className="mb-10">
             <DotLoader />
