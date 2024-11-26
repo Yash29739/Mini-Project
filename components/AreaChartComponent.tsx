@@ -33,7 +33,10 @@ interface ScreenTimeGraphProps {
   limitedUsage: number; // Passed from parent component, in hours
 }
 
-const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, limitedUsage }) => {
+const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({
+  refreshGraph,
+  limitedUsage,
+}) => {
   const [state, setState] = useState<{
     loading: boolean;
     data: ScreenTimeData[];
@@ -42,18 +45,24 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, limited
     data: [],
   });
 
-  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
-  const [startDate, endDate] = dateRange;
-
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+    null,
+    null,
+  ]);
+  const [startDate, setStartDate] = useState<string | null>(null);
+  const [endDate, setEndDate] = useState<string | null>(null);
   // Fetch data from backend
   const fetchData = useCallback(async () => {
     setState((prev) => ({ ...prev, loading: true }));
     try {
-      const response = await fetch("https://digital-detox-y73b.onrender.com/tracker", {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-      });
+      const response = await fetch(
+        "https://digital-detox-y73b.onrender.com/tracker",
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }
+      );
 
       const result = await response.json();
       const groupedData = groupByDate(result.data);
@@ -80,7 +89,9 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, limited
     data.forEach((entry) => {
       const existing = grouped.get(entry.date) || [];
       entry.entries.forEach((subEntry) => {
-        const existingCategory = existing.find((e) => e.category === subEntry.category);
+        const existingCategory = existing.find(
+          (e) => e.category === subEntry.category
+        );
         if (existingCategory) {
           existingCategory.timeSpent += subEntry.timeSpent; // Now in hours
         } else {
@@ -93,6 +104,22 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, limited
     return Array.from(grouped.entries())
       .map(([date, entries]) => ({ date, entries }))
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  };
+
+  const filteredData = useMemo(() => {
+    if (!startDate || !endDate) return state.data;
+    return state.data.filter((entry) => {
+      const entryDate = new Date(entry.date);
+      return entryDate >= new Date(startDate) && entryDate <= new Date(endDate);
+    });
+  }, [state.data, startDate, endDate]);
+
+  const handleFilterData = () => {
+    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+      alert("Start date cannot be after end date.");
+      return;
+    }
+    fetchData(); // Refresh data based on date range
   };
 
   // Calculate total time
@@ -129,15 +156,17 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, limited
   };
 
   const monthlyStats = useMemo(() => getRangeStats("monthly"), [state.data]);
-  const weeklyStats = useMemo(() => getRangeStats("weekly"), [state.data])
-
+  const weeklyStats = useMemo(() => getRangeStats("weekly"), [state.data]);
 
   const getCategoryWiseData = () => {
     const categoryData: Record<string, number> = {};
 
-    state.data.flatMap((entry) => entry.entries).forEach((subEntry) => {
-      categoryData[subEntry.category] = (categoryData[subEntry.category] || 0) + subEntry.timeSpent;
-    });
+    state.data
+      .flatMap((entry) => entry.entries)
+      .forEach((subEntry) => {
+        categoryData[subEntry.category] =
+          (categoryData[subEntry.category] || 0) + subEntry.timeSpent;
+      });
 
     return Object.entries(categoryData).map(([category, timeSpent]) => ({
       category,
@@ -147,34 +176,33 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, limited
 
   const formatXAxisDate = (date: string) => {
     const newDate = new Date(date);
-    return newDate.toLocaleDateString("en-US", { day: "numeric", month: "short" });
+    return newDate.toLocaleDateString("en-US", {
+      day: "numeric",
+      month: "short",
+    });
   };
 
-  // Filter data by date range
-  const filteredData = useMemo(() => {
-    if (!startDate || !endDate) return state.data;
-    return state.data.filter((entry) => {
-      const entryDate = new Date(entry.date);
-      return entryDate >= startDate && entryDate <= endDate;
-    });
-  }, [state.data, startDate, endDate]);
-
   const renderAverageStats = (label: string, data: ScreenTimeData[]) => {
-    const total = data.flatMap((entry) => entry.entries).reduce((sum, e) => sum + e.timeSpent, 0);
+    const total = data
+      .flatMap((entry) => entry.entries)
+      .reduce((sum, e) => sum + e.timeSpent, 0);
     const average = total / data.length || 0;
     const percentageMessage = calculateThresholdPercentage(average);
 
     return (
       <div className="text-center">
         <p className="text-lg text-blue-600">
-          Average Screen Time {label}: {average.toFixed(2)} hours ({percentageMessage})
+          Average Screen Time {label}: {average.toFixed(2)} hours (
+          {percentageMessage})
         </p>
       </div>
     );
   };
 
   const renderDailyTotalStats = (data: ScreenTimeData[]) => {
-    const totalTime = data.flatMap((entry) => entry.entries).reduce((sum, e) => sum + e.timeSpent, 0);
+    const totalTime = data
+      .flatMap((entry) => entry.entries)
+      .reduce((sum, e) => sum + e.timeSpent, 0);
 
     return (
       <div className="text-center">
@@ -217,6 +245,27 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, limited
             {renderAverageStats("This Month", monthlyStats)}
           </div>
 
+          <div className="flex flex-wrap gap-4 justify-center bg-blue-50 py-10 px-5">
+            <label className="flex items-center">
+              From:
+              <input
+                type="date"
+                value={startDate || ""}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="ml-2 px-2 py-1 border rounded"
+              />
+            </label>
+            <label className="flex items-center">
+              To:
+              <input
+                type="date"
+                value={endDate || ""}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="ml-2 px-2 py-1 border rounded"
+              />
+            </label>
+          </div>
+
           {/* Total Screen Time */}
           <div className="bg-white p-5 rounded-lg shadow-lg mb-5">
             <h2 className="text-xl font-semibold text-center text-blue-700">
@@ -233,7 +282,12 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, limited
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="date"
-                  tickFormatter={formatXAxisDate}
+                  tickFormatter={(date) =>
+                    new Date(date).toLocaleDateString("en-US", {
+                      day: "numeric",
+                      month: "short",
+                    })
+                  }
                   angle={-45}
                   textAnchor="end"
                   height={80}
@@ -246,7 +300,7 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, limited
                   dataKey="threshold"
                   stroke="red"
                   dot={false}
-                  isAnimationActive={false}
+                  isAnimationActive={true}
                 />
               </BarChart>
             </ResponsiveContainer>
@@ -255,7 +309,7 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, limited
           {/* Category-Wise Distribution */}
           <div className="bg-white p-5 rounded-lg shadow-lg">
             <h2 className="text-xl font-semibold text-center text-blue-700">
-              Category-Wise Distribution
+              Category-Wise Dsistribution
             </h2>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
@@ -275,8 +329,8 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({ refreshGraph, limited
                         index % 3 === 0
                           ? "#4C9FEF"
                           : index % 3 === 1
-                            ? "#6CC8FF"
-                            : "#F2A900"
+                          ? "#6CC8FF"
+                          : "#F2A900"
                       }
                     />
                   ))}
