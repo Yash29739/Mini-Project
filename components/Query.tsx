@@ -428,7 +428,7 @@ const Query = () => {
             <DotLoader />
           </div>
         ) : (
-          <div className="my-6 font-serif w-full max-w-[800px]">
+          <div className="my-6 font-serif w-full  max-w-[800px]">
             <div className="text-center mb-4">
               <TextGenerateEffect
                 words={mlResponse}

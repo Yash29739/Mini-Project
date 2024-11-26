@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import ScreenTimeGraph from "@/components/AreaChartComponent";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -15,10 +15,6 @@ interface Entry {
 
 const Track = () => {
   const [entries, setEntries] = useState<Entry[]>([]);
-  const [newEntry, setNewEntry] = useState({
-    category: "",
-    timeSpent: "",
-  });
   const [date, setDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [limitUsage, setLimitUsage] = useState(7); // Default screen time limit in hours
@@ -27,6 +23,13 @@ const Track = () => {
   const [refreshGraph, setRefreshGraph] = useState(false);
   const { isLoggedIn } = useLogin();
   const router = useRouter();
+  const [newEntry, setNewEntry] = useState({
+    category: "",
+    timeSpent: "",
+  });
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
 
   useEffect(() => {
     getWeeklyData();
@@ -187,6 +190,17 @@ const Track = () => {
     updateLimit();
   };
 
+  const handleFilterData = (e:React.FormEvent)=>{
+    e.preventDefault();
+    if(new Date(startDate)>new Date(endDate)){
+      toast.error("Start date cannot be after the end Date");
+      return;
+    }
+    setRefreshGraph((prev)=>!prev);
+    getWeeklyData();
+  }
+
+
   return (
     <div className="my-20">
       {/* Form for screen time tracking */}
@@ -338,3 +352,4 @@ const Track = () => {
 };
 
 export default Track;
+
