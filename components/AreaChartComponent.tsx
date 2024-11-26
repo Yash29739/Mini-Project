@@ -191,6 +191,18 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({
     );
   };
 
+  // Filter data for today's date
+  const dailyStatsData = useMemo(() => {
+    const today = new Date();
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+
+    return state.data.filter((entry) => {
+      const entryDate = new Date(entry.date);
+      return entryDate >= todayStart && entryDate < todayEnd;
+    });
+  }, [state.data]);
+
   const renderDailyTotalStats = (data: ScreenTimeData[]) => {
     const totalTime = data
       .flatMap((entry) => entry.entries)
@@ -218,7 +230,7 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({
             <h2 className="text-xl font-semibold text-center text-blue-700">
               Daily Screen Time
             </h2>
-            {renderDailyTotalStats(filteredData)}
+            {renderDailyTotalStats(dailyStatsData)}
           </div>
 
           {/* Weekly Stats */}

@@ -4,7 +4,8 @@ import React, { useEffect, useState } from "react";
 import ScreenTimeGraph from "@/components/AreaChartComponent";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import LoadingSpinner from "./LoadingSpinner";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/navigation";
 import { useLogin } from "@/context/LoginContext";
 
@@ -108,7 +109,6 @@ const Track = () => {
   const handleAddEntry = () => {
     const { category, timeSpent } = newEntry;
     const timeSpentNum = Number(timeSpent);
-
     if (isNaN(timeSpentNum) || timeSpentNum <= 0) {
       toast.error("Please enter valid time spent.");
       return;
@@ -136,6 +136,11 @@ const Track = () => {
     if (entries.length === 0) {
       toast.error("Please add at least one entry before submitting.");
       return;
+    }
+    const totalHours = entries.reduce((sum, entry) => sum + Number(entry.timeSpent), 0);
+    if(totalHours>24){
+      toast.error("Total time spent exceeds 24 hours.");
+      return
     }
 
     const selectedDate = new Date(date);
@@ -295,14 +300,12 @@ const Track = () => {
               required
             />
           </div>
-
-          {loading && <LoadingSpinner />}
           <button
             type="submit"
             className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             disabled={loading}
           >
-            {loading ? "Submitting..." : "Submit"}
+            {loading ? (<><FontAwesomeIcon icon={faSpinner} spin className="text-white" />  <span className="text-white">Submitting....</span></> ): "Submit"}
           </button>
         </form>
       </div>
