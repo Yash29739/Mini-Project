@@ -174,14 +174,6 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({
     }));
   };
 
-  const formatXAxisDate = (date: string) => {
-    const newDate = new Date(date);
-    return newDate.toLocaleDateString("en-US", {
-      day: "numeric",
-      month: "short",
-    });
-  };
-
   const renderAverageStats = (label: string, data: ScreenTimeData[]) => {
     const total = data
       .flatMap((entry) => entry.entries)
