@@ -5,7 +5,7 @@ import "../global.css";
 const About = () => {
   return (
     <div>
-      <div className="mt-20 flex p-10 flex-3 w-full flex-col space-y-9 justify-center items-center">
+      <div className="mt-20 flex p-10 flex-3 space-x-4 w-[100px] flex-col space-y-9 mx-auto justify-center items-center">
         <Card
           title="Log In"
           description="Get started by creating an account or logging in to your existing one. Access all features tailored to you."

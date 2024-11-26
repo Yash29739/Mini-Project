@@ -337,12 +337,12 @@ const Query = () => {
                 <div>
                   {questions.map((item, index) => (
                     <div key={index}>
-                      <h2 className="text-xl font-semibold mb-4">
+                      <h2 className="text-xl font-semibold mb-2">
                         {index + 1}. {item.question}
                       </h2>
-                      <div className="space-y-2">
+                      <div className="space-y-2 mb-8">
                         {item.options.map((option) => (
-                          <label key={option} className="flex items-center">
+                          <label key={option} className="flex  items-center">
                             <input
                               type="radio"
                               name={item.responseKey}

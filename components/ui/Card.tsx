@@ -12,7 +12,7 @@ interface CardProps {
 
 const Card: React.FC<CardProps> = ({ title, description, image, frontText, link, linkText }) => {
   return (
-    <div className="relative bg-blue-50 border rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105 transform group">
+    <div className="relative bg-blue-50 border rounded-lg shadow-md overflow-hidden w-[300px] lg:w-[400px] transition-transform duration-300 hover:scale-105  transform group">
       {/* Overlay Div */}
       <div className="bg-gradient-to-bl from-[#0014af] via-[#0037ff] to-[#0014af] absolute inset-0 flex items-center text-white justify-center bg-gray-100 font-serif text-4xl font-bold transition-opacity duration-300 group-hover:opacity-0 z-10">
         {frontText}
@@ -36,7 +36,7 @@ const Card: React.FC<CardProps> = ({ title, description, image, frontText, link,
           <h2 className="text-xl font-semibold px-5 text-gray-800 text-center mb-2">
             {title}
           </h2>
-          <p className="text-gray-600 w-[400px] text-sm px-5 pb-1 text-center line-clamp-3">
+          <p className="text-gray-600 w-auto text-sm px-5 pb-1 text-center">
             {description}
           </p>
           {link && (
