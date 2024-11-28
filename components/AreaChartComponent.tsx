@@ -217,6 +217,8 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({
     );
   };
 
+  const data = getCategoryWiseData()
+
   return (
     <div className="w-full h-full bg-blue-50 py-10 px-5">
       {state.loading ? (
@@ -318,7 +320,7 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={getCategoryWiseData()}
+                  data={data}
                   dataKey="timeSpent"
                   nameKey="category"
                   cx="50%"
@@ -326,7 +328,7 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({
                   outerRadius={120}
                   labelLine={false}
                 >
-                  {getCategoryWiseData().map((entry, index) => (
+                  {data.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={
@@ -341,6 +343,12 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({
                     />
                   ))}
                 </Pie>
+                {/* Tooltip to show timeSpent on hover */}
+                <Tooltip
+                  formatter={(value, name) => [`${value} hrs`, "Time Spent"]}
+                  contentStyle={{ backgroundColor: "#f4f4f4", border: "1px solid #ccc" }}
+                  itemStyle={{ color: "#333" }}
+                />
                 <Legend
                   verticalAlign="bottom"
                   align="center"
