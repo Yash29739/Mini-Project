@@ -3,12 +3,10 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import './global.css';
 
 
 const Home = () => {
-  const router = useRouter()
   return (
     <div className="min-h-screen bg-gradient-to-b from-white  to-gray-100 mt-16 mx-4 flex flex-col items-center">
       {/* Header */}
@@ -58,7 +56,7 @@ const Home = () => {
           <FeatureCard
             title="Manage Your Schedule"
             description="Set reminders and schedules for screen breaks and limit your usage."
-            image="/schedules.webp"
+            image="/schedule.webp"
           />
         </div>
       </section>
