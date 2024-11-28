@@ -330,11 +330,13 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({
                     <Cell
                       key={`cell-${index}`}
                       fill={
-                        index % 3 === 0
-                          ? "#4C9FEF"
-                          : index % 3 === 1
-                          ? "#6CC8FF"
-                          : "#F2A900"
+                        index % 4 === 0
+                          ? "#4C9FEF" // Blue
+                          : index % 4 === 1
+                            ? "#6CC8FF" // Light Blue
+                            : index % 4 === 2
+                              ? "#F2A900" // Gold
+                              : "#FF6B6B" // Coral Red
                       }
                     />
                   ))}
