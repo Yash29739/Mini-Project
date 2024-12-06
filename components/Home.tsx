@@ -53,7 +53,7 @@ const Home = () => {
           <FeatureCard
             title="Track Your Screen Time"
             description="Monitor your daily usage and stay on track with your digital detox goals."
-            image="/Time.webp"
+            image="/time.png"
           />
           <FeatureCard
             title="Manage Your Schedule"
