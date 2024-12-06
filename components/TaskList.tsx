@@ -100,6 +100,7 @@ const TodoList = () => {
 
     updateTodos([...todos, newTodo]);
 
+    // Api to store to do list
     try {
       const response = await fetch("https://digital-detox-y73b.onrender.com/toDoList", {
         method: "POST",
@@ -111,6 +112,11 @@ const TodoList = () => {
       if (!response.ok) {
         throw new Error("Failed to add task.");
       }
+
+      // Clearing the form
+      setInputValue("");
+      setDueDate("");
+
     } catch (error) {
       toast.error("An error occurred while adding the task.");
     }

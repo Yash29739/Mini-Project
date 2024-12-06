@@ -217,6 +217,8 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({
     );
   };
 
+  const data = getCategoryWiseData()
+
   return (
     <div className="w-full h-full bg-blue-50 py-10 px-5">
       {state.loading ? (
@@ -318,7 +320,7 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={getCategoryWiseData()}
+                  data={data}
                   dataKey="timeSpent"
                   nameKey="category"
                   cx="50%"
@@ -326,19 +328,27 @@ const ScreenTimeGraph: React.FC<ScreenTimeGraphProps> = ({
                   outerRadius={120}
                   labelLine={false}
                 >
-                  {getCategoryWiseData().map((entry, index) => (
+                  {data.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={
-                        index % 3 === 0
-                          ? "#4C9FEF"
-                          : index % 3 === 1
-                          ? "#6CC8FF"
-                          : "#F2A900"
+                        index % 4 === 0
+                          ? "#4C9FEF" // Blue
+                          : index % 4 === 1
+                            ? "#6CC8FF" // Light Blue
+                            : index % 4 === 2
+                              ? "#F2A900" // Gold
+                              : "#FF6B6B" // Coral Red
                       }
                     />
                   ))}
                 </Pie>
+                {/* Tooltip to show timeSpent on hover */}
+                <Tooltip
+                  formatter={(value, name) => [`${value} hrs`, "Time Spent"]}
+                  contentStyle={{ backgroundColor: "#f4f4f4", border: "1px solid #ccc" }}
+                  itemStyle={{ color: "#333" }}
+                />
                 <Legend
                   verticalAlign="bottom"
                   align="center"

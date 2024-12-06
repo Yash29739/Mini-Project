@@ -50,7 +50,7 @@ const Navbar = () => {
 
   const menuLinks = [
     { href: "/", label: "Home" },
-    { href: "/info", label: "About" },
+    { href: "/info", label: "Guide" },
     { href: "/schedules", label: "Suggestions" },
     { href: "/toDoList", label: "To-Do List" },
     { href: "/tracker", label: "Tracker" },

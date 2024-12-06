@@ -28,8 +28,6 @@ const Track = () => {
     category: "",
     timeSpent: "",
   });
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
 
 
   useEffect(() => {
@@ -109,16 +107,34 @@ const Track = () => {
   const handleAddEntry = () => {
     const { category, timeSpent } = newEntry;
     const timeSpentNum = Number(timeSpent);
+
+    // Validate time spent
     if (isNaN(timeSpentNum) || timeSpentNum <= 0) {
-      toast.error("Please enter valid time spent.");
+      toast.error("Please enter a valid time spent.");
       return;
     }
 
+    // Check for duplicate categories
     if (entries.some((entry) => entry.category === category)) {
       toast.error(`The category "${category}" has already been added.`);
       return;
     }
 
+    // Calculate the total time including the new entry
+    const totalHours = entries.reduce((sum, entry) => sum + entry.timeSpent, 0) + timeSpentNum;
+    if (totalHours > 24) {
+      toast.error("Total time spent cannot exceed 24 hours.");
+      return;
+    }
+
+    // Check category limit
+    const categories = new Set(entries.map((entry) => entry.category));
+    if (categories.size >= 4 && !categories.has(category)) {
+      toast.error("You can only have a maximum of 4 categories.");
+      return;
+    }
+
+    // Add the new entry
     setEntries((prevEntries) => [
       ...prevEntries,
       { category, timeSpent: timeSpentNum },
@@ -138,7 +154,7 @@ const Track = () => {
       return;
     }
     const totalHours = entries.reduce((sum, entry) => sum + Number(entry.timeSpent), 0);
-    if(totalHours>24){
+    if (totalHours > 24) {
       toast.error("Total time spent exceeds 24 hours.");
       return
     }
@@ -194,17 +210,6 @@ const Track = () => {
     setIsEditing(false);
     updateLimit();
   };
-
-  const handleFilterData = (e:React.FormEvent)=>{
-    e.preventDefault();
-    if(new Date(startDate)>new Date(endDate)){
-      toast.error("Start date cannot be after the end Date");
-      return;
-    }
-    setRefreshGraph((prev)=>!prev);
-    getWeeklyData();
-  }
-
 
   return (
     <div className="my-20">
@@ -305,7 +310,7 @@ const Track = () => {
             className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             disabled={loading}
           >
-            {loading ? (<><FontAwesomeIcon icon={faSpinner} spin className="text-white" />  <span className="text-white">Submitting....</span></> ): "Submit"}
+            {loading ? (<><FontAwesomeIcon icon={faSpinner} spin className="text-white" />  <span className="text-white">Submitting....</span></>) : "Submit"}
           </button>
         </form>
       </div>
